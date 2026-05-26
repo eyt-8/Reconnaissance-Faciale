@@ -7,8 +7,18 @@ import org.ejml.simple.SimpleMatrix;
  * @version 0.1
 */
 public class Comparaison {
+	/**
+	 * Matrice de l'image à l'origine 
+	 * */
 	private SimpleMatrix image;
+	/** 
+	 * Matrice déduite de la projection sur l'espace des eigenfaces (la plus proche)
+	 * Pour plus d'informations, se référer à {@link Eigenfaces}
+	 * */
 	private SimpleMatrix projete;
+	/** 
+	 * Taille de la matrice (chaque matrice image est considérée comme carrée)
+	 * */
 	private int taille;
 	
 	/** 
@@ -36,6 +46,6 @@ public class Comparaison {
 				somme = somme + Math.pow(this.image.get(i,j)-this.projete.get(i,j),2);
 			}
 		}
-		return somme;
+		return somme/taille;
 	}
 }
