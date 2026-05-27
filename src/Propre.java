@@ -1,5 +1,6 @@
+// Import des objets SimpleMatrix et SimpleEVD
 import org.ejml.simple.SimpleMatrix;
-
+import org.ejml.simple.SimpleEVD;
 
 /**
  * Classe pour la décomposition en valeurs propres
@@ -41,50 +42,53 @@ public class Propre {
 
     /**
      * Méthode permettant de fiare la décomposition de matrice à l'aide de la méthode eig de EJML
+     * Cette méthode instancie matP et matD permattant ensuite de les réustiliser
      */
-    public void decomposer(){
+    public void decomposer() {
+        // Dimension de la matrice (carrée) : n lignes = n colonnes = n valeurs propres.
         int n = matrice.numRows();
+
+        // L'objet evd contient les valeurs propres et les vecteurs propres.
         SimpleEVD<SimpleMatrix> evd = matrice.eig();
-        matP = valParFacto(matrice);
-    }
 
-    /**
-     * Méthode qui renvoie la matrice des VALEURS PROPRES (diagonale) et construit
-     * la matrice des vecteurs propres dans matP.
-     * @param matrice matrice symetrique carree a decomposer
-     * @return matrice DIAGONALE contenant les valeurs propres
-     */
-    public SimpleMatrix valParFacto(SimpleMatrix matrice){
-    int n = matrice.numRows();
- 
-    // evd contient déjà les valeurs et vecteurs propres
-    SimpleEVD<SimpleMatrix> evd = matrice.eig();
- 
-    SimpleMatrix D = new SimpleMatrix(n, n);   // diagonale des valeurs propres
-    SimpleMatrix P = new SimpleMatrix(n, n);   // vecteurs propres en colonnes
- 
-    for (int j = 0; j < n; j++) {
-        // Valeur propre j (reelle pour une matrice symetrique).
-        double lambda = evd.getEigenvalue(j).getReal();
-        D.set(j, j, lambda);
+        // D : matrice diagonale qui recevra les valeurs propres (zéros ailleurs).
+        SimpleMatrix D = new SimpleMatrix(n, n);
+        // P : matrice qui recevra les vecteurs propres, rangés en colonnes.
+        SimpleMatrix P = new SimpleMatrix(n, n);
 
-        // Vecteur propre associe (colonne n x 1). null si valeur propre complexe.
-        SimpleMatrix v = evd.getEigenVector(j);
-        if (v != null) {
-            // Normalisation (norme 1) pour une base orthonormee propre.
-            double norme = v.normF();
-            if (norme > 1e-12) {
-                v = v.divide(norme);
-            }
-            for (int i = 0; i < n; i++) {
-                P.set(i, j, v.get(i, 0));
+        // On parcourt chaque couple (valeur propre, vecteur propre), indexé par j.
+        for (int j = 0; j < n; j++) {
+
+            // Récupère la j-ème valeur propre. getReal() suffit car la matrice est
+            // symétrique : ses valeurs propres sont garanties réelles (partie
+            // imaginaire nulle), donc on ignore la composante complexe.
+            double lambda = evd.getEigenvalue(j).getReal();
+            // On place cette valeur propre sur la diagonale, en position (j, j).
+            D.set(j, j, lambda);
+
+            // Récupère le vecteur propre associé à cette valeur propre (colonne n x 1).
+            // EJML renvoie null si la valeur propre est complexe : on s'en protège.
+            SimpleMatrix v = evd.getEigenVector(j);
+            if (v != null) {
+
+                // Norme euclidienne du vecteur. On la calcule pour pouvoir normaliser :
+                // on veut une base ORTHONORMÉE (vecteurs de longueur 1), nécessaire
+                // pour que la reconstruction A = P * D * P^T fonctionne.
+                double norme = v.normF();
+                // On ne divise que si la norme n'est pas quasi nulle, pour éviter
+                // une division par zéro (1e-12 = seuil de sécurité numérique).
+                if (norme > 1e-12) v = v.divide(norme);
+
+                // Recopie composante par composante le vecteur v dans la colonne j de P.
+                // i parcourt les lignes : P[i][j] reçoit la i-ème composante de v.
+                for (int i = 0; i < n; i++) {
+                    P.set(i, j, v.get(i, 0));
+                }
             }
         }
-    }
 
-    this.matP = P;
-    this.matD = D;
-    return D;
+        this.matP = P;
+        this.matD = D;
     }
     
     /**
@@ -99,37 +103,5 @@ public class Propre {
      */
     public SimpleMatrix getMatD() {
         return matD;
-    }
-
-    /**
-     * Test sans utilisation du reste du projet
-     */
-    public static void main(String[] args) {
- 
-        // --- MATRICE DE TEST (factice) ---
-        // Symetrique 2x2. trace = 7, det = 11 => valeurs propres ~ 5.30 et 1.70.
-        double[][] data = {
-                {4.0, 1.0},
-                {1.0, 3.0}
-        };
-        SimpleMatrix test = new SimpleMatrix(data);
- 
-        System.out.println("=== Matrice de test ===");
-        test.print();
- 
-        Propre propre = new Propre(test);
-        propre.decomposer();
- 
-        System.out.println("=== matD (valeurs propres) ===");
-        propre.getMatD().print();
- 
-        System.out.println("=== matP (vecteurs propres en colonnes) ===");
-        propre.getMatP().print();
- 
-        // --- Verification : P * D * P^T doit redonner la matrice de depart ---
-        SimpleMatrix reconstruite =
-                propre.getMatP().mult(propre.getMatD()).mult(propre.getMatP().transpose());
-        System.out.println("=== Reconstruction P*D*P^T (doit ~= test) ===");
-        reconstruite.print();
     }
 }
