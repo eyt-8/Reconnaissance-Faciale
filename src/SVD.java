@@ -1,7 +1,9 @@
 /** @author : SOULEZ-DAMAZIE Soraya*/
 
+
 //On importe la classe SimpleMatrix de la bibliothèque
 import org.ejml.simple.SimpleMatrix;
+
 
 //Définition de la classe SVD
 public class SVD {
@@ -10,6 +12,19 @@ public class SVD {
     private SimpleMatrix matriceVarCov;
     private SimpleMatrix bValSinguliere;
     private SimpleMatrix vectPropATA;
+    
+    /**On crée une instance de la classe Propre
+    *SVD délègue le calcul des valeurs/vecteurs propres 
+    * à cette classe spécialisée. Cela permet de séparer la logique mathématique (EIG) 
+    * du traitement des données SVD.
+    * */
+    private Propre calculPropre;
+    
+    public SVD() {
+    	//On initialise l'objet Propre
+    	this.calculPropre = new Propre();
+    	
+    }
     
     /**On crée une instance de la classe Propre
     *SVD délègue le calcul des valeurs/vecteurs propres 
@@ -45,12 +60,14 @@ public class SVD {
         
         //On donne la matrice à la classe 'Propre'
         calculPropre.setMatrice(matriceVarCov);
+        //On donne la matrice à la classe 'Propre'
+        calculPropre.setMatrice(matriceVarCov);
         
         //La décomposition
         calculPropre.decomposer();
         
         //Récupération des résultats pour remplir les attributs de SVD
-        //matD -> valeurs singulières au carré
+        //matD -> valurs singulières au carré
         this.bValSinguliere = calculPropre.getMatD();
         
         //matP -> vecteurs propres de AtA
@@ -66,7 +83,11 @@ public class SVD {
     
     public SimpleMatrix getVectPropATA() {
     	return vectPropATA;
+    
+    public SimpleMatrix getVectPropATA() {
+    	return vectPropATA;
     }
+        
         
 }
 	
