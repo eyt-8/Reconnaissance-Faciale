@@ -1,15 +1,33 @@
+/** Importation des classes nécessaires */
 import org.ejml.simple.SimpleMatrix;
 
-// TODO : A confirmer en fonction des méthodes des autres classes
-
+/**
+ * La classe Projection effectue la projection d'images sur la base des
+ * eigenfaces et permet de reconstruire des images à partir de coordonnées
+ * dans cet espace de caractéristiques
+ *
+ * @author Maël Lescoulié
+ * @version 1.0
+ */
 public class Projection {
+    /** Les eigenfaces (base et valeurs propres) utilisées pour la projection */
     private Eigenfaces eigenfaces;
+    /** Coordonnées de la dernière projection effectuée (vecteur colonne) */
     private SimpleMatrix coords;
 
+    /**
+     * Constructeur principal de la projection
+     * @param eigenfaces objet contenant la base d'eigenfaces et le visage moyen
+     */
     public Projection(Eigenfaces eigenfaces) {
         this.eigenfaces=eigenfaces;
     }
 
+    /**
+     * Projette une image sur la base d'eigenfaces.
+     * @param img l'image à projeter
+     * @return un vecteur de coordonnées (coefficients) dans la base des eigenfaces
+     */
     public SimpleMatrix projeter(Image img) {
         SimpleMatrix vImage = img.vectoriser();
         SimpleMatrix visageMoyen = this.eigenfaces.getVisageMoyen();
@@ -19,6 +37,11 @@ public class Projection {
         return this.coords;
     }
 
+    /**
+     * Reconstruit une image à partir de coordonnées dans l'espace des eigenfaces.
+     * @param coords vecteur de coefficients dans la base des eigenfaces
+     * @return une instance d'Image reconstruite
+     */
     public Image reconstruire(SimpleMatrix coords) {
         SimpleMatrix baseEigenfaces = this.eigenfaces.getBase();
         SimpleMatrix vCentreReconstruit = coords.mult(baseEigenfaces.transpose());
@@ -28,6 +51,12 @@ public class Projection {
         return imgReconstruite;
     }
 
+    /**
+     * Calcule l'erreur de reconstruction entre deux images
+     * @param j image originale
+     * @param jp image reconstruite
+     * @return la distance (erreur) entre les deux images
+     */
     public double erreurReconstruction(Image j, Image jp) {
         SimpleMatrix vOriginal = j.vectoriser();
         SimpleMatrix vReconstruit = jp.vectoriser();
@@ -36,6 +65,10 @@ public class Projection {
         return erreur;
     }
 
+    /**
+     * Calcule la variance expliquée cumulée par les valeurs propres.
+     * @return vecteur colonne contenant la variance cumulée (entre 0 et 1)
+     */
     public SimpleMatrix varianceCumulee() {
         SimpleMatrix valPropres = this.eigenfaces.getValPropres();
         int taille = valPropres.getNumElements();
