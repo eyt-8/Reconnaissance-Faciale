@@ -57,6 +57,7 @@ public class Propre {
     public SimpleMatrix valParFacto(SimpleMatrix matrice){
     int n = matrice.numRows();
  
+    // evd contient déjà les valeurs et vecteurs propres
     SimpleEVD<SimpleMatrix> evd = matrice.eig();
  
     SimpleMatrix D = new SimpleMatrix(n, n);   // diagonale des valeurs propres
@@ -103,32 +104,32 @@ public class Propre {
     /**
      * Test sans utilisation du reste du projet
      */
-    // public static void main(String[] args) {
+    public static void main(String[] args) {
  
-    //     // --- MATRICE DE TEST (factice) ---
-    //     // Symetrique 2x2. trace = 7, det = 11 => valeurs propres ~ 5.30 et 1.70.
-    //     double[][] data = {
-    //             {4.0, 1.0},
-    //             {1.0, 3.0}
-    //     };
-    //     SimpleMatrix test = new SimpleMatrix(data);
+        // --- MATRICE DE TEST (factice) ---
+        // Symetrique 2x2. trace = 7, det = 11 => valeurs propres ~ 5.30 et 1.70.
+        double[][] data = {
+                {4.0, 1.0},
+                {1.0, 3.0}
+        };
+        SimpleMatrix test = new SimpleMatrix(data);
  
-    //     System.out.println("=== Matrice de test ===");
-    //     test.print();
+        System.out.println("=== Matrice de test ===");
+        test.print();
  
-    //     Propre propre = new Propre(test);
-    //     propre.decomposer();
+        Propre propre = new Propre(test);
+        propre.decomposer();
  
-    //     System.out.println("=== matD (valeurs propres) ===");
-    //     propre.getMatD().print();
+        System.out.println("=== matD (valeurs propres) ===");
+        propre.getMatD().print();
  
-    //     System.out.println("=== matP (vecteurs propres en colonnes) ===");
-    //     propre.getMatP().print();
+        System.out.println("=== matP (vecteurs propres en colonnes) ===");
+        propre.getMatP().print();
  
-    //     // --- Verification : P * D * P^T doit redonner la matrice de depart ---
-    //     SimpleMatrix reconstruite =
-    //             propre.getMatP().mult(propre.getMatD()).mult(propre.getMatP().transpose());
-    //     System.out.println("=== Reconstruction P*D*P^T (doit ~= test) ===");
-    //     reconstruite.print();
-    // }
+        // --- Verification : P * D * P^T doit redonner la matrice de depart ---
+        SimpleMatrix reconstruite =
+                propre.getMatP().mult(propre.getMatD()).mult(propre.getMatP().transpose());
+        System.out.println("=== Reconstruction P*D*P^T (doit ~= test) ===");
+        reconstruite.print();
+    }
 }
