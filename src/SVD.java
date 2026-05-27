@@ -10,7 +10,7 @@ public class SVD {
     private SimpleMatrix vectPropATA;
 
     /**
-     * Calcule la matrice AtA (Matrice de Variance-Covariance simplifiée)
+     * Calcule la matrice AtA (Matrice de Variance-Covariance)
      * @param A La matrice des visages centrés
      */
     public void calculerMatriceVarCov(SimpleMatrix A) {
