@@ -3,32 +3,52 @@
 import org.ejml.simple.SimpleMatrix;
 //Définition de la classe SVD
 public class SVD {
-	 // Déclaration d'un attribut privé pour stocker les valeurs singulières.
-    // "v_singu" contiendra l'importance de chaque caractéristique du visage.
-    private SimpleMatrix v_singu;
-
-    // Déclaration d'un attribut privé pour stocker la matrice V de la décomposition.
-    private SimpleMatrix V;
+    
+    // Attributs tels qu'écrits sur ton diagramme
+    private SimpleMatrix matriceVarCov;
+    private SimpleMatrix bValSinguliere;
+    private SimpleMatrix vectPropATA;
 
     /**
-     * Cette méthode sert à faire le calcul mathématique : Transposée de A multipliée par A.
-     * @param A : C'est notre matrice "assemblage" (les images centrées mises côte à côte).
-     * @return : Le résultat est une matrice carrée qui montre comment les images sont liées entre elles.
+     * Calcule la matrice AtA (Matrice de Variance-Covariance simplifiée)
+     * @param A La matrice des visages centrés
      */
-    public SimpleMatrix calculerAtA(SimpleMatrix A) {
+    public void calculerMatriceVarCov(SimpleMatrix A) {
+        // On respecte le nom de l'attribut du diagramme
+        this.matriceVarCov = A.transpose().mult(A);
+    }
+
+    /**
+     * Méthode présente sur notre diagramme (+)
+     * Elle est censée calculer les Valeurs Singulières (BV)
+     */
+    public void calculerBV() {
+        if (matriceVarCov == null) {
+            System.out.println("Erreur : Calculez d'abord la matrice de Var-Cov !");
+            return;
+        }
         
-        // 1. A.transpose() : 
-        // Cette fonction crée une nouvelle matrice où les lignes de A deviennent des colonnes.
+        // On utilise l'outil SVD intégré à SimpleMatrix
+        // .svd() décompose la matrice en U, W (valeurs singulières), et V
+        var svdResult = matriceVarCov.svd();
         
-        // 2. .mult(A) : 
-        // On prend la matrice qu'on vient de faire pivoter et on la multiplie par la matrice A originale.
-        
-        // 3. SimpleMatrix result : 
-        // On crée une variable appelée "result" pour ranger le résultat final de ce calcul.
-        SimpleMatrix result = A.transpose().mult(A);
-        
-        // On renvoie la matrice calculée pour qu'elle puisse être utilisée par d'autres classes
-        return result;
+        /* On remplit les attributs du diagramme avec les résultats
+        * .getW() : Récupère la matrice des Valeurs Singulières.
+        * .getV() : Récupère la matrice des Vecteurs Propres (ou vecteurs singuliers à droite)
+        */
+        this.bValSinguliere = svdResult.getW(); // Matrice diagonale des valeurs singulières
+        this.vectPropATA = svdResult.getV();    // Vecteurs propres
+    }
+
+    // Getters pour que les autres classes (comme 'Propre') puissent voir les résultats
+    public SimpleMatrix getMatriceVarCov() { 
+    	return matriceVarCov; 
+    }
+    public SimpleMatrix getbValSinguliere() { 
+    	return bValSinguliere; 
+    }
+    public SimpleMatrix getVectPropATA() { 
+    	return vectPropATA; 
     }
 }
 	
