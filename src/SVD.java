@@ -67,7 +67,7 @@ public class SVD {
         calculPropre.decomposer();
         
         //Récupération des résultats pour remplir les attributs de SVD
-        //matD -> valurs singulières au carré
+        //matD -> valeurs singulières au carré
         this.bValSinguliere = calculPropre.getMatD();
         
         //matP -> vecteurs propres de AtA
