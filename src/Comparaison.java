@@ -26,6 +26,7 @@ public class Comparaison {
 	 * @author virgile
 	 * @param image matrice correspondant à l'image
 	 * @param projete matrice prédite
+	 * Modifie {@link Comparaison#image}, {@link Comparaison#projete} et {@link Comparaison#taille}
 	 * */
 	public Comparaison(SimpleMatrix image, SimpleMatrix projete, int taille) {
 		this.image = image;
@@ -37,6 +38,7 @@ public class Comparaison {
 	 * Erreur moyenne quadratique (EQM)
 	 * @author virgile
 	 * @return  Erreur moyenne quadratique (EQM)
+	 * Utilise {@link Comparaison#image} et {@link Comparaison#projete}
 	 * */
 	public double calcul_eqm() {
 		double somme = 0;
@@ -47,5 +49,77 @@ public class Comparaison {
 			}
 		}
 		return somme/taille;
+	}
+	
+	/** 
+	 * Racine de l'erreur moyenne quadratique (REQM)
+	 * @author virgile
+	 * @return  Racine de l'erreur moyenne quadratique (REQM)
+	 * Utilise {@link Comparaison#calcul_reqm()}
+	 * */
+	public double calcul_reqm() {
+		return Math.sqrt(this.calcul_eqm());
+	}
+	
+	/** 
+	 * Biais (moyenne des écarts)
+	 * @author virgile
+	 * @return biais
+	 * Utilise {@link Comparaison#image} et {@link Comparaison#projete}
+	 * */
+	public double biais() {
+		double somme = 0;
+		// On réalise la somme de la différence des pixels au carré (formule de l'EQM)
+		for (int i=0;i<taille;i++) {
+			for (int j=0;j<taille;j++) {
+				somme = somme + this.image.get(i,j)-this.projete.get(i,j);
+			}
+		}
+		return somme/taille;
+	}
+	
+	public static void main(String args[]) {
+		System.out.println("Classe comparaison (TEST)");
+		SimpleMatrix a = new SimpleMatrix(3,2);
+		SimpleMatrix a2 = new SimpleMatrix(3,2);
+		
+		// Création d'une matrice de test
+		/* ( 3 2 ) 
+		 * ( 5 3 )
+		 * */
+		double[][] arr = {{3,2},{5,3}};
+		// Création d'une deuxième matrice de test
+		/* ( 1 5 )
+		 * ( 7 6 )
+		 * */
+		double[][] arr2 = {{1,5},{7,6}};
+		
+		// Affichage des matrices en parallèle
+		for (int i=0;i<2;i++) {
+			
+			// Matrice 1
+			
+			System.out.print("(");
+			for (int j=0;j<2;j++) {
+				System.out.print(" "+arr[i][j]+"");
+				// On copie la matrice 1 en parallèle
+				a.set(i, j, arr[i][j]);
+			}
+			
+			System.out.print(" )");
+			
+			System.out.print(" (");
+			// Matrice 2
+			for (int j=0;j<2;j++) {
+				System.out.print(" "+arr2[i][j]+"");
+				// On copie la matrice en parallèle
+				a2.set(i, j, arr2[i][j]);
+			}
+			
+			System.out.println(" )");
+			
+		}
+		
+		//biais()
 	}
 }
