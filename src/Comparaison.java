@@ -24,7 +24,7 @@ public class Comparaison {
 	/** 
 	 * Constructeur de la classe
 	 * @author virgile
-	 * @param image matrice correspondant à l'image
+	 * @param image vectorielle correspondant à l'image
 	 * @param projete matrice prédite
 	 * Modifie {@link Comparaison#image}, {@link Comparaison#projete} et {@link Comparaison#taille}
 	 * */
@@ -48,7 +48,7 @@ public class Comparaison {
 				somme = somme + Math.pow(this.image.get(i,j)-this.projete.get(i,j),2);
 			}
 		}
-		return somme/(Math.pow(taille, 2));
+		return somme/taille;
 	}
 	
 	/** 
@@ -75,7 +75,7 @@ public class Comparaison {
 				somme = somme + Math.abs(this.image.get(i,j)-this.projete.get(i,j));
 			}
 		}
-		return somme/(Math.pow(taille, 2));
+		return somme/taille;
 	}
 	
 	public static void main(String args[]) {
@@ -94,6 +94,9 @@ public class Comparaison {
 		 * */
 		double[][] arr2 = {{1,5},{7,6}};
 		
+		// Description des matrices
+		System.out.println("Matrice gauche : matrice d'origine");
+		System.out.println("Matrice droite : matrice des eigenfaces la plus proche");
 		// Affichage des matrices en parallèle
 		for (int i=0;i<2;i++) {
 			
