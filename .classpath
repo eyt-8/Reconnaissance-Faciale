@@ -6,5 +6,13 @@
 	<classpathentry kind="lib" path="lib/ejml-core-0.45.0.jar"/>
 	<classpathentry kind="lib" path="lib/ejml-ddense-0.45.0.jar"/>
 	<classpathentry kind="lib" path="lib/ejml-simple-0.45.0.jar"/>
+	<classpathentry kind="lib" path="lib/javafx-swt.jar"/>
+	<classpathentry kind="lib" path="lib/javafx.base.jar"/>
+	<classpathentry kind="lib" path="lib/javafx.controls.jar"/>
+	<classpathentry kind="lib" path="lib/javafx.fxml.jar"/>
+	<classpathentry kind="lib" path="lib/javafx.graphics.jar"/>
+	<classpathentry kind="lib" path="lib/javafx.media.jar"/>
+	<classpathentry kind="lib" path="lib/javafx.swing.jar"/>
+	<classpathentry kind="lib" path="lib/javafx.web.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
