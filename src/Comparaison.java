@@ -48,7 +48,7 @@ public class Comparaison {
 				somme = somme + Math.pow(this.image.get(i,j)-this.projete.get(i,j),2);
 			}
 		}
-		return somme/taille;
+		return somme/(Math.pow(taille, 2));
 	}
 	
 	/** 
@@ -72,10 +72,10 @@ public class Comparaison {
 		// On réalise la somme de la différence des pixels au carré (formule de l'EQM)
 		for (int i=0;i<taille;i++) {
 			for (int j=0;j<taille;j++) {
-				somme = somme + this.image.get(i,j)-this.projete.get(i,j);
+				somme = somme + Math.abs(this.image.get(i,j)-this.projete.get(i,j));
 			}
 		}
-		return somme/taille;
+		return somme/(Math.pow(taille, 2));
 	}
 	
 	public static void main(String args[]) {
@@ -120,6 +120,15 @@ public class Comparaison {
 			
 		}
 		
-		//biais()
+		//On crée la Comparaison et on teste la classe
+		
+		Comparaison c = new Comparaison(a,a2,2);
+		
+		// EQM
+		System.out.println("EQM : "+c.calcul_eqm());
+		// REQM
+		System.out.println("REQM : "+c.calcul_reqm());
+		// Biais
+		System.out.println("Biais : "+c.biais());
 	}
 }
