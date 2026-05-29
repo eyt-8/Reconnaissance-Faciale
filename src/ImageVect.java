@@ -57,10 +57,19 @@ public class ImageVect {
         return this.largeur;
     }
 
+    /**
+     * Accesseur de l'image
+     * @return l'image original
+     */
     public BufferedImage getBufferedImage(){
         return this.image;
     }
 
+
+    /**
+     * Accesseur du vecteur
+     * @return le vecteur colonne
+     */
     public SimpleMatrix getVecteurCol(){
         return this.vecteurCol;
     }
