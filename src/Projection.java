@@ -34,7 +34,7 @@ public class Projection {
         SimpleMatrix visageMoyen = this.eigenfaces.getVisageMoyen();
         SimpleMatrix vCentre = vImage.minus(visageMoyen);
         SimpleMatrix baseEigenfaces = this.eigenfaces.getBase();
-        this.coords = vCentre.mult(baseEigenfaces);
+        this.coords = baseEigenfaces.transpose().mult(vCentre);
         return this.coords;
     }
 
@@ -45,7 +45,7 @@ public class Projection {
      */
     public ImageVect reconstruire(SimpleMatrix coords) {
         SimpleMatrix baseEigenfaces = this.eigenfaces.getBase();
-        SimpleMatrix vCentreReconstruit = coords.mult(baseEigenfaces.transpose());
+        SimpleMatrix vCentreReconstruit = baseEigenfaces.mult(coords);
         SimpleMatrix visageMoyen = this.eigenfaces.getVisageMoyen();
         SimpleMatrix vImagePixels = vCentreReconstruit.plus(visageMoyen);
         
