@@ -9,23 +9,28 @@ public class ImageVect {
     private int longueur;
     private int largeur;
     private String nom; // nom du fichier
-    private SimpleMatrix vecteurCol;
+    private SimpleMatrix vecteurCol; // vecteur de l'image
     private BufferedImage image;
     private File fichier;
 
+    /**
+     * Constructeur d'ImageVect
+     * @param chemin nom du chemin du fichier
+     * @throws IOException si on trouve pas le fichier
+     */
     public ImageVect(String chemin) throws IOException{
         this.fichier = new File(chemin);
         this.image = ImageIO.read(this.fichier);
 
         if (this.image == null){
-            throw new IOException("Le chemin ne marche pas!");
+            throw new IOException("Le chemin ne marche pas\n");
         }
 
         this.nom = this.fichier.getName();
         this.nom = this.nom.substring(0, this.nom.length() - 4);
         this.longueur = this.image.getHeight();
         this.largeur = this.image.getWidth();
-        this.vecteurCol = new SimpleMatrix(1,this.largeur*this.longueur);
+        this.vecteurCol = new SimpleMatrix(this.largeur*this.longueur,1);
     }
 
     public String getNom(){
@@ -52,6 +57,28 @@ public class ImageVect {
         }
     }
 
+    public BufferedImage devectoriser(SimpleMatrix vecteur, int largeur, int longueur){
+
+        BufferedImage img = new BufferedImage(largeur, longueur, BufferedImage.TYPE_INT_RGB);
+
+        int index = 0;
+
+        for (int i=0;i<largeur;i++){
+            for (int j=0;j<longueur;j++){
+
+                double valeur = vecteur.get(index,0);
+                int pixelGris = (int) Math.max(0,Math.min(255, valeur));
+                int pixel = (255<<24) | (pixelGris<<16) | (pixelGris<<8) | pixelGris;
+                img.setRGB(i, j, pixel);
+                index++;
+
+            }
+        }
+
+        return img;
+    }
+
+
     public static void main(String[] args){
 
         try {
@@ -60,14 +87,12 @@ public class ImageVect {
             System.out.println("Nom du fichier : " + img.getNom());
             System.out.println("Dimensions : " + img.getLargeur() + " x " + img.getLongueur() + " pixels");
             System.out.println(img.vecteurCol);
+            img.vectoriser();
         } catch (IOException e) {
             System.out.println(e);
         }
-        
-
 
     }
 
-
-
 }
+
