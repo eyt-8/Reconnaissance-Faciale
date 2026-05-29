@@ -1,3 +1,4 @@
+/** Importation des classes nécessaires */
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
@@ -9,19 +10,39 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
+/**
+ * Ecran représente l'interface principale de l'application.
+ * Il assemble les composants JavaFX et met à jour les images et résultats
+ * de reconnaissance faciale.
+ *
+ * @author Maël Lescoulié
+ * @version 1.0
+ */
 public class Ecran extends BorderPane {
+    /** Bouton permettant de sélectionner une image à analyser */
     private Button choisirFichier;
+    /** Zone d'affichage de l'image entrée par l'utilisateur */
     private ImageView visageEntre;
+    /** Zone d'affichage de l'image correspondant à la personne trouvée */
     private ImageView visageTrouve;
+    /** Libellé du nom de la personne reconnue */
     private Label nomPrenom;
+    /** Barre de progression du taux de ressemblance */
     private ProgressBar barreRessemblance;
+    /** Affichage textuel du pourcentage de ressemblance */
     private Label pourcentage;
 
+    /**
+     * Initialise l'écran et construit le layout.
+     */
     public Ecran() {
         this.initialiserComposants();
         this.assemblerLayout();
     }
 
+    /**
+     * Crée les composants graphiques de base utilisés dans l'écran.
+     */
     private void initialiserComposants() {
         this.choisirFichier = new Button("Choisir un fichier");
         this.choisirFichier.setStyle("-fx-background-color: #dcdcdc; -fx-text-fill: black; -fx-padding: 8 15;");
@@ -44,6 +65,9 @@ public class Ecran extends BorderPane {
         this.pourcentage.setStyle("-fx-font-size: 14px;");
     }
 
+    /**
+     * Assemble le layout principal de l'écran et positionne les composants.
+     */
     private void assemblerLayout() {
         HBox bandeauHaut = new HBox(new Label("Reconnaissance Faciale"));
         bandeauHaut.setStyle("-fx-background-color: #7bc07b; -fx-padding: 10;");
@@ -69,6 +93,10 @@ public class Ecran extends BorderPane {
         this.setCenter(contenuCentral);
     }
 
+    /**
+     * Configure un ImageView avec une taille fixe et une image par défaut.
+     * @param iv ImageView à configurer
+     */
     private void configurerImageView(ImageView iv) {
         iv.setFitWidth(180);
         iv.setFitHeight(180);
@@ -85,10 +113,20 @@ public class Ecran extends BorderPane {
         }
     }
 
+    /**
+     * @return le bouton utilisé pour sélectionner un fichier d'image
+     */
     public Button getChoisirFichier() {
         return this.choisirFichier;
     }
 
+    /**
+     * Met à jour l'affichage avec les images et le score de reconnaissance.
+     * @param imgEntre image d'entrée sélectionnée
+     * @param imgTrouvee image de la personne trouvée
+     * @param nom nom reconnu de la personne
+     * @param taux pourcentage de ressemblance
+     */
     public void majInterface(Image imgEntre, Image imgTrouvee, String nom, double taux) {
         if (imgEntre != null) this.visageEntre.setImage(imgEntre);
         if (imgTrouvee != null) this.visageTrouve.setImage(imgTrouvee);
