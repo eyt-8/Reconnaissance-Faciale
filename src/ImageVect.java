@@ -65,7 +65,7 @@ public class ImageVect {
         for (int i=0;i<this.getLargeur();i++){
             for (int j=0;j<this.getLongueur();j++){
                 int pixel = this.image.getRGB(i,j); // Récupère pixel
-                double pixelAjoute = pixel & 0xFF;
+                double pixelAjoute = pixel & 0xFF; // Récupère la valeur du pixel (0 à 255)
                 this.vecteurCol.set(index,0,pixelAjoute);
                 index++;
             }
@@ -89,7 +89,9 @@ public class ImageVect {
             for (int j=0;j<longueur;j++){
 
                 double valeur = vecteur.get(index,0);
+                // Transforme en valeur de gris
                 int pixelGris = (int) Math.max(0,Math.min(255, valeur));
+                // Remet en valeur RGBx 
                 int pixel = (255<<24) | (pixelGris<<16) | (pixelGris<<8) | pixelGris;
                 img.setRGB(i, j, pixel);
                 index++;
