@@ -26,19 +26,6 @@ public class SVD {
     	
     }
     
-    /**On crée une instance de la classe Propre
-    *SVD délègue le calcul des valeurs/vecteurs propres 
-    * à cette classe spécialisée. Cela permet de séparer la logique mathématique (EIG) 
-    * du traitement des données SVD.
-    * */
-    private Propre calculPropre;
-    
-    public SVD() {
-    	//On initialise l'objet Propre
-    	this.calculPropre = new Propre();
-    	
-    }
-
     /**
      * Calcule la matrice AtA (Matrice de Variance-Covariance)
      * @param A La matrice des visages centrés
@@ -78,14 +65,11 @@ public class SVD {
     
     //Les Getters 
     public SimpleMatrix getbValSinguliere() {
-    	return bValSinguliere;
+    	return this.bValSinguliere;
     }
     
     public SimpleMatrix getVectPropATA() {
-    	return vectPropATA;
-    
-    public SimpleMatrix getVectPropATA() {
-    	return vectPropATA;
+    	return this.vectPropATA;
     }
         
         
