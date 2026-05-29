@@ -148,4 +148,24 @@ public class BaseDeDonnees {
 		}		
 		return association;
 	}
+
+	/**
+	 * Créer la matrice final
+	 * @param images listes des vecteurs images
+	 * @return la matrice avec en colonnes les vecteurs colonnes
+	 */
+	public SimpleMatrix matriceTot(List<ImageVect> images){
+
+            int nbColonnes = images.size();
+            int nbLignes = image.get(0).getVecteur().numRows(); // Récupère le nombre de pixel d'un vecteur (le même pour tous)
+
+            SimpleMatrix matrice = new SimpleMatrix(nbLignes nbColonnes);
+
+            for (int i=0;i<nbColonnes;i++){
+                SimpleMatrix vecteur = images.get(i).getVecteurCol();
+                matrice.insertIntoThis(0, i, vecteur);
+
+            return matrice;
+
+        }
 }

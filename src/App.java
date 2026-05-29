@@ -1,7 +1,18 @@
+import org.ejml.simple
+
+import org.ejml.simple.SimpleMatrix;.SimpleMatrix;
+
 public class App {
     public static void main(String[] args) throws Exception {
         System.out.println("Hello, World!");
+
+        BaseDeDonnees bdd = new BaseDeDonnees();
+        bdd.associerIdNom();
+        List<ImageVect> images = bdd.getReferences();
+        SimpleMatrix matriceComplete = bdd.matriceTot(images);
         
+
+
         // Chargement des images : matrice => vecteurs => matrices des images (Danika)
         // Requiert BDD et ImageVect
         
