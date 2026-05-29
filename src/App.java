@@ -19,6 +19,22 @@ public class App {
         
         Acp acp = new Acp(bdd);
         
+        SVD svd = new SVD(acp.getMatrice_centree());
+        
+        Eigenfaces faces = new Eigenfaces();
+        
+        faces.construire(svd.getbValSinguliere(),svd.getVectPropATA());
+        
+        List<ImageVect> images_test = bdd.getTests();
+        
+        Projection p = new Projection(faces);
+        Reconnaissance rec = new Reconnaissance(bdd,p,100);
+        
+        // String prediction = rec.identifier(images_test.get(0));
+
+        // Chargement des images : matrice => vecteurs => matrices des images (Danika)
+        // Requiert BDD et ImageVect
+        
         // Calculer le visage moyen => centrer la matrice image (Virgile)
         // Requiert ACP
         
