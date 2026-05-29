@@ -16,7 +16,8 @@ public class App {
         images = bdd.getReferences();
         
         SimpleMatrix matriceComplete = bdd.matriceTot(images);
-    
+        
+        Acp acp = new Acp(bdd);
         
         // Calculer le visage moyen => centrer la matrice image (Virgile)
         // Requiert ACP
