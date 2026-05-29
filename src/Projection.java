@@ -49,10 +49,10 @@ public class Projection {
         SimpleMatrix visageMoyen = this.eigenfaces.getVisageMoyen();
         SimpleMatrix vImagePixels = vCentreReconstruit.plus(visageMoyen);
         
-        int largeur = this.eigenfaces.getLargeur();
-        int longueur = this.eigenfaces.getLongueur();
+        int nbPixels = vImagePixels.getNumRows();
+        int cote = (int) Math.sqrt(nbPixels);
 
-        ImageVect imgReconstruite = new ImageVect(vImagePixels, largeur, longueur);
+        ImageVect imgReconstruite = new ImageVect(vImagePixels, cote, cote);
         return imgReconstruite;
     }
 
