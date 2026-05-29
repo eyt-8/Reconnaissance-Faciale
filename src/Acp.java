@@ -1,6 +1,5 @@
 
 
-import java.util.Vector;
 
 import org.ejml.simple.SimpleMatrix;
 
@@ -33,7 +32,9 @@ public class Acp {
 	
 	/** 
 	 * Constructeur utilisant directement une matrice
-	 * Utilisée principalement pour réaliser des tests*/
+	 * Utilisée principalement pour réaliser des tests
+	 * @param test matrice de test
+	 * */
 	public Acp(SimpleMatrix test) {
 		this.donnees=null;
 		this.calcVisageMoyen(test);
@@ -69,7 +70,7 @@ public class Acp {
 	/** 
 	 * Permet de calculer le visage moyen à partir de la base de données
 	 * Modifie {@link Acp#visage_moyen}
-	 * Utilise {@link BaseDeDonnees#matriceImage} ou une matrice de test
+	 * @param visages Utilise {@link BaseDeDonnees#matriceImage} ou une matrice de test
 	 * */
 	public void calcVisageMoyen(SimpleMatrix visages) {
 		// Le nombre d'images correspond au nombre de lignes
@@ -95,6 +96,7 @@ public class Acp {
 	/** 
 	 * Centre la matrice {@link BaseDeDonnees#matriceImages} ou une matrice de test
 	 * Modifie {@link Acp#matrice_centree}
+	 * @param visages {@link BaseDeDonnees#matriceImage} ou une matrice de test
 	 * */
 	public void centrer(SimpleMatrix visages) {
 		// Le nombre d'images correspond au nombre de lignes
