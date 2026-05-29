@@ -1,6 +1,8 @@
-import org.ejml.simple
+import java.util.ArrayList;
+import java.util.List;
 
-import org.ejml.simple.SimpleMatrix;.SimpleMatrix;
+
+import org.ejml.simple.SimpleMatrix;
 
 public class App {
 
@@ -16,7 +18,9 @@ public class App {
 
         BaseDeDonnees bdd = new BaseDeDonnees();
         bdd.associerIdNom();
-        List<ImageVect> images = bdd.getReferences();
+        List<ImageVect> images = new ArrayList<>();
+        images = bdd.getReferences();
+        
         SimpleMatrix matriceComplete = bdd.matriceTot(images);
         
 
