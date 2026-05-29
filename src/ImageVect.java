@@ -34,6 +34,21 @@ public class ImageVect {
     }
 
     /**
+     * Deuxième constructeur d'ImageVect
+     * @param vecteur vecteut colonne
+     * @param largeur largeur de l'image
+     * @param longueur longueur de l'image
+     */
+    public ImageVect(SimpleMatrix vecteur, int largeur, int longueur){
+        this.nom = "ImageReconstruite";
+        this.longueur = longueur;
+        this.largeur = largeur;
+        this.vecteurCol = vecteur;
+        this.fichier = null;
+        this.image = this.devectoriser(vecteur, largeur, longueur);
+    }
+
+    /**
      * Accesseur de nom
      * @return le nom de l'image
      */
