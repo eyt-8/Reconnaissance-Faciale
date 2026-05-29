@@ -76,8 +76,8 @@ public class Comparaison {
 	
 	public static void main(String args[]) {
 		System.out.println("Classe comparaison (TEST)");
-		SimpleMatrix a = new SimpleMatrix(3,2);
-		SimpleMatrix a2 = new SimpleMatrix(3,2);
+		SimpleMatrix a = new SimpleMatrix(2,2);
+		SimpleMatrix a2 = new SimpleMatrix(2,2);
 		
 		// Création d'une matrice de test
 		/* ( 3 2 ) 
