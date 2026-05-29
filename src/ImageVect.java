@@ -34,6 +34,21 @@ public class ImageVect {
     }
 
     /**
+     * Deuxième constructeur d'ImageVect
+     * @param vecteur vecteut colonne
+     * @param largeur largeur de l'image
+     * @param longueur longueur de l'image
+     */
+    public ImageVect(SimpleMatrix vecteur, int largeur, int longueur){
+        this.nom = "ImageReconstruite";
+        this.longueur = longueur;
+        this.largeur = largeur;
+        this.vecteurCol = vecteur;
+        this.fichier = null;
+        this.image = this.devectoriser(vecteur, largeur, longueur);
+    }
+
+    /**
      * Accesseur de nom
      * @return le nom de l'image
      */
@@ -58,6 +73,23 @@ public class ImageVect {
     }
 
     /**
+     * Accesseur de l'image
+     * @return l'image original
+     */
+    public BufferedImage getBufferedImage(){
+        return this.image;
+    }
+
+
+    /**
+     * Accesseur du vecteur
+     * @return le vecteur colonne
+     */
+    public SimpleMatrix getVecteurCol(){
+        return this.vecteurCol;
+    }
+
+    /**
      * Transforme l'image en vecteur colonne
      */
     public void vectoriser(){
@@ -65,7 +97,7 @@ public class ImageVect {
         for (int i=0;i<this.getLargeur();i++){
             for (int j=0;j<this.getLongueur();j++){
                 int pixel = this.image.getRGB(i,j); // Récupère pixel
-                double pixelAjoute = pixel & 0xFF;
+                double pixelAjoute = pixel & 0xFF; // Récupère la valeur du pixel (0 à 255)
                 this.vecteurCol.set(index,0,pixelAjoute);
                 index++;
             }
@@ -89,7 +121,9 @@ public class ImageVect {
             for (int j=0;j<longueur;j++){
 
                 double valeur = vecteur.get(index,0);
+                // Transforme en valeur de gris
                 int pixelGris = (int) Math.max(0,Math.min(255, valeur));
+                // Remet en valeur RGBx 
                 int pixel = (255<<24) | (pixelGris<<16) | (pixelGris<<8) | pixelGris;
                 img.setRGB(i, j, pixel);
                 index++;
