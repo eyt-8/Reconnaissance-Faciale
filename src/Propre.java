@@ -46,7 +46,7 @@ public class Propre {
      */
     public void decomposer() {
         // Dimension de la matrice (carrée) : n lignes = n colonnes = n valeurs propres.
-        int n = matrice.numRows();
+        int n = matrice.getNumRows();
 
         // L'objet evd contient les valeurs propres et les vecteurs propres.
         SimpleEVD<SimpleMatrix> evd = matrice.eig();
