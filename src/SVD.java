@@ -1,6 +1,8 @@
 /** @author : SOULEZ-DAMAZIE Soraya*/
+
 //On importe la classe SimpleMatrix de la bibliothèque
 import org.ejml.simple.SimpleMatrix;
+
 //Définition de la classe SVD
 public class SVD {
     
@@ -8,6 +10,19 @@ public class SVD {
     private SimpleMatrix matriceVarCov;
     private SimpleMatrix bValSinguliere;
     private SimpleMatrix vectPropATA;
+    
+    /**On crée une instance de la classe Propre
+    *SVD délègue le calcul des valeurs/vecteurs propres 
+    * à cette classe spécialisée. Cela permet de séparer la logique mathématique (EIG) 
+    * du traitement des données SVD.
+    * */
+    private Propre calculPropre;
+    
+    public SVD() {
+    	//On initialise l'objet Propre
+    	this.calculPropre = new Propre();
+    	
+    }
 
     /**
      * Calcule la matrice AtA (Matrice de Variance-Covariance)
@@ -28,27 +43,30 @@ public class SVD {
             return;
         }
         
-        // On utilise l'outil SVD intégré à SimpleMatrix
-        // .svd() décompose la matrice en U, W (valeurs singulières), et V
-        var svdResult = matriceVarCov.svd();
+        //On donne la matrice à la classe 'Propre'
+        calculPropre.setMatrice(matriceVarCov);
         
-        /* On remplit les attributs du diagramme avec les résultats
-        * .getW() : Récupère la matrice des Valeurs Singulières.
-        * .getV() : Récupère la matrice des Vecteurs Propres (ou vecteurs singuliers à droite)
-        */
-        this.bValSinguliere = svdResult.getW(); // Matrice diagonale des valeurs singulières
-        this.vectPropATA = svdResult.getV();    // Vecteurs propres
+        //La décomposition
+        calculPropre.decomposer();
+        
+        //Récupération des résultats pour remplir les attributs de SVD
+        //matD -> valurs singulières au carré
+        this.bValSinguliere = calculPropre.getMatD();
+        
+        //matP -> vecteurs propres de AtA
+        this.vectPropATA = calculPropre.getMatP();
+        
+        System.out.println("Décomposition Ok");
     }
-
-    // Getters pour que les autres classes (comme 'Propre') puissent voir les résultats
-    public SimpleMatrix getMatriceVarCov() { 
-    	return matriceVarCov; 
+    
+    //Les Getters 
+    public SimpleMatrix getbValSinguliere() {
+    	return bValSinguliere;
     }
-    public SimpleMatrix getbValSinguliere() { 
-    	return bValSinguliere; 
+    
+    public SimpleMatrix getVectPropATA() {
+    	return vectPropATA;
     }
-    public SimpleMatrix getVectPropATA() { 
-    	return vectPropATA; 
-    }
+        
 }
 	

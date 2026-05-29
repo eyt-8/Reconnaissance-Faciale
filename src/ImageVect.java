@@ -42,9 +42,12 @@ public class ImageVect {
 
     public void vectoriser(){
         int index = 0;
-        for (int i=0;i<this.getLongueur();i++){
-            for (int j=0;j<this.getLargeur();j++){
-                
+        for (int i=0;i<this.getLargeur();i++){
+            for (int j=0;j<this.getLongueur();j++){
+                int pixel = this.image.getRGB(i,j); // Récupère pixel
+                double pixelAjoute = pixel & 0xFF;
+                this.vecteurCol.set(index,0,pixelAjoute);
+                index++;
             }
         }
     }
