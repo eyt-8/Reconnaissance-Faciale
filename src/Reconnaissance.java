@@ -69,10 +69,9 @@ public class Reconnaissance {
     }
 
     /**
-     * Évalue les performances globales du modèle en testant toutes les images du répertoire de test.
      * Calcule le ratio de bonnes identifications par rapport au nombre total de tests.
      * 
-     * @return le taux d'identification (valeur comprise entre 0.0 et 1.0)
+     * @return le taux d'identification (entre 0.0 et 1.0)
      */
     public double tauxIdentification() {
         int totalTests = 0; 
