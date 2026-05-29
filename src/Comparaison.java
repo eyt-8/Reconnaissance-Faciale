@@ -23,7 +23,6 @@ public class Comparaison {
 	
 	/** 
 	 * Constructeur de la classe
-	 * @author virgile
 	 * @param image vectorielle correspondant à l'image
 	 * @param projete matrice prédite
 	 * Modifie {@link Comparaison#image}, {@link Comparaison#projete} et {@link Comparaison#taille}
@@ -36,7 +35,6 @@ public class Comparaison {
 	
 	/** 
 	 * Erreur moyenne quadratique (EQM)
-	 * @author virgile
 	 * @return  Erreur moyenne quadratique (EQM)
 	 * Utilise {@link Comparaison#image} et {@link Comparaison#projete}
 	 * */
@@ -53,7 +51,6 @@ public class Comparaison {
 	
 	/** 
 	 * Racine de l'erreur moyenne quadratique (REQM)
-	 * @author virgile
 	 * @return  Racine de l'erreur moyenne quadratique (REQM)
 	 * Utilise {@link Comparaison#calcul_reqm()}
 	 * */
@@ -63,7 +60,6 @@ public class Comparaison {
 	
 	/** 
 	 * Biais (moyenne des écarts)
-	 * @author virgile
 	 * @return biais
 	 * Utilise {@link Comparaison#image} et {@link Comparaison#projete}
 	 * */

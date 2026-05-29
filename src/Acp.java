@@ -27,7 +27,6 @@ public class Acp {
 	
 	/** 
 	 * Permet de calculer le visage moyen
-	 * @author virgile
 	 * Modifie {@link Acp#visage_moyen} 
 	 * Utilise {@link BaseDeDonnees#matriceImage}
 	 * */
@@ -51,7 +50,6 @@ public class Acp {
 	
 	/** 
 	 * Centre la matrice {@link BaseDeDonnees#matriceImages}
-	 * @author virgile
 	 * Modifie {@link Acp#matrice_centree}
 	 * */
 	public void centrer() {
