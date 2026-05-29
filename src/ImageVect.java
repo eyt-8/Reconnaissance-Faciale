@@ -57,6 +57,14 @@ public class ImageVect {
         return this.largeur;
     }
 
+    public BufferedImage getBufferedImage(){
+        return this.image;
+    }
+
+    public SimpleMatrix getVecteurCol(){
+        return this.vecteurCol;
+    }
+
     /**
      * Transforme l'image en vecteur colonne
      */
@@ -70,36 +78,6 @@ public class ImageVect {
                 index++;
             }
         }
-    }
-
-    /**
-     * Transforme le vecteur colonne en son apparence original
-     * @param vecteur vecteur colonne
-     * @param largeur largeur original
-     * @param longueur longueur original
-     * @return l'image original
-     */
-    public BufferedImage devectoriser(SimpleMatrix vecteur, int largeur, int longueur){
-
-        BufferedImage img = new BufferedImage(largeur, longueur, BufferedImage.TYPE_INT_RGB);
-
-        int index = 0;
-
-        for (int i=0;i<largeur;i++){
-            for (int j=0;j<longueur;j++){
-
-                double valeur = vecteur.get(index,0);
-                // Transforme en valeur de gris
-                int pixelGris = (int) Math.max(0,Math.min(255, valeur));
-                // Remet en valeur RGBx 
-                int pixel = (255<<24) | (pixelGris<<16) | (pixelGris<<8) | pixelGris;
-                img.setRGB(i, j, pixel);
-                index++;
-
-            }
-        }
-
-        return img;
     }
 
 }
