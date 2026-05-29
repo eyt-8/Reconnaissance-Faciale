@@ -26,29 +26,10 @@ public class Reconnaissance {
      * @param projection l'instance de Projection contenant la base d'Eigenfaces
      * @param seuil      la distance euclidienne maximale tolérée pour une identification
      */
-    /** Liste des signatures calculées à l'initialisation */
-    private java.util.List<SimpleMatrix> signatures;
-    
-    /** Noms extraits directement des fichiers pour chaque signature */
-    private java.util.List<String> nomsCorrespondants;
-
     public Reconnaissance(BaseDeDonnees baseRef, Projection projection, double seuil) {
         this.baseRef = baseRef;
         this.projection = projection;
         this.seuil = seuil;
-        
-        this.signatures = new java.util.ArrayList<>();
-        this.nomsCorrespondants = new java.util.ArrayList<>();
-        
-        // On génère les signatures directement ici en projetant chaque image
-        for (ImageVect img : baseRef.getReferences()) {
-            this.signatures.add(projection.projeter(img));
-            
-            // La méthode getNom() renvoie le nom du fichier (ex: "nylan1"). 
-            // On supprime les chiffres pour obtenir l'identité (ex: "nylan")
-            String nomIdentite = img.getNom().replaceAll("[0-9]", "");
-            this.nomsCorrespondants.add(nomIdentite);
-        }
     }
 
     /**
@@ -63,11 +44,11 @@ public class Reconnaissance {
         double distanceMinimale = Double.MAX_VALUE;
         String identiteTrouvee = "Inconnu";
 
-        for (int i = 0; i < this.signatures.size(); i++) {
-            double d = distance(coordonneesTest, this.signatures.get(i));
+        for (int i = 0; i < baseRef.getReferences().size(); i++) {
+            double d = distance(coordonneesTest, baseRef.getReferences().get(i));
             if (d < distanceMinimale) {
                 distanceMinimale = d;
-                identiteTrouvee = this.nomsCorrespondants.get(i);
+                identiteTrouvee = baseRef.getIdentite(i);
             }
         }
         
