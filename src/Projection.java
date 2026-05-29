@@ -28,8 +28,9 @@ public class Projection {
      * @param img l'image à projeter
      * @return un vecteur de coordonnées (coefficients) dans la base des eigenfaces
      */
-    public SimpleMatrix projeter(Image img) {
-        SimpleMatrix vImage = img.vectoriser();
+    public SimpleMatrix projeter(ImageVect img) {
+        img.vectoriser();
+        SimpleMatrix vImage = img.getVecteurCol();
         SimpleMatrix visageMoyen = this.eigenfaces.getVisageMoyen();
         SimpleMatrix vCentre = vImage.minus(visageMoyen);
         SimpleMatrix baseEigenfaces = this.eigenfaces.getBase();
@@ -42,12 +43,16 @@ public class Projection {
      * @param coords vecteur de coefficients dans la base des eigenfaces
      * @return une instance d'Image reconstruite
      */
-    public Image reconstruire(SimpleMatrix coords) {
+    public ImageVect reconstruire(SimpleMatrix coords) {
         SimpleMatrix baseEigenfaces = this.eigenfaces.getBase();
         SimpleMatrix vCentreReconstruit = coords.mult(baseEigenfaces.transpose());
         SimpleMatrix visageMoyen = this.eigenfaces.getVisageMoyen();
         SimpleMatrix vImagePixels = vCentreReconstruit.plus(visageMoyen);
-        Image imgReconstruite = new Image(); // TODO
+        
+        int largeur = this.eigenfaces.getLargeur();
+        int longueur = this.eigenfaces.getLongueur();
+
+        ImageVect imgReconstruite = new ImageVect(vImagePixels, largeur, longueur);
         return imgReconstruite;
     }
 
@@ -57,9 +62,11 @@ public class Projection {
      * @param jp image reconstruite
      * @return la distance (erreur) entre les deux images
      */
-    public double erreurReconstruction(Image j, Image jp) {
-        SimpleMatrix vOriginal = j.vectoriser();
-        SimpleMatrix vReconstruit = jp.vectoriser();
+    public double erreurReconstruction(ImageVect j, ImageVect jp) {
+        j.vectoriser();
+        SimpleMatrix vOriginal = j.getVecteurCol();
+        jp.vectoriser();
+        SimpleMatrix vReconstruit = jp.getVecteurCol();
         SimpleMatrix difference = vOriginal.minus(vReconstruit);
         double erreur = difference.normF();
         return erreur;
@@ -72,7 +79,7 @@ public class Projection {
     public SimpleMatrix varianceCumulee() {
         SimpleMatrix valPropres = this.eigenfaces.getValPropres();
         int taille = valPropres.getNumElements();
-        SimpleMatrix varianceCumulee = new SimpleMatrix(taille,1); // Inverse ?
+        SimpleMatrix varianceCumulee = new SimpleMatrix(taille,1);
         double total = valPropres.elementSum();
         double cumul = 0;
         for (int i=0 ; i<taille ; i++) {

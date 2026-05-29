@@ -31,6 +31,7 @@ public class ImageVect {
         this.longueur = this.image.getHeight();
         this.largeur = this.image.getWidth();
         this.vecteurCol = new SimpleMatrix(this.largeur*this.longueur,1);
+        this.vectoriser();
     }
 
     /**
