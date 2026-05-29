@@ -1,10 +1,9 @@
-// Import des objets SimpleMatrix et SimpleEVD
 import org.ejml.simple.SimpleMatrix;
 import org.ejml.simple.SimpleEVD;
 
 /**
  * Classe pour la décomposition en valeurs propres
- * @author Nylan
+ * @author Nylan PAILLASSA
  * @version 1.0
  */
 
