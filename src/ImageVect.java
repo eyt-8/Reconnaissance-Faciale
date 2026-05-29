@@ -33,18 +33,33 @@ public class ImageVect {
         this.vecteurCol = new SimpleMatrix(this.largeur*this.longueur,1);
     }
 
+    /**
+     * Accesseur de nom
+     * @return le nom de l'image
+     */
     public String getNom(){
         return this.nom;
     }
 
+    /**
+     * Accesseur de longueur
+     * @return la longueur de l'image
+     */
     public int getLongueur(){
         return this.longueur;
     }
 
+    /**
+     * Accesseur de largeur
+     * @return la largeur de l'image
+     */
     public int getLargeur(){
         return this.largeur;
     }
 
+    /**
+     * Transforme l'image en vecteur colonne
+     */
     public void vectoriser(){
         int index = 0;
         for (int i=0;i<this.getLargeur();i++){
@@ -57,6 +72,13 @@ public class ImageVect {
         }
     }
 
+    /**
+     * Transforme le vecteur colonne en son apparence original
+     * @param vecteur vecteur colonne
+     * @param largeur largeur original
+     * @param longueur longueur original
+     * @return l'image original
+     */
     public BufferedImage devectoriser(SimpleMatrix vecteur, int largeur, int longueur){
 
         BufferedImage img = new BufferedImage(largeur, longueur, BufferedImage.TYPE_INT_RGB);
@@ -76,22 +98,6 @@ public class ImageVect {
         }
 
         return img;
-    }
-
-
-    public static void main(String[] args){
-
-        try {
-            ImageVect img = new ImageVect("donnees/apprentissage/Alysa Liu/alysa1.jpg");
-            System.out.println("Image chargée avec succès !");
-            System.out.println("Nom du fichier : " + img.getNom());
-            System.out.println("Dimensions : " + img.getLargeur() + " x " + img.getLongueur() + " pixels");
-            System.out.println(img.vecteurCol);
-            img.vectoriser();
-        } catch (IOException e) {
-            System.out.println(e);
-        }
-
     }
 
 }
