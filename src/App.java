@@ -23,7 +23,7 @@ public class App {
         
         SimpleMatrix matriceComplete = bdd.matriceTot(images);
         
-
+        Acp acp = new Acp(bdd);
 
         // Chargement des images : matrice => vecteurs => matrices des images (Danika)
         // Requiert BDD et ImageVect
