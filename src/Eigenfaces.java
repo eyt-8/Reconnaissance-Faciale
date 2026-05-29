@@ -10,7 +10,7 @@ import org.ejml.simple.SimpleMatrix;
  * obtenue à partir de l'ACP des visages de référence.
  */
 public class Eigenfaces {
-
+    private SimpleMatrix visageMoyen;
     private SimpleMatrix base;        // eigenfaces sélectionnées (colonnes)
     private SimpleMatrix valPropres;  // valeurs propres associées
     private int k;                    // nombre d'eigenfaces retenues
@@ -110,5 +110,13 @@ public class Eigenfaces {
 
     public int getK() {
         return k;
+    }
+
+    public void setVisageMoyen(SimpleMatrix visageMoyen) {
+        this.visageMoyen = visageMoyen;
+    }
+
+    public SimpleMatrix getVisageMoyen() {
+        return this.visageMoyen;
     }
 }
