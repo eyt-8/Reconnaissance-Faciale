@@ -78,10 +78,15 @@ public class BaseDeDonnees {
 				if (fichiersImages != null) {
 					for (File fichierImage : fichiersImages) {
 						if (fichierImage.isFile() && fichierImage.getName().endsWith(".jpg")) {
-							ImageVect img = new ImageVect(fichierImage.getAbsolutePath());
-							imagesPersonne.add(img);
-							toutesImages.add(img);
-							this.listeNoms.add(nomPersonne);
+							try {
+								ImageVect img = new ImageVect(fichierImage.getAbsolutePath());
+								img.vectoriser();
+								imagesPersonne.add(img);
+								toutesImages.add(img);
+								this.listeNoms.add(nomPersonne);
+							} catch (IOException e) {
+								System.err.println("Erreur lors du chargement de " + fichierImage.getName() + " : " + e.getMessage());
+							}
 						}
 					}
 				}
@@ -90,10 +95,10 @@ public class BaseDeDonnees {
 		}
 		int totalImages = toutesImages.size();
         if (totalImages > 0) {
-            int nbPixels = toutesImages.get(0).getVecteur().numRows();
+            int nbPixels = toutesImages.get(0).getVecteurCol().getNumRows();
             this.matriceImages = new SimpleMatrix(nbPixels, totalImages);            
             for (int j = 0; j < totalImages; j++) {
-                this.matriceImages.insertIntoThis(0, j, toutesImages.get(j).getVecteur());
+                this.matriceImages.insertIntoThis(0, j, toutesImages.get(j).getVecteurCol());
             }
         }
 	}
@@ -157,14 +162,14 @@ public class BaseDeDonnees {
 	public SimpleMatrix matriceTot(List<ImageVect> images){
 
             int nbColonnes = images.size();
-            int nbLignes = image.get(0).getVecteur().numRows(); // Récupère le nombre de pixel d'un vecteur (le même pour tous)
+            int nbLignes = images.get(0).getVecteurCol().getNumRows(); // Récupère le nombre de pixel d'un vecteur (le même pour tous)
 
-            SimpleMatrix matrice = new SimpleMatrix(nbLignes nbColonnes);
+            SimpleMatrix matrice = new SimpleMatrix(nbLignes, nbColonnes);
 
             for (int i=0;i<nbColonnes;i++){
                 SimpleMatrix vecteur = images.get(i).getVecteurCol();
                 matrice.insertIntoThis(0, i, vecteur);
-
+			}
             return matrice;
 
         }
