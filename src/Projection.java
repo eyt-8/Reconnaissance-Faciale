@@ -14,13 +14,19 @@ public class Projection {
     private Eigenfaces eigenfaces;
     /** Coordonnées de la dernière projection effectuée (vecteur colonne) */
     private SimpleMatrix coords;
+    private Acp acp;
 
     /**
      * Constructeur principal de la projection
      * @param eigenfaces objet contenant la base d'eigenfaces et le visage moyen
      */
-    public Projection(Eigenfaces eigenfaces) {
+    public Projection(Eigenfaces eigenfaces, Acp acp) {
         this.eigenfaces=eigenfaces;
+        this.acp=acp;
+    }
+
+    public Eigenfaces getEigenfaces() {
+        return eigenfaces;
     }
 
     /**
@@ -33,8 +39,12 @@ public class Projection {
         SimpleMatrix vImage = img.getVecteurCol();
         SimpleMatrix visageMoyen = this.eigenfaces.getVisageMoyen();
         SimpleMatrix vCentre = vImage.minus(visageMoyen);
+
+        SimpleMatrix matriceCentreeGlobale = this.acp.getMatrice_centree();
+        SimpleMatrix vIntermediaire = matriceCentreeGlobale.transpose().mult(vCentre);
+
         SimpleMatrix baseEigenfaces = this.eigenfaces.getBase();
-        this.coords = baseEigenfaces.transpose().mult(vCentre);
+        this.coords = baseEigenfaces.transpose().mult(vIntermediaire);
         return this.coords;
     }
 

@@ -27,7 +27,7 @@ public class App {
         
         List<ImageVect> images_test = bdd.getTests();
         
-        Projection p = new Projection(faces);
+        Projection p = new Projection(faces,acp);
         Reconnaissance rec = new Reconnaissance(bdd,p,100);
         
         // Visage moyen à récupérer
