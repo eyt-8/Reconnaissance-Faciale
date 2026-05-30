@@ -30,7 +30,10 @@ public class App {
         Projection p = new Projection(faces);
         Reconnaissance rec = new Reconnaissance(bdd,p,100);
         
-        // String prediction = rec.identifier(images_test.get(0));
+        // Visage moyen à récupérer
+        faces.setVisageMoyen(acp.getVisage_moyen());
+        
+        String prediction = rec.identifier(images_test.get(0));
 
         // Chargement des images : matrice => vecteurs => matrices des images (Danika)
         // Requiert BDD et ImageVect

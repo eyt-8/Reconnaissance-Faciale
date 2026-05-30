@@ -45,7 +45,7 @@ public class Reconnaissance {
         String identiteTrouvee = "Inconnu";
 
         for (int i = 0; i < baseRef.getReferences().size(); i++) {
-            SimpleMatrix coordonneesRef = projection.projeter(baseRef.getReferences().get(i));
+            SimpleMatrix coordonneesRef = projection.getEigenfaces().getBase().getColumn(i);
             double d = distance(coordonneesTest, coordonneesRef);
             if (d < distanceMinimale) {
                 distanceMinimale = d;
