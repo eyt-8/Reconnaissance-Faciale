@@ -52,8 +52,7 @@ public class Reconnaissance {
                 identiteTrouvee = baseRef.getIdentite(i);
             }
         }
-        
-        return (distanceMinimale > seuil) ? "Inconnu" : identiteTrouvee;
+        return (distanceMinimale > this.seuil) ? "Inconnu" : identiteTrouvee;
     }
     
     /**
@@ -66,7 +65,7 @@ public class Reconnaissance {
      * @return la distance calculée entre les deux vecteurs de coordonnées
      */
     public double distance(SimpleMatrix jp, SimpleMatrix jpk) {
-        return jp.minus(jpk).normF();
+        return (jp.minus(jpk)).normF();
     }
 
     /**

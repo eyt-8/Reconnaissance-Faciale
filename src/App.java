@@ -28,12 +28,14 @@ public class App {
         List<ImageVect> images_test = bdd.getTests();
         
         Projection p = new Projection(faces,acp);
-        Reconnaissance rec = new Reconnaissance(bdd,p,100);
+        Reconnaissance rec = new Reconnaissance(bdd,p,Double.MAX_VALUE);
         
         // Visage moyen à récupérer
         faces.setVisageMoyen(acp.getVisage_moyen());
         
         String prediction = rec.identifier(images_test.get(0));
+        
+        System.out.println(prediction);
 
         // Chargement des images : matrice => vecteurs => matrices des images (Danika)
         // Requiert BDD et ImageVect
