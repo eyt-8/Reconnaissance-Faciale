@@ -5,7 +5,7 @@ import org.ejml.simple.SimpleMatrix;
  * Elle permet d'identifier de nouvelles images (visages) en les projetant
  * dans l'espace des eigenfaces et en calculant la distance avec les signatures connues.
  * 
- * @author SOULEZ-DAMAZIE Soraya PAILLASSA Nylan
+ * @author SOULEZ-DAMAZIE Soraya PAILLASSA Nylan CAUMONT Virgile
  * @version 1.0
  */
 public class Reconnaissance {
@@ -37,22 +37,60 @@ public class Reconnaissance {
      * La méthode projette l'image, trouve la signature la plus proche et vérifie si elle respecte le seuil.
      * 
      * @param test l'image vectorisée (ImageVect) représentant le visage à identifier
+     * @param methode la distance utilisée (euclidienne, cosinus)
      * @return le nom de la personne si elle est reconnue, ou "Inconnu" si la distance dépasse le seuil
      */
-    public String identifier(ImageVect test) {
+    public String identifier(ImageVect test, String methode) {
         SimpleMatrix coordonneesTest = projection.projeter(test);
         double distanceMinimale = Double.MAX_VALUE;
         String identiteTrouvee = "Inconnu";
 
         for (int i = 0; i < baseRef.getReferences().size(); i++) {
             SimpleMatrix coordonneesRef = projection.getEigenfaces().getBase().getColumn(i);
-            double d = distance(coordonneesTest, coordonneesRef);
+            double d = distance(coordonneesTest, coordonneesRef, methode);
             if (d < distanceMinimale) {
                 distanceMinimale = d;
                 identiteTrouvee = baseRef.getIdentite(i);
             }
         }
+        System.out.println("Distance minimale : "+distanceMinimale);
         return (distanceMinimale > this.seuil) ? "Inconnu" : identiteTrouvee;
+    }
+    
+    /**
+     * Calcule la distance (euclidienne ou cosinus) entre 
+     * les coordonnées projetées de deux visages. Plus la distance est proche de 0, 
+     * plus les visages sont similaires.
+     * 
+     * @param jp  les coordonnées projetées du premier visage (test)
+     * @param jpk les coordonnées projetées du deuxième visage (référence k)
+     * @param methode le nom de la méthode (euclidienne, cosinus)
+     * @return la distance calculée entre les deux vecteurs de coordonnées
+     */
+    public double distance(SimpleMatrix jp, SimpleMatrix jpk, String methode) {
+    	double distance;
+        switch (methode) {
+        	case "euclidienne" ->
+        		distance= this.distance_euclidenne(jp, jpk);
+        	case "cosinus" ->
+        		distance = this.distance_cosinus(jp, jpk);
+        	default -> // Par défaut on prend la distance euclidienne
+        		distance= this.distance_euclidenne(jp, jpk);
+        }
+        return distance;
+    }
+    
+    /**
+     * Calcule la distance par cosinus (donc la corrélation) entre 
+     * les coordonnées projetées de deux visages. Plus la distance est proche de 0, 
+     * plus les visages sont similaires.
+     * 
+     * @param jp  les coordonnées projetées du premier visage (test)
+     * @param jpk les coordonnées projetées du deuxième visage (référence k)
+     * @return la distance calculée entre les deux vecteurs de coordonnées
+     */
+    public double distance_cosinus(SimpleMatrix jp, SimpleMatrix jpk) {
+        return Math.abs((jp.dot(jpk))/(jp.normF()*jpk.normF()));
     }
     
     /**
@@ -64,8 +102,22 @@ public class Reconnaissance {
      * @param jpk les coordonnées projetées du deuxième visage (référence k)
      * @return la distance calculée entre les deux vecteurs de coordonnées
      */
-    public double distance(SimpleMatrix jp, SimpleMatrix jpk) {
+    public double distance_euclidenne(SimpleMatrix jp, SimpleMatrix jpk) {
         return (jp.minus(jpk)).normF();
+    }
+    
+    /**
+     * Calcule la distance de Mahalanobis entre 
+     * les coordonnées projetées de deux visages. Plus la distance est proche de 0, 
+     * plus les visages sont similaires.
+     * 
+     * @param jp  les coordonnées projetées du premier visage (test)
+     * @param jpk les coordonnées projetées du deuxième visage (référence k)
+     * @return la distance calculée entre les deux vecteurs de coordonnées
+     */
+    public double distance_mahalanobis(SimpleMatrix jp, SimpleMatrix jpk) {
+    	SimpleMatrix mat_inv = projection.getEigenfaces().getBase();
+        return mat_inv;
     }
 
     /**
@@ -79,7 +131,7 @@ public class Reconnaissance {
         
         for (ImageVect imgTest : baseRef.getTests()) {
             totalTests++;
-            String identiteTrouvee = identifier(imgTest);
+            String identiteTrouvee = identifier(imgTest,"euclidienne");
             
             // On déduit le nom attendu à partir du nom du fichier image
             // (Assurez-vous que cette ligne correspond à votre façon de nommer les fichiers tests)
