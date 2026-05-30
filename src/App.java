@@ -33,7 +33,7 @@ public class App {
         // Visage moyen à récupérer
         faces.setVisageMoyen(acp.getVisage_moyen());
         
-        String prediction = rec.identifier(images_test.get(0),"cosinus");
+        String prediction = rec.identifier(images_test.get(0),"mahalanobis");
         
         System.out.println(prediction);
 

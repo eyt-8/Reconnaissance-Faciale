@@ -74,6 +74,8 @@ public class Reconnaissance {
         		distance= this.distance_euclidenne(jp, jpk);
         	case "cosinus" ->
         		distance = this.distance_cosinus(jp, jpk);
+        	case "mahalanobis"->
+        		distance = this.distance_mahalanobis(jp, jpk);
         	default -> // Par défaut on prend la distance euclidienne
         		distance= this.distance_euclidenne(jp, jpk);
         }
@@ -110,14 +112,30 @@ public class Reconnaissance {
      * Calcule la distance de Mahalanobis entre 
      * les coordonnées projetées de deux visages. Plus la distance est proche de 0, 
      * plus les visages sont similaires.
+     * source : https://link-springer-com.bibdocs.u-cergy.fr/chapter/10.1007/978-3-642-30958-8_17
      * 
      * @param jp  les coordonnées projetées du premier visage (test)
      * @param jpk les coordonnées projetées du deuxième visage (référence k)
      * @return la distance calculée entre les deux vecteurs de coordonnées
      */
     public double distance_mahalanobis(SimpleMatrix jp, SimpleMatrix jpk) {
-    	SimpleMatrix mat_inv = projection.getEigenfaces().getBase();
-        return mat_inv;
+    	SimpleMatrix base = projection.getEigenfaces().getBase();
+    	
+    	// On inverse les éléments diagonaux de la matrice des valeurs propres D pour avoir D-1
+    	SimpleMatrix propreInv = new SimpleMatrix(base.getNumRows(),base.getNumRows());
+    	propreInv.zero();
+    	SimpleMatrix propre_vec = projection.getEigenfaces().getValPropres();
+    	double eltDiag;
+    	for (int i=0;i<propre_vec.getNumCols();i++) {
+    		eltDiag = 1/propre_vec.get(i, 0);
+    		propreInv.set(i, i, eltDiag);
+    	}
+    	// On inverse la matrice ATA=PDPT => (ATA)-1 = PTD-1P
+    	SimpleMatrix mat_inv = base.transpose().mult(propreInv).mult(base);
+    	
+    	// On calcule la différence entre les deux vecteurs pour après passer à la norme
+    	SimpleMatrix difference = jp.minus(jpk);
+        return difference.transpose().mult(mat_inv).dot(difference);
     }
 
     /**
