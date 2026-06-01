@@ -25,9 +25,12 @@ public class App {
         // Visage moyen à récupérer
         faces.setVisageMoyen(acp.getVisage_moyen());
         
-        String prediction = rec.identifier(images_test.get(0),"mahalanobis");
-        
-        System.out.println(prediction);
+        // 1. Charger une image bien précise en indiquant son chemin d'accès
+        ImageVect monImageTest = new ImageVect("donnees/test/7.jpg");
+        // 2. Demander au système de l'identifier (ici en utilisant la distance de Mahalanobis)
+        String prediction = rec.identifier(monImageTest, "mahalanobis"); // tu peux aussi mettre "euclidienne"
+        // 3. Afficher le résultat dans la console
+        System.out.println("La personne reconnue sur cette image est : " + prediction);
 
         // Chargement des images : matrice => vecteurs => matrices des images (Danika)
         // Requiert BDD et ImageVect
