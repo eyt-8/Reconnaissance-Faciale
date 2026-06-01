@@ -14,15 +14,13 @@ public class Projection {
     private Eigenfaces eigenfaces;
     /** Coordonnées de la dernière projection effectuée (vecteur colonne) */
     private SimpleMatrix coords;
-    private Acp acp;
 
     /**
      * Constructeur principal de la projection
      * @param eigenfaces objet contenant la base d'eigenfaces et le visage moyen
      */
-    public Projection(Eigenfaces eigenfaces, Acp acp) {
+    public Projection(Eigenfaces eigenfaces) {
         this.eigenfaces=eigenfaces;
-        this.acp=acp;
     }
 
     public Eigenfaces getEigenfaces() {

@@ -1,8 +1,4 @@
-import java.util.ArrayList;
 import java.util.List;
-
-
-import org.ejml.simple.SimpleMatrix;
 
 public class App {
 
@@ -12,10 +8,6 @@ public class App {
         // Requiert BDD et ImageVect
         BaseDeDonnees bdd = new BaseDeDonnees();
         bdd.associerIdNom();
-        List<ImageVect> images = new ArrayList<>();
-        images = bdd.getReferences();
-        
-        SimpleMatrix matriceComplete = bdd.matriceTot(images);
         
         Acp acp = new Acp(bdd);
         
@@ -27,7 +19,7 @@ public class App {
         
         List<ImageVect> images_test = bdd.getTests();
         
-        Projection p = new Projection(faces,acp);
+        Projection p = new Projection(faces);
         Reconnaissance rec = new Reconnaissance(bdd,p,Double.MAX_VALUE);
         
         // Visage moyen à récupérer
