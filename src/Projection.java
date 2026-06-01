@@ -40,11 +40,8 @@ public class Projection {
         SimpleMatrix visageMoyen = this.eigenfaces.getVisageMoyen();
         SimpleMatrix vCentre = vImage.minus(visageMoyen);
 
-        SimpleMatrix matriceCentreeGlobale = this.acp.getMatrice_centree();
-        SimpleMatrix vIntermediaire = matriceCentreeGlobale.transpose().mult(vCentre);
-
         SimpleMatrix baseEigenfaces = this.eigenfaces.getBase();
-        this.coords = baseEigenfaces.transpose().mult(vIntermediaire);
+        this.coords = baseEigenfaces.transpose().mult(vCentre);
         return this.coords;
     }
 

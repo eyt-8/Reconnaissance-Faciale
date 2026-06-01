@@ -46,7 +46,8 @@ public class Reconnaissance {
         String identiteTrouvee = "Inconnu";
 
         for (int i = 0; i < baseRef.getReferences().size(); i++) {
-            SimpleMatrix coordonneesRef = projection.getEigenfaces().getBase().getColumn(i);
+            ImageVect refImg = baseRef.getReferences().get(i);
+            SimpleMatrix coordonneesRef = projection.projeter(refImg);
             double d = distance(coordonneesTest, coordonneesRef, methode);
             if (d < distanceMinimale) {
                 distanceMinimale = d;
@@ -119,23 +120,21 @@ public class Reconnaissance {
      * @return la distance calculée entre les deux vecteurs de coordonnées
      */
     public double distance_mahalanobis(SimpleMatrix jp, SimpleMatrix jpk) {
-    	SimpleMatrix base = projection.getEigenfaces().getBase();
-    	
-    	// On inverse les éléments diagonaux de la matrice des valeurs propres D pour avoir D-1
-    	SimpleMatrix propreInv = new SimpleMatrix(base.getNumRows(),base.getNumRows());
-    	propreInv.zero();
     	SimpleMatrix propre_vec = projection.getEigenfaces().getValPropres();
-    	double eltDiag;
-    	for (int i=0;i<propre_vec.getNumCols();i++) {
-    		eltDiag = 1/propre_vec.get(i, 0);
-    		propreInv.set(i, i, eltDiag);
-    	}
-    	// On inverse la matrice ATA=PDPT => (ATA)-1 = PTD-1P
-    	SimpleMatrix mat_inv = base.transpose().mult(propreInv).mult(base);
+        int k = propre_vec.getNumRows(); // Nombre de composantes (K)
     	
-    	// On calcule la différence entre les deux vecteurs pour après passer à la norme
+    	// La matrice de covariance des coordonnées projetées est diagonale (les valeurs propres)
+    	SimpleMatrix propreInv = new SimpleMatrix(k, k);
+    	propreInv.zero();
+    	for (int i=0; i<k; i++) {
+    		propreInv.set(i, i, 1.0 / propre_vec.get(i, 0));
+    	}
+    	
+    	// Différence entre les deux vecteurs de coordonnées (taille K x 1)
     	SimpleMatrix difference = jp.minus(jpk);
-        return difference.transpose().mult(mat_inv).dot(difference);
+        
+        // Formule : d = (jp - jpk)^T * D^-1 * (jp - jpk)
+        return difference.transpose().mult(propreInv).dot(difference);
     }
 
     /**
