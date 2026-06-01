@@ -13,6 +13,9 @@ public class SVD {
     private SimpleMatrix bValSinguliere;
     private SimpleMatrix vectPropATA;
     
+    /** Matrice centrée (A) conservée pour calculer les eigenfaces (U = A * V) */
+    private SimpleMatrix matriceCentree;
+    
     /**On crée une instance de la classe Propre
     *SVD délègue le calcul des valeurs/vecteurs propres 
     * à cette classe spécialisée. Cela permet de séparer la logique mathématique (EIG) 
@@ -22,7 +25,7 @@ public class SVD {
     
     public SVD(SimpleMatrix matrice) {
     	//On initialise l'objet Propre
-    	
+    	this.matriceCentree = matrice;
     	this.calculerMatriceVarCov(matrice);
     	this.calculerBV();
     	
@@ -53,11 +56,34 @@ public class SVD {
         calculPropre.decomposer();
         
         //Récupération des résultats pour remplir les attributs de SVD
-        //matD -> valeurs singulières au carré
-        this.bValSinguliere = calculPropre.getMatD();
         
-        //matP -> vecteurs propres de AtA
-        this.vectPropATA = calculPropre.getMatP();
+        // 1. Gestion des valeurs propres (extraction de la diagonale en vecteur colonne)
+        SimpleMatrix D = calculPropre.getMatD();
+        int n = D.getNumRows();
+        SimpleMatrix vp = new SimpleMatrix(n, 1);
+        for (int i = 0; i < n; i++) {
+            // Si D est bien diagonale (N x N), on extrait la diagonale
+            // Si Propre a déjà été corrigé (N x 1), on prend la première colonne
+            vp.set(i, 0, D.getNumCols() > 1 ? D.get(i, i) : D.get(i, 0));
+        }
+        this.bValSinguliere = vp;
+        
+        // 2. Gestion des vecteurs propres (Vecteurs de AtA -> Vraies Eigenfaces U)
+        SimpleMatrix V = calculPropre.getMatP();
+        SimpleMatrix U = this.matriceCentree.mult(V); // U = A * V
+        
+        // Normalisation de chaque eigenface (colonne de U)
+        for (int j = 0; j < U.getNumCols(); j++) {
+            SimpleMatrix colonne = U.getColumn(j);
+            double norme = colonne.normF();
+            if (norme > 1e-12) {
+                colonne = colonne.divide(norme);
+            }
+            U.insertIntoThis(0, j, colonne);
+        }
+        
+        // On sauvegarde U (les vraies eigenfaces de taille Pixels x N)
+        this.vectPropATA = U;
         
         System.out.println("Décomposition Réussie");
     }

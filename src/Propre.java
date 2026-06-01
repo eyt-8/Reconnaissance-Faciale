@@ -51,7 +51,7 @@ public class Propre {
         SimpleEVD<SimpleMatrix> evd = matrice.eig();
 
         // D : matrice diagonale qui recevra les valeurs propres (zéros ailleurs).
-        SimpleMatrix D = new SimpleMatrix(n, n);
+        SimpleMatrix D = new SimpleMatrix(n, 1);
         // P : matrice qui recevra les vecteurs propres, rangés en colonnes.
         SimpleMatrix P = new SimpleMatrix(n, n);
 
@@ -63,7 +63,7 @@ public class Propre {
             // imaginaire nulle), donc on ignore la composante complexe.
             double lambda = evd.getEigenvalue(j).getReal();
             // On place cette valeur propre sur la diagonale, en position (j, j).
-            D.set(j, j, lambda);
+            D.set(j, 0, lambda);
 
             // Récupère le vecteur propre associé à cette valeur propre (colonne n x 1).
             // EJML renvoie null si la valeur propre est complexe : on s'en protège.
