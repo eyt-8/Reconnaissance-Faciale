@@ -28,6 +28,21 @@ public class Projection {
     }
 
     /**
+     * Projette une image sur la base d'origine en passant par la base réduite.
+     * @return un vecteur de coordonnées (coefficients) dans la base "d'origine"
+     */
+    public SimpleMatrix projection_inv_ortho() {
+        SimpleMatrix liste_vp = eigenfaces.getValPropres();
+        int nb_vp = liste_vp.getNumRows();
+        SimpleMatrix m_vp = new SimpleMatrix(nb_vp,nb_vp);
+        m_vp.zero();
+        for (int i=0;i<nb_vp;i++) {
+                m_vp.set(i, i, liste_vp.get(i,0));
+        }
+        return coords.mult(m_vp).mult(eigenfaces.getBase().transpose());
+    }
+    
+    /**
      * Projette une image sur la base d'eigenfaces.
      * @param img l'image à projeter
      * @return un vecteur de coordonnées (coefficients) dans la base des eigenfaces
