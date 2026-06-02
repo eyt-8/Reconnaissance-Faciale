@@ -10,7 +10,7 @@ public class SVD {
     private SimpleMatrix matriceVarCov;
     private SimpleMatrix bValSinguliere;
     private SimpleMatrix vectPropATA;
-    
+    private SimpleMatrix U;
     /** Matrice centrée (A) conservée pour calculer les eigenfaces (U = A * V) */
     private SimpleMatrix matriceCentree;
     
@@ -74,6 +74,7 @@ public class SVD {
         
         // On sauvegarde V (les vraies eigenfaces de taille Images x Images)
         this.vectPropATA = V;
+        this.U = U;
         
         System.out.println("Décomposition Réussie");
     }
@@ -86,16 +87,23 @@ public class SVD {
     public SimpleMatrix getVectPropATA() {
     	return this.vectPropATA;
     }
+
+    public SimpleMatrix getU() {
+        return this.U;
+    }
     
     public SimpleMatrix getMatriceVarCov() {
     	return this.matriceVarCov;
     }
 
-	@Override
-	public String toString() {
-		return "SVD [matriceVarCov=" + matriceVarCov + ", bValSinguliere=" + bValSinguliere + ", vectPropATA="
-				+ vectPropATA + ", calculPropre=" + calculPropre + "]";
-	}
+    @Override
+    public String toString() {
+        return "SVD [matriceVarCov=" + matriceVarCov 
+             + ", bValSinguliere=" + bValSinguliere 
+             + ", vectPropATA=" + vectPropATA 
+             + ", U=" + U
+             + ", calculPropre=" + calculPropre + "]";
+    }
         
         
 }

@@ -49,7 +49,7 @@ public class Comparaison {
 				somme = somme + Math.pow(this.image.get(i, j) - this.projete.get(i, j), 2);
 			}
 		}
-		return somme / taille;
+		return somme / (taille * taille);
 	}
 
 	/**
@@ -76,7 +76,7 @@ public class Comparaison {
 				somme = somme + Math.abs(this.image.get(i, j) - this.projete.get(i, j));
 			}
 		}
-		return somme / taille;
+		return somme / (taille * taille);
 	}
 
 	public static void main(String args[]) {

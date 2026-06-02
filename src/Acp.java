@@ -76,9 +76,9 @@ public class Acp {
 	 *                test
 	 */
 	public void calcVisageMoyen(SimpleMatrix visages) {
-		// Le nombre d'images correspond au nombre de lignes
+		// Le nombre d'images correspond au nombre de colonnes 
 		int taille = visages.getNumCols();
-		// Le nombre de colonnes correspond au nombre de colonnes
+		// Le nombre de colonnes correspond au nombre de pixels
 		int taille_pixels = visages.getNumRows();
 
 		this.visage_moyen = new SimpleMatrix(taille_pixels, 1);

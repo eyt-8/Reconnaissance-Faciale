@@ -31,7 +31,7 @@ public class Eigenfaces {
     	// vec matrice des vecteurs propres en colonnes (taille n x m)
 
     	SimpleMatrix vp = svd.getbValSinguliere();
-    	SimpleMatrix vec = svd.getVectPropATA();
+    	SimpleMatrix vec = svd.getU();
     	
         int m = vp.getNumRows();
         Integer[] indices = new Integer[m];
