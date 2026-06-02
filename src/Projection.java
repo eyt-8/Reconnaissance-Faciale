@@ -41,20 +41,7 @@ public class Projection {
         SimpleMatrix vCentre = vImage.minus(visageMoyen);
 
         SimpleMatrix baseEigenfaces = this.eigenfaces.getBase();
-        // Regarder la taille de la base
-        this.coords = acp.getMatrice_centree().transpose().mult(vCentre);
-        
-        SimpleMatrix v_ortho = new SimpleMatrix(this.coords.getNumRows(),this.coords.getNumCols());
-        v_ortho.zero();
-        
-        SimpleMatrix vec_propres = this.eigenfaces.getSvd().getVectPropATA();
-        
-        // On projette sur la base orthogonale
-        
-        for (int i=0;i<this.coords.getNumCols();i++) {
-        	v_ortho = v_ortho.plus(vec_propres.getRow(i).scale(vec_propres.getRow(i).dot(this.coords)).transpose());
-        }
-        this.coords = v_ortho;
+        this.coords = baseEigenfaces.transpose().mult(vCentre);
         return this.coords;
     }
     
