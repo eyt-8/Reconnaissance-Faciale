@@ -62,7 +62,7 @@ public class Reconnaissance {
                 identiteTrouvee = baseRef.getIdentite(i);
             }
         }
-        System.out.println("Distance minimale : "+distanceMinimale);
+        System.out.println(" Distance minimale :"+distanceMinimale);
         this.derniereDistance = distanceMinimale;
         this.confiances(distances);
         return (distanceMinimale > this.seuil) ? "Inconnu" : identiteTrouvee;

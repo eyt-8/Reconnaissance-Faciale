@@ -1,9 +1,14 @@
 // import java.util.List;
 
+import java.util.Scanner;
+
 public class App {
 
     public static void main(String[] args) throws Exception {
 
+    	
+    	System.out.println("[+] Chargement de la base de données et calcul des Eigenfaces...");
+    	
         // Chargement des images : matrice => vecteurs => matrices des images (Danika)
         // Requiert BDD et ImageVect
         BaseDeDonnees bdd = new BaseDeDonnees();
@@ -25,11 +30,94 @@ public class App {
         // Visage moyen à récupérer
         faces.setVisageMoyen(acp.getVisage_moyen());
         
+        System.out.println("[+] Chargement terminé !");
+        
         // 1. Charger une image bien précise en indiquant son chemin d'accès
-        ImageVect monImageTest = new ImageVect("donnees/test/2.jpg");
-        // 2. Demander au système de l'identifier (ici en utilisant la distance de Mahalanobis)
-        String prediction = rec.identifier(monImageTest, "euclidienne"); // tu peux aussi mettre "euclidienne"
+        Scanner scanner = new Scanner(System.in);
+        
+        // 1. Choix de l'image de test
+        System.out.println("===================================================================");
+        System.out.println("Entrez le chemin de l'image de test [Défaut: donnees/test/1.jpg] : ");
+        System.out.println("===================================================================");
+        
+        // Montre tous les choix possibles d'images (donc celles présentes dans test à l'origine)
+        
+        System.out.println("Sélectionnez l'image de test à analyser :");
+        for (int i = 1; i <= 10; i++) {
+            System.out.println(" " + i + ". Image n°" + i + " (donnees/test/" + i + ".jpg)");
+        }
+        
+        boolean imageValide = false;
+        String cheminImage = "";
+        
+        while (!imageValide) {
+            System.out.print("Entrez le numéro de l'image (1 à 10) [Défaut: 2] : ");
+            String saisie = scanner.nextLine().trim();
+            
+            if (saisie.isEmpty()) {
+                cheminImage = "donnees/test/2.jpg";
+                imageValide = true;
+            } else {
+                try {
+                    int choixImage = Integer.parseInt(saisie);
+                    if (choixImage >= 1 && choixImage <= 10) {
+                        cheminImage = "donnees/test/" + choixImage + ".jpg";
+                        imageValide = true;
+                    } else {
+                        System.out.println("[!] Numéro invalide. Choisissez un nombre entre 1 et 10.");
+                    }
+                } catch (NumberFormatException e) {
+                    System.out.println("[!] Entrée invalide. Veuillez saisir un nombre.");
+                }
+            }
+        }
+        
+        // Choix des types de distance
+        
+        boolean distanceValide = false;
+        String typeDistance = "";
+        while (!distanceValide) {
+            System.out.println("-------------------------------------------------------");
+            System.out.println("Choisissez la métrique de distance souhaitée :");
+            System.out.println(" 1. Euclidienne");
+            System.out.println(" 2. Mahalanobis");
+            System.out.println(" 3. Cosinus");
+            System.out.print("Votre choix (1, 2 ou 3) : ");
+            
+            String choix = scanner.nextLine().trim();
+            
+            switch (choix) {
+                case "1":
+                    typeDistance = "euclidienne";
+                    distanceValide = true;
+                    break;
+                case "2":
+                    typeDistance = "mahalanobis";
+                    distanceValide = true;
+                    break;
+                case "3":
+                    typeDistance = "cosinus";
+                    distanceValide = true;
+                    break;
+                default:
+                    System.out.println("[!] Choix invalide. Veuillez entrer 1, 2 ou 3.");
+                    break;
+            }
+        }
+        
+        scanner.close(); // Fermeture propre du scanner
+        
+        System.out.println("\n[+] Analyse en cours...");
+        ImageVect monImageTest = new ImageVect(cheminImage);
         // 3. Afficher le résultat dans la console
+        System.out.println("===================================================================");
+        System.out.println("          RÉSULTATS DE LA RECONNAISSANCE ACP           ");
+        System.out.println("===================================================================");
+     // Demander au système de l'identifier
+        String prediction = rec.identifier(monImageTest, typeDistance); // tu peux aussi mettre "euclidienne"
+        System.out.println(" Image analysée    : " + cheminImage);
+        System.out.println(" Métrique choisie  : " + typeDistance.toUpperCase());
+        System.out.println("-------------------------------------------------------");
         System.out.println("La personne reconnue sur cette image est : " + prediction);
         
         // On passe les eigenfaces en image
