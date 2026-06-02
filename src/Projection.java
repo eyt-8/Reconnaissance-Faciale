@@ -78,6 +78,7 @@ public class Projection {
      * @param coords vecteur de coefficients dans la base des eigenfaces
      * @return une instance d'Image reconstruite
      */
+    
     // public ImageVect reconstruire(SimpleMatrix coords) {
     //     SimpleMatrix baseEigenfaces = this.eigenfaces.getBase();
     //     SimpleMatrix vCentreReconstruit = baseEigenfaces.mult(coords);
