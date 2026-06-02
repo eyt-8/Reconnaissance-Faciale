@@ -57,22 +57,13 @@ public class Propre {
 
         // On parcourt chaque couple (valeur propre, vecteur propre), indexé par j.
         for (int j = 0; j < n; j++) {
-
-            // Récupère la j-ème valeur propre. getReal() suffit car la matrice est
-            // symétrique : ses valeurs propres sont garanties réelles (partie
-            // imaginaire nulle), donc on ignore la composante complexe.
             double lambda = evd.getEigenvalue(j).getReal();
-            // On place cette valeur propre sur la diagonale, en position (j, j).
             D.set(j, 0, lambda);
 
             // Récupère le vecteur propre associé à cette valeur propre (colonne n x 1).
             // EJML renvoie null si la valeur propre est complexe : on s'en protège.
             SimpleMatrix v = evd.getEigenVector(j);
             if (v != null) {
-
-                // Norme euclidienne du vecteur. On la calcule pour pouvoir normaliser :
-                // on veut une base ORTHONORMÉE (vecteurs de longueur 1), nécessaire
-                // pour que la reconstruction A = P * D * P^T fonctionne.
                 double norme = v.normF();
                 // On ne divise que si la norme n'est pas quasi nulle, pour éviter
                 // une division par zéro (1e-12 = seuil de sécurité numérique).
