@@ -13,14 +13,16 @@ public class Projection {
     /** Les eigenfaces (base et valeurs propres) utilisées pour la projection */
     private Eigenfaces eigenfaces;
     /** Coordonnées de la dernière projection effectuée (vecteur colonne) */
+    private Acp acp;
     private SimpleMatrix coords;
 
     /**
      * Constructeur principal de la projection
      * @param eigenfaces objet contenant la base d'eigenfaces et le visage moyen
      */
-    public Projection(Eigenfaces eigenfaces) {
+    public Projection(Eigenfaces eigenfaces, Acp acp) {
         this.eigenfaces=eigenfaces;
+        this.acp = acp;
     }
 
     public Eigenfaces getEigenfaces() {
@@ -39,8 +41,18 @@ public class Projection {
         for (int i=0;i<nb_vp;i++) {
                 m_vp.set(i, i, liste_vp.get(i,0));
         }
-        return coords.mult(m_vp).mult(eigenfaces.getBase().transpose());
+        
+        SimpleMatrix v_reduit = coords.mult(m_vp).mult(eigenfaces.getBase().transpose());
+        return v_reduit;
     }
+    
+    
+    /* A faire
+    public SimpleMatrix projection_inv() {
+    	this.projection_inv_ortho();
+    	
+    }
+    */
     
     /**
      * Projette une image sur la base d'eigenfaces.
@@ -54,9 +66,24 @@ public class Projection {
         SimpleMatrix vCentre = vImage.minus(visageMoyen);
 
         SimpleMatrix baseEigenfaces = this.eigenfaces.getBase();
-        this.coords = baseEigenfaces.transpose().mult(vCentre);
+        // Regarder la taille de la base
+        this.coords = acp.getMatrice_centree().transpose().mult(vCentre);
+        
+        SimpleMatrix v_ortho = new SimpleMatrix(this.coords.getNumRows(),this.coords.getNumCols());
+        v_ortho.zero();
+        
+        SimpleMatrix vec_propres = this.eigenfaces.getSvd().getVectPropATA();
+        
+        // On projette sur la base orthogonale
+        
+        for (int i=0;i<this.coords.getNumCols();i++) {
+        	v_ortho = v_ortho.plus(vec_propres.scale(vec_propres.getRow(i).dot(this.coords)));
+        }
+        this.coords = v_ortho;
         return this.coords;
     }
+    
+    
 
     /**
      * Reconstruit une image à partir de coordonnées dans l'espace des eigenfaces.
