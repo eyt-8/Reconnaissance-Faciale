@@ -28,45 +28,6 @@ public class Projection {
     public Eigenfaces getEigenfaces() {
         return eigenfaces;
     }
-
-    /**
-     * Projette une image sur la base d'origine en passant par la base réduite.
-     * @return un vecteur de coordonnées (coefficients) dans la base "d'origine" mais ne correspondant pas à l'image (sous la base AtA)
-     */
-    public SimpleMatrix projection_inv_ortho() {
-        SimpleMatrix liste_vp = eigenfaces.getValPropres();
-        
-        // nb_vp => Nombre de valeurs propres
-        int nb_vp = liste_vp.getNumRows();
-        
-        // m_vp => matrice des valeurs propres
-        SimpleMatrix m_vp = new SimpleMatrix(nb_vp,nb_vp);
-        m_vp.zero();
-        
-        // On récupère la matrice diagonale modifiée
-        
-        for (int i=0;i<nb_vp;i++) {
-        	if (i<=eigenfaces.getK()) {
-                m_vp.set(i, i, liste_vp.get(i,0));
-        	}
-        	else {
-        		m_vp.set(i, i, 0);
-        	}
-        }
-        
-        SimpleMatrix P = eigenfaces.getSvd().getVectPropATA();
-        
-        SimpleMatrix v_reduit = P.mult(m_vp).mult(P.transpose()).mult(P.transpose()).mult(this.coords);
-        return v_reduit;
-    }
-    
-    
-    /* A faire
-    public SimpleMatrix projection_inv() {
-    	this.projection_inv_ortho();
-    	
-    }
-    */
     
     /**
      * Projette une image sur la base d'eigenfaces.
