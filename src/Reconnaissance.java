@@ -19,6 +19,8 @@ public class Reconnaissance {
     /** Limite de distance au-delà de laquelle le visage est considéré comme inconnu */
     private double seuil; 
     
+    private double derniereDistance = 0.0;
+
     /**
      * Constructeur de la classe Reconnaissance.
      * 
@@ -55,6 +57,7 @@ public class Reconnaissance {
             }
         }
         System.out.println("Distance minimale : "+distanceMinimale);
+        this.derniereDistance = distanceMinimale;
         return (distanceMinimale > this.seuil) ? "Inconnu" : identiteTrouvee;
     }
     
@@ -173,5 +176,9 @@ public class Reconnaissance {
         System.out.println("Lancement des scénarios de test...");
         double taux = tauxIdentification();
         System.out.println("Taux d'identification global : " + (taux * 100) + " %");
+    }
+
+    public double getDerniereDistance() {
+        return this.derniereDistance;
     }
 }

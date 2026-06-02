@@ -103,8 +103,12 @@ public class Gestionnaire {
                         imgTrouvee = new Image(fichiersImages[0].toURI().toString());
                     }
                 }
-                tauxRessemblance = 85.0 + (Math.random() * 10);
-            } else {
+                double vraiDistance = this.reco.getDerniereDistance();
+                double seuilMax =  3000.0;
+                double calculTaux = 100.0 * (1.0 - (vraiDistance/seuilMax));
+                tauxRessemblance = Math.max(0.0, Math.min(100.0, calculTaux));
+            } 
+            else {
                 tauxRessemblance = 0.0;
             }
             this.ecran.majInterface(imgEntree, imgTrouvee, nomTrouve, tauxRessemblance);
