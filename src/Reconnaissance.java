@@ -1,3 +1,6 @@
+import java.util.ArrayList;
+import java.util.Collections;
+
 import org.ejml.simple.SimpleMatrix;
 
 /**
@@ -47,10 +50,13 @@ public class Reconnaissance {
         double distanceMinimale = Double.MAX_VALUE;
         String identiteTrouvee = "Inconnu";
 
+        ArrayList <Double> distances = new ArrayList<Double>();
+        
         for (int i = 0; i < baseRef.getReferences().size(); i++) {
             ImageVect refImg = baseRef.getReferences().get(i);
             SimpleMatrix coordonneesRef = projection.projeter(refImg);
             double d = distance(coordonneesTest, coordonneesRef, methode);
+            distances.add(d);
             if (d < distanceMinimale) {
                 distanceMinimale = d;
                 identiteTrouvee = baseRef.getIdentite(i);
@@ -58,7 +64,31 @@ public class Reconnaissance {
         }
         System.out.println("Distance minimale : "+distanceMinimale);
         this.derniereDistance = distanceMinimale;
+        this.confiances(distances);
         return (distanceMinimale > this.seuil) ? "Inconnu" : identiteTrouvee;
+    }
+    
+    /*
+     * Retourne la confiance liée à chaque distance dans l'ordre
+     * @param distances liste de toutes les distances (ordre non requis)
+     */
+    public void confiances(ArrayList<Double> distances) {
+    	ArrayList<Double> confiances = new ArrayList<Double>();
+    	Double somme=0.0;
+    	for (int i=0;i<distances.size();i++) {
+    		// On passe les distances entre 0 et 1
+    		distances.set(i, 1.0-distances.get(i)/Collections.max(distances));
+    		somme = somme + 1.0 - distances.get(i)/Collections.max(distances);
+    	}
+    	
+    	for (int i=0;i<distances.size();i++) {
+    		confiances.add(distances.get(i)/somme*100);
+    	}
+    	// On trie les confiances
+    	Collections.sort(confiances);
+    	Collections.reverse(confiances);
+    	System.out.println("Confiance (%)");
+    	System.out.println(confiances.toString());
     }
     
     /**
@@ -167,6 +197,7 @@ public class Reconnaissance {
         if (totalTests == 0) return 0.0;
         return (double) reussites / totalTests;
     }
+    
 
     /**
      * Déclenche une série de tests sur la base de données de test et 

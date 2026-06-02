@@ -101,4 +101,12 @@ public class Projection {
         }
         return varianceCumulee;
     }
+
+	public SimpleMatrix getCoords() {
+		return coords;
+	}
+
+	public void setCoords(SimpleMatrix coords) {
+		this.coords = coords;
+	}
 }

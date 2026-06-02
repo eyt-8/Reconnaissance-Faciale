@@ -34,9 +34,12 @@ public class App {
         
         // On passe les eigenfaces en image
         
+        ImageVect vecteur = new ImageVect(p.getCoords(),999);
+        /*
         for (int i=0;i<faces.getBase().getNumCols();i++) {
         	ImageVect im = new ImageVect(faces.getBase().getColumn(i),i);
         }
+        */
         // Chargement des images : matrice => vecteurs => matrices des images (Danika)
         // Requiert BDD et ImageVect
         
