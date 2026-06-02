@@ -48,13 +48,13 @@ public class Gestionnaire {
 
             SVD svd = new SVD(acp.getMatrice_centree());
 
-            Eigenfaces faces = new Eigenfaces();
-            faces.construire(svd.getbValSinguliere(), svd.getVectPropATA());
+            Eigenfaces faces = new Eigenfaces(svd);
+            faces.construire();
             faces.setVisageMoyen(acp.getVisage_moyen());
 
             faces.selectionnerK(0.95);
 
-            this.proj = new Projection(faces);
+            this.proj = new Projection(faces, acp);
 
             double seuil = 3000.0;
             this.reco = new Reconnaissance(bdd, proj, seuil);

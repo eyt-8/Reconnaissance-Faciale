@@ -16,7 +16,7 @@ public class Eigenfaces {
     private SimpleMatrix valPropres;  // valeurs propres associées
     private int k;                    // nombre d'eigenfaces retenues
 
-public Eigenfaces(SVD svd) {
+    public Eigenfaces(SVD svd) {
         this.k = 0;
         this.svd = svd;
     }
