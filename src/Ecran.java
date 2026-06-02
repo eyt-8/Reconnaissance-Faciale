@@ -129,7 +129,19 @@ public class Ecran extends BorderPane {
      */
     public void majInterface(Image imgEntre, Image imgTrouvee, String nom, double taux) {
         if (imgEntre != null) this.visageEntre.setImage(imgEntre);
-        if (imgTrouvee != null) this.visageTrouve.setImage(imgTrouvee);
+        if (imgTrouvee != null) {
+            this.visageTrouve.setImage(imgTrouvee);
+        }
+        else {
+            try {
+                java.io.File fichierSilhouette = new java.io.File("donnees/silhouette.png");
+                if (fichierSilhouette.exists()) {
+                    this.visageTrouve.setImage(new Image(fichierSilhouette.toURI().toString()));
+                }
+            } catch (Exception e) {
+                System.err.println("Erreur lors du rechargement de la silhouette.");
+            }
+        }
         this.nomPrenom.setText("La personne est " + nom);
         this.barreRessemblance.setProgress(taux / 100.0);
         this.pourcentage.setText("Taux de ressemblance : " + String.format("%.1f", taux) + " %");
