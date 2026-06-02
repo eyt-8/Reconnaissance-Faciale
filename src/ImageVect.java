@@ -2,6 +2,7 @@ import org.ejml.simple.SimpleMatrix;
 import java.io.File;
 import javax.imageio.ImageIO;
 import java.io.IOException;
+import java.awt.Color;
 import java.awt.image.BufferedImage;
 
 public class ImageVect {
@@ -31,6 +32,29 @@ public class ImageVect {
         this.longueur = this.image.getHeight();
         this.largeur = this.image.getWidth();
         this.vecteurCol = new SimpleMatrix(this.largeur*this.longueur,1);
+    }
+    
+    public ImageVect(SimpleMatrix vec_eigenface) throws IOException {
+    	this.fichier = null;
+    	this.vecteurCol = vec_eigenface;
+    	// On convertit le vecteur en image
+    	
+    	int taille = (int)Math.floor(Math.sqrt(this.vecteurCol.getNumRows()));
+    	
+    	this.vecteurCol.reshape(taille, taille);
+    	
+	    BufferedImage image_dest = null;
+	    for(int i=0; i<this.vecteurCol.getNumRows(); i++) {
+	        for(int j=0; j<this.vecteurCol.getNumCols(); j++) {
+	            int a = this.vecteurCol.getIndex(i, j);
+	            Color newColor = new Color(a,a,a);
+	            image_dest.setRGB(j,i,newColor.getRGB());
+	        }
+	    }
+	    File output = new File("GrayScale.jpg");
+	    ImageIO.write(image_dest, "jpg", output);
+	
+    	
     }
 
     /**
