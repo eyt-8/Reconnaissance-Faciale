@@ -73,8 +73,7 @@ public class SVD {
         }
         
         // On sauvegarde V (les vraies eigenfaces de taille Images x Images)
-        this.vectPropATA = V;
-        this.U = U;
+        this.vectPropATA = U;
         
         System.out.println("Décomposition Réussie");
     }
