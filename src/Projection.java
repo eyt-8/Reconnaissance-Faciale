@@ -42,11 +42,6 @@ public class Projection {
         return coords.mult(m_vp).mult(eigenfaces.getBase().transpose());
     }
     
-    public SimpleMatrix projection_inv() {
-    	this.projection_inv_ortho();
-    	
-    }
-    
     /**
      * Projette une image sur la base d'eigenfaces.
      * @param img l'image à projeter
