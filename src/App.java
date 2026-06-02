@@ -1,4 +1,4 @@
-import java.util.List;
+// import java.util.List;
 
 public class App {
 
@@ -17,7 +17,7 @@ public class App {
         
         faces.construire();
         
-        List<ImageVect> images_test = bdd.getTests();
+        // List<ImageVect> images_test = bdd.getTests();
         
         Projection p = new Projection(faces,acp);
         Reconnaissance rec = new Reconnaissance(bdd,p,Double.MAX_VALUE);
