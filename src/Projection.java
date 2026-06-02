@@ -22,7 +22,7 @@ public class Projection {
      */
     public Projection(Eigenfaces eigenfaces, Acp acp) {
         this.eigenfaces=eigenfaces;
-        // this.acp = acp;
+        this.acp = acp;
     }
 
     public Eigenfaces getEigenfaces() {
@@ -42,7 +42,7 @@ public class Projection {
         SimpleMatrix visageMoyen = this.eigenfaces.getVisageMoyen();
         SimpleMatrix vCentre = vImage.minus(visageMoyen);
 
-        // SimpleMatrix baseEigenfaces = this.eigenfaces.getBase();
+        SimpleMatrix baseEigenfaces = this.eigenfaces.getBase();
         // Regarder la taille de la base
         this.coords = acp.getMatrice_centree().transpose().mult(vCentre);
         
