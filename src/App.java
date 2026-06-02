@@ -124,9 +124,10 @@ public class App {
         
         System.out.println("===================================================================");
         System.out.println("         Passage des Eigenfaces en image (voir fichier principal)           ");
-        System.out.println("===================================================================");
+        System.out.println("===================================================================\n");
         for (int i=0;i<faces.getBase().getNumCols();i++) {
         	ImageVect im = new ImageVect(faces.getBase().getColumn(i),i);
+        	System.out.print("-")
         }
         
         // Chargement des images : matrice => vecteurs => matrices des images (Danika)

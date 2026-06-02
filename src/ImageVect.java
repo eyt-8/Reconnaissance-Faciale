@@ -50,7 +50,6 @@ public class ImageVect {
 	        	double decentrer = this.vecteurCol.get(j, i)+this.vecteurCol.elementMinAbs();
 	        	decentrer = decentrer /(this.vecteurCol.elementMinAbs()+this.vecteurCol.elementMaxAbs());
 	            int a = (int)Math.floor(Math.abs(decentrer*255));
-	            System.out.println(a);
 	            Color newColor = new Color(a,a,a);
 	            image_dest.setRGB(j,i,newColor.getRGB());
 	        }
