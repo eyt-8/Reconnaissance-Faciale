@@ -6,7 +6,6 @@ import org.ejml.simple.SimpleMatrix;
 //Définition de la classe SVD
 public class SVD {
     
-    // Attributs tels qu'écrits sur ton diagramme
     private SimpleMatrix matriceVarCov;
     private SimpleMatrix bValSinguliere;
     private SimpleMatrix vectPropATA;
