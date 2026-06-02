@@ -13,7 +13,7 @@ public class Projection {
     /** Les eigenfaces (base et valeurs propres) utilisées pour la projection */
     private Eigenfaces eigenfaces;
     /** Coordonnées de la dernière projection effectuée (vecteur colonne) */
-    // private Acp acp;
+    private Acp acp;
     private SimpleMatrix coords;
 
     /**
@@ -36,39 +36,27 @@ public class Projection {
      * @param img l'image à projeter
      * @return un vecteur de coordonnées (coefficients) dans la base des eigenfaces
      */
-    // public SimpleMatrix projeter(ImageVect img) {
-    //     img.vectoriser();
-    //     SimpleMatrix vImage = img.getVecteurCol();
-    //     SimpleMatrix visageMoyen = this.eigenfaces.getVisageMoyen();
-    //     SimpleMatrix vCentre = vImage.minus(visageMoyen);
-
-    //     // SimpleMatrix baseEigenfaces = this.eigenfaces.getBase();
-    //     // Regarder la taille de la base
-    //     this.coords = acp.getMatrice_centree().transpose().mult(vCentre);
-        
-    //     SimpleMatrix v_ortho = new SimpleMatrix(this.coords.getNumRows(),this.coords.getNumCols());
-    //     v_ortho.zero();
-        
-    //     SimpleMatrix vec_propres = this.eigenfaces.getSvd().getVectPropATA();
-        
-    //     // On projette sur la base orthogonale
-        
-    //     for (int i=0;i<this.coords.getNumCols();i++) {
-    //     	v_ortho = v_ortho.plus(vec_propres.getRow(i).scale(vec_propres.getRow(i).dot(this.coords)).transpose());
-    //     }
-    //     this.coords = v_ortho;
-    //     return this.coords;
-    // }
-
-    // ----------------------------------------------------------------------
-    // test
     public SimpleMatrix projeter(ImageVect img) {
         img.vectoriser();
         SimpleMatrix vImage = img.getVecteurCol();
-        SimpleMatrix vCentre = vImage.minus(this.eigenfaces.getVisageMoyen());
+        SimpleMatrix visageMoyen = this.eigenfaces.getVisageMoyen();
+        SimpleMatrix vCentre = vImage.minus(visageMoyen);
+
+        // SimpleMatrix baseEigenfaces = this.eigenfaces.getBase();
+        // Regarder la taille de la base
+        this.coords = acp.getMatrice_centree().transpose().mult(vCentre);
         
-        SimpleMatrix U_k = this.eigenfaces.getBase();  // n² × K
-        this.coords = U_k.transpose().mult(vCentre);   // (K × n²) · (n² × 1) = (K × 1)
+        SimpleMatrix v_ortho = new SimpleMatrix(this.coords.getNumRows(),this.coords.getNumCols());
+        v_ortho.zero();
+        
+        SimpleMatrix vec_propres = this.eigenfaces.getSvd().getVectPropATA();
+        
+        // On projette sur la base orthogonale
+        
+        for (int i=0;i<this.coords.getNumCols();i++) {
+        	v_ortho = v_ortho.plus(vec_propres.getRow(i).scale(vec_propres.getRow(i).dot(this.coords)).transpose());
+        }
+        this.coords = v_ortho;
         return this.coords;
     }
     
@@ -79,28 +67,15 @@ public class Projection {
      * @return une instance d'Image reconstruite
      */
     
-    // public ImageVect reconstruire(SimpleMatrix coords) {
-    //     SimpleMatrix baseEigenfaces = this.eigenfaces.getBase();
-    //     SimpleMatrix vCentreReconstruit = baseEigenfaces.mult(coords);
-    //     SimpleMatrix visageMoyen = this.eigenfaces.getVisageMoyen();
-    //     SimpleMatrix vImagePixels = vCentreReconstruit.plus(visageMoyen);
-        
-    //     int nbPixels = vImagePixels.getNumRows();
-    //     int cote = (int) Math.sqrt(nbPixels);
-
-    //     ImageVect imgReconstruite = new ImageVect(vImagePixels, cote, cote);
-    //     return imgReconstruite;
-    // }
-
     public ImageVect reconstruire(SimpleMatrix coords) {
-        SimpleMatrix baseEigenfaces = this.eigenfaces.getBase();       // n² × K
-        SimpleMatrix vCentreReconstruit = baseEigenfaces.mult(coords); // n² × 1
+        SimpleMatrix baseEigenfaces = this.eigenfaces.getBase();
+        SimpleMatrix vCentreReconstruit = baseEigenfaces.mult(coords);
         SimpleMatrix visageMoyen = this.eigenfaces.getVisageMoyen();
-        SimpleMatrix vImagePixels = vCentreReconstruit.plus(visageMoyen); // n² × 1
+        SimpleMatrix vImagePixels = vCentreReconstruit.plus(visageMoyen);
         
         int nbPixels = vImagePixels.getNumRows();
         int cote = (int) Math.sqrt(nbPixels);
-        
+
         ImageVect imgReconstruite = new ImageVect(vImagePixels, cote, cote);
         return imgReconstruite;
     }
