@@ -56,7 +56,7 @@ public class SVD {
         //Récupération des résultats pour remplir les attributs de SVD
         
         // 1. Gestion des valeurs propres (extraction de la diagonale en vecteur colonne)
-        this.bValSinguliere = calculPropre.getMatD();
+        this.bValSinguliere = calculPropre.getVectD();
         
         // 2. Gestion des vecteurs propres (Vecteurs de AtA -> Vraies Eigenfaces U)
         SimpleMatrix V = calculPropre.getMatP();

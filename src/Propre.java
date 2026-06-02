@@ -13,9 +13,9 @@ public class Propre {
      */
     private SimpleMatrix matP;
     /**
-     * matrice DIAGONALE des VALEURS PROPRES
+     * vecteur de taille nx1 des VALEURS PROPRES
      */
-    private SimpleMatrix matD;
+    private SimpleMatrix vectD;
     /**
      * Matrice à décomposer arrivant par le constructeur ou le setter
      */
@@ -41,7 +41,7 @@ public class Propre {
 
     /**
      * Méthode permettant de fiare la décomposition de matrice à l'aide de la méthode eig de EJML
-     * Cette méthode instancie matP et matD permattant ensuite de les réustiliser
+     * Cette méthode instancie matP et vectD permattant ensuite de les réustiliser
      */
     public void decomposer() {
         // Dimension de la matrice (carrée) : n lignes = n colonnes = n valeurs propres.
@@ -87,7 +87,7 @@ public class Propre {
         }
 
         this.matP = P;
-        this.matD = D;
+        this.vectD = D;
     }
     
     /**
@@ -98,9 +98,9 @@ public class Propre {
     }
     
     /**
-     * Accesseur matD (Matrice Diagonale des Valeurs Propres)
+     * Accesseur vectD (vecteur des Valeurs Propres)
      */
-    public SimpleMatrix getMatD() {
-        return matD;
+    public SimpleMatrix getVectD() {
+        return vectD;
     }
 }
