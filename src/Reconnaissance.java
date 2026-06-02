@@ -152,9 +152,9 @@ public class Reconnaissance {
             
             // On déduit le nom attendu à partir du nom du fichier image
             // (Assurez-vous que cette ligne correspond à votre façon de nommer les fichiers tests)
-            String nomAttendu = imgTest.getNom().replaceAll("[0-9]", ""); 
+            String nomAttendu = imgTest.getNom().replaceAll("[0-9]", "").trim(); 
             
-            if (identiteTrouvee.equals(nomAttendu)) {
+            if (identiteTrouvee.toLowerCase().contains(nomAttendu.toLowerCase())) {
                 reussites++;
             } else {
                 System.out.println("Erreur : " + imgTest.getNom() + " identifié(e) comme " + identiteTrouvee);

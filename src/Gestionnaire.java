@@ -96,13 +96,11 @@ public class Gestionnaire {
             Image imgTrouvee = null;
             double tauxRessemblance = 0.0;
             if (!nomTrouve.equals("Inconnu")) {
-                for (ImageVect imgRef : this.bdd.getReferences()) {
-                    if (imgRef.getNom().contains(nomTrouve)) {
-                        File fRef = new File("donnees/apprentissage/" + nomTrouve + "/" + imgRef.getNom() + ".jpg");
-                        if (fRef.exists()) {
-                            imgTrouvee = new Image(fRef.toURI().toString());
-                        }
-                        break;
+                File dossierPersonne = new File("donnees/apprentissage/" + nomTrouve);                
+                if (dossierPersonne.exists() && dossierPersonne.isDirectory()) {
+                    File[] fichiersImages = dossierPersonne.listFiles((dir, name) -> name.endsWith(".jpg"));                    
+                    if (fichiersImages != null && fichiersImages.length > 0) {
+                        imgTrouvee = new Image(fichiersImages[0].toURI().toString());
                     }
                 }
                 tauxRessemblance = 85.0 + (Math.random() * 10);
