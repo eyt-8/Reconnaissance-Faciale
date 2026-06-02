@@ -58,15 +58,7 @@ public class SVD {
         //Récupération des résultats pour remplir les attributs de SVD
         
         // 1. Gestion des valeurs propres (extraction de la diagonale en vecteur colonne)
-        SimpleMatrix D = calculPropre.getMatD();
-        int n = D.getNumRows();
-        SimpleMatrix vp = new SimpleMatrix(n, 1);
-        for (int i = 0; i < n; i++) {
-            // Si D est bien diagonale (N x N), on extrait la diagonale
-            // Si Propre a déjà été corrigé (N x 1), on prend la première colonne
-            vp.set(i, 0, D.getNumCols() > 1 ? D.get(i, i) : D.get(i, 0));
-        }
-        this.bValSinguliere = vp;
+        this.bValSinguliere = calculPropre.getMatD();
         
         // 2. Gestion des vecteurs propres (Vecteurs de AtA -> Vraies Eigenfaces U)
         SimpleMatrix V = calculPropre.getMatP();

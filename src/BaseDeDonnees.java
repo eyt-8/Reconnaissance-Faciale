@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -30,7 +31,7 @@ public class BaseDeDonnees {
 	 */
 	public BaseDeDonnees(){
 		this.cheminRacine = "donnees/apprentissage/";
-        this.images = new HashMap<>();
+        this.images = new LinkedHashMap<>();
         this.listeNoms = new ArrayList<>();
         this.chargerChemin();
 	}
