@@ -77,7 +77,7 @@ public class Projection {
         // On projette sur la base orthogonale
         
         for (int i=0;i<this.coords.getNumCols();i++) {
-        	v_ortho = v_ortho.plus(vec_propres.scale(vec_propres.getRow(i).dot(this.coords)));
+        	v_ortho = v_ortho.plus(vec_propres.getRow(i).scale(vec_propres.getRow(i).dot(this.coords)).transpose());
         }
         this.coords = v_ortho;
         return this.coords;
