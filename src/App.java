@@ -13,22 +13,22 @@ public class App {
         
         SVD svd = new SVD(acp.getMatrice_centree());
         
-        Eigenfaces faces = new Eigenfaces();
+        Eigenfaces faces = new Eigenfaces(svd);
         
-        faces.construire(svd.getbValSinguliere(),svd.getVectPropATA());
+        faces.construire();
         
         List<ImageVect> images_test = bdd.getTests();
         
-        Projection p = new Projection(faces);
+        Projection p = new Projection(faces,acp);
         Reconnaissance rec = new Reconnaissance(bdd,p,Double.MAX_VALUE);
         
         // Visage moyen à récupérer
         faces.setVisageMoyen(acp.getVisage_moyen());
         
         // 1. Charger une image bien précise en indiquant son chemin d'accès
-        ImageVect monImageTest = new ImageVect("donnees/test/7.jpg");
+        ImageVect monImageTest = new ImageVect("donnees/test/2.jpg");
         // 2. Demander au système de l'identifier (ici en utilisant la distance de Mahalanobis)
-        String prediction = rec.identifier(monImageTest, "mahalanobis"); // tu peux aussi mettre "euclidienne"
+        String prediction = rec.identifier(monImageTest, "cosinus"); // tu peux aussi mettre "euclidienne"
         // 3. Afficher le résultat dans la console
         System.out.println("La personne reconnue sur cette image est : " + prediction);
 
