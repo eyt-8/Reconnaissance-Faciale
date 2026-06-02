@@ -42,24 +42,18 @@ public class Gestionnaire {
         System.out.println("Démarrage de l'apprentissage...");
         try {
             this.bdd = new BaseDeDonnees();
-            this.bdd.associerIdNom();
 
-            Acp acp = new Acp(this.bdd);
-
-            SVD svd = new SVD(acp.getMatrice_centree());
-
-            Eigenfaces faces = new Eigenfaces(svd);
+            Acp        acp   = new Acp(this.bdd);
+            SVD        svd   = new SVD(acp.getMatrice_centree());
+            Eigenfaces faces = new Eigenfaces(svd, acp.getVisage_moyen());
             faces.construire();
-            faces.setVisageMoyen(acp.getVisage_moyen());
-
             faces.selectionnerK(0.95);
 
-            this.proj = new Projection(faces, acp);
+            this.proj = new Projection(faces);
+            this.reco = new Reconnaissance(this.bdd, this.proj, Double.MAX_VALUE);
+            this.reco.calibrerSeuil();
 
-            double seuil = 3000.0;
-            this.reco = new Reconnaissance(bdd, proj, seuil);
-
-            System.out.println("Apprentissage terminé");
+            System.out.println("Apprentissage terminé — K = " + faces.getK());
         } catch (Exception e) {
             System.err.println("Erreur lors de l'initialisation de la reconnaissance : " + e.getMessage());
             e.printStackTrace();
@@ -104,8 +98,8 @@ public class Gestionnaire {
                     }
                 }
                 double vraiDistance = this.reco.getDerniereDistance();
-                double seuilMax =  3000.0;
-                double calculTaux = 100.0 * (1.0 - (vraiDistance/seuilMax));
+                double seuilMax = this.reco.getSeuil();
+                double calculTaux = 100.0 * (1.0 - (vraiDistance / seuilMax));
                 tauxRessemblance = Math.max(0.0, Math.min(100.0, calculTaux));
             } 
             else {

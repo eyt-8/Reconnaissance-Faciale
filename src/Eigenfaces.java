@@ -21,6 +21,12 @@ public class Eigenfaces {
         this.svd = svd;
     }
 
+    public Eigenfaces(SVD svd, SimpleMatrix visageMoyen) {
+        this.k = 0;
+        this.svd = svd;
+        this.visageMoyen = visageMoyen;
+    }
+
     /**
      * Construit la base d'eigenfaces à partir des valeurs propres et vecteurs propres.
      */
@@ -31,7 +37,7 @@ public class Eigenfaces {
     	// vec matrice des vecteurs propres en colonnes (taille n x m)
 
     	SimpleMatrix vp = svd.getbValSinguliere();
-    	SimpleMatrix vec = svd.getVectPropATA();
+    	SimpleMatrix vec = svd.getU();
     	
         int m = vp.getNumRows();
         Integer[] indices = new Integer[m];
@@ -104,6 +110,10 @@ public class Eigenfaces {
             varCum.set(i, 0, cumul / total);
         }
         return varCum;
+    }
+
+    public SimpleMatrix getValPropresK() {
+        return this.valPropres.extractMatrix(0, this.k, 0, 1);
     }
 
     public SimpleMatrix getBase() {

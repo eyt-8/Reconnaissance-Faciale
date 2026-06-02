@@ -12,19 +12,16 @@ import org.ejml.simple.SimpleMatrix;
 public class Projection {
     /** Les eigenfaces (base et valeurs propres) utilisées pour la projection */
     private Eigenfaces eigenfaces;
-    /** Coordonnées de la dernière projection effectuée (vecteur colonne) */
-    private Acp acp;
     private SimpleMatrix coords;
+
+    public Projection(Eigenfaces eigenfaces) {
+        this.eigenfaces = eigenfaces;
+    }
 
     /**
      * Constructeur principal de la projection
      * @param eigenfaces objet contenant la base d'eigenfaces et le visage moyen
      */
-    public Projection(Eigenfaces eigenfaces, Acp acp) {
-        this.eigenfaces=eigenfaces;
-        this.acp = acp;
-    }
-
     public Eigenfaces getEigenfaces() {
         return eigenfaces;
     }

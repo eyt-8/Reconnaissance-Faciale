@@ -1,5 +1,5 @@
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.List;
 
 import org.ejml.simple.SimpleMatrix;
 
@@ -7,42 +7,55 @@ import org.ejml.simple.SimpleMatrix;
  * La classe Reconnaissance gère la phase de test du système.
  * Elle permet d'identifier de nouvelles images (visages) en les projetant
  * dans l'espace des eigenfaces et en calculant la distance avec les signatures connues.
- * 
- * @author SOULEZ-DAMAZIE Soraya PAILLASSA Nylan CAUMONT Virgile
- * @version 1.0
+ *
+ * @author SOULEZ-DAMAZIE Soraya, PAILLASSA Nylan, CAUMONT Virgile
+ * @version 1.2
  */
 public class Reconnaissance {
-    
+
     /** Base de données contenant les images de référence et leurs signatures */
-    private BaseDeDonnees baseRef; 
-    
+    private BaseDeDonnees baseRef;
+
     /** Objet gérant la projection mathématique dans l'espace réduit (ACP) */
-    private Projection projection; 
-    
+    private Projection projection;
+
     /** Limite de distance au-delà de laquelle le visage est considéré comme inconnu */
-    private double seuil; 
-    
+    private double seuil;
+
+    /** Signatures pré-calculées des images de référence */
+    private List<SimpleMatrix> signaturesRef;
+
     private double derniereDistance = 0.0;
 
     /**
      * Constructeur de la classe Reconnaissance.
-     * 
+     *
      * @param baseRef    l'instance de BaseDeDonnees contenant les signatures d'apprentissage
      * @param projection l'instance de Projection contenant la base d'Eigenfaces
      * @param seuil      la distance euclidienne maximale tolérée pour une identification
      */
     public Reconnaissance(BaseDeDonnees baseRef, Projection projection, double seuil) {
-        this.baseRef = baseRef;
+        this.baseRef    = baseRef;
         this.projection = projection;
-        this.seuil = seuil;
+        this.seuil      = seuil;
+        this.signaturesRef = new ArrayList<>();
+        this.precalculerSignatures();
+    }
+
+    /**
+     * Projette une fois pour toutes les images de référence.
+     */
+    private void precalculerSignatures() {
+        for (ImageVect img : this.baseRef.getReferences()) {
+            this.signaturesRef.add(this.projection.projeter(img));
+        }
     }
 
     /**
      * Tente d'identifier une image test en la comparant avec toutes les signatures de la base.
-     * La méthode projette l'image, trouve la signature la plus proche et vérifie si elle respecte le seuil.
-     * 
-     * @param test l'image vectorisée (ImageVect) représentant le visage à identifier
-     * @param methode la distance utilisée (euclidienne, cosinus)
+     *
+     * @param test    l'image vectorisée (ImageVect) représentant le visage à identifier
+     * @param methode la distance utilisée (euclidienne, cosinus, mahalanobis)
      * @return le nom de la personne si elle est reconnue, ou "Inconnu" si la distance dépasse le seuil
      */
     public String identifier(ImageVect test, String methode) {
@@ -50,171 +63,141 @@ public class Reconnaissance {
         double distanceMinimale = Double.MAX_VALUE;
         String identiteTrouvee = "Inconnu";
 
-        ArrayList <Double> distances = new ArrayList<Double>();
-        
-        for (int i = 0; i < baseRef.getReferences().size(); i++) {
-            ImageVect refImg = baseRef.getReferences().get(i);
-            SimpleMatrix coordonneesRef = projection.projeter(refImg);
-            double d = distance(coordonneesTest, coordonneesRef, methode);
-            distances.add(d);
+        for (int i = 0; i < signaturesRef.size(); i++) {
+            double d = distance(coordonneesTest, signaturesRef.get(i), methode);
             if (d < distanceMinimale) {
                 distanceMinimale = d;
-                identiteTrouvee = baseRef.getIdentite(i);
+                identiteTrouvee  = baseRef.getIdentite(i);
             }
         }
-        System.out.println("Distance minimale : "+distanceMinimale);
         this.derniereDistance = distanceMinimale;
-        this.confiances(distances);
         return (distanceMinimale > this.seuil) ? "Inconnu" : identiteTrouvee;
     }
-    
-    /*
-     * Retourne la confiance liée à chaque distance dans l'ordre
-     * @param distances liste de toutes les distances (ordre non requis)
-     */
-    public void confiances(ArrayList<Double> distances) {
-    	ArrayList<Double> confiances = new ArrayList<Double>();
-    	Double somme=0.0;
-    	Double maximum = Collections.max(distances);
-    	ArrayList<Double> dist_inv = new ArrayList<Double>();
-    	
-    	// On centre
-    	for (int i=0;i<distances.size();i++) {
-    		dist_inv.add(maximum-distances.get(i));
-    		somme = somme + maximum - distances.get(i);
-    	}
-    	
-    	// On normalise à 100
-    	for (int i=0;i<distances.size();i++) {
-    		confiances.add((dist_inv.get(i)/somme)*100);
-    	}
-    	somme = 0.0;
-    	for (int i=0;i<distances.size();i++) {
-    		somme = somme + confiances.get(i);
-    	}
-    	// On trie les confiances
-    	Collections.sort(confiances);
-    	Collections.reverse(confiances);
-    	System.out.println("Confiance (%)");
-    	System.out.println(confiances.toString());
-    }
-    
+
     /**
-     * Calcule la distance (euclidienne ou cosinus) entre 
-     * les coordonnées projetées de deux visages. Plus la distance est proche de 0, 
-     * plus les visages sont similaires.
-     * 
-     * @param jp  les coordonnées projetées du premier visage (test)
-     * @param jpk les coordonnées projetées du deuxième visage (référence k)
-     * @param methode le nom de la méthode (euclidienne, cosinus)
-     * @return la distance calculée entre les deux vecteurs de coordonnées
+     * Calcule la distance entre les coordonnées projetées de deux visages.
+     *
+     * @param jp      coordonnées du visage test (K×1)
+     * @param jpk     coordonnées du visage de référence (K×1)
+     * @param methode euclidienne, cosinus ou mahalanobis
+     * @return distance ≥ 0
      */
     public double distance(SimpleMatrix jp, SimpleMatrix jpk, String methode) {
-    	double distance;
         switch (methode) {
-        	case "euclidienne" ->
-        		distance= this.distance_euclidenne(jp, jpk);
-        	case "cosinus" ->
-        		distance = 1-this.distance_cosinus(jp, jpk);
-        	case "mahalanobis"->
-        		distance = this.distance_mahalanobis(jp, jpk);
-        	default -> // Par défaut on prend la distance euclidienne
-        		distance= this.distance_euclidenne(jp, jpk);
+            case "cosinus"     -> { return distance_cosinus(jp, jpk); }
+            case "mahalanobis" -> { return distance_mahalanobis(jp, jpk); }
+            default            -> { return distance_euclidienne(jp, jpk); }
         }
-        return distance;
     }
-    
+
     /**
-     * Calcule la distance par cosinus (donc la corrélation) entre 
-     * les coordonnées projetées de deux visages. Plus la distance est proche de 0, 
-     * plus les visages sont similaires.
-     * 
-     * @param jp  les coordonnées projetées du premier visage (test)
-     * @param jpk les coordonnées projetées du deuxième visage (référence k)
-     * @return la distance calculée entre les deux vecteurs de coordonnées
+     * Distance cosinus entre deux vecteurs de coordonnées : 1 − cos(θ).
      */
     public double distance_cosinus(SimpleMatrix jp, SimpleMatrix jpk) {
-        return Math.abs((jp.dot(jpk))/(jp.normF()*jpk.normF()));
+        double n1 = jp.normF();
+        double n2 = jpk.normF();
+        if (n1 < 1e-12 || n2 < 1e-12) return 1.0;
+        return 1.0 - (jp.dot(jpk) / (n1 * n2));
     }
-    
+
     /**
-     * Calcule la distance euclidienne (Norme de Frobenius pour EJML) entre 
-     * les coordonnées projetées de deux visages. Plus la distance est proche de 0, 
-     * plus les visages sont similaires.
-     * 
-     * @param jp  les coordonnées projetées du premier visage (test)
-     * @param jpk les coordonnées projetées du deuxième visage (référence k)
-     * @return la distance calculée entre les deux vecteurs de coordonnées
+     * Distance euclidienne entre deux vecteurs de coordonnées.
      */
-    public double distance_euclidenne(SimpleMatrix jp, SimpleMatrix jpk) {
+    public double distance_euclidienne(SimpleMatrix jp, SimpleMatrix jpk) {
         return (jp.minus(jpk)).normF();
     }
-    
+
     /**
-     * Calcule la distance de Mahalanobis entre 
-     * les coordonnées projetées de deux visages. Plus la distance est proche de 0, 
-     * plus les visages sont similaires.
-     * source : https://link-springer-com.bibdocs.u-cergy.fr/chapter/10.1007/978-3-642-30958-8_17
-     * 
-     * @param jp  les coordonnées projetées du premier visage (test)
-     * @param jpk les coordonnées projetées du deuxième visage (référence k)
-     * @return la distance calculée entre les deux vecteurs de coordonnées
+     * Distance de Mahalanobis dans l'espace réduit (K composantes sélectionnées).
+     * La matrice de covariance est diagonale : d = (jp−jpk)ᵀ × Λ⁻¹ × (jp−jpk).
      */
     public double distance_mahalanobis(SimpleMatrix jp, SimpleMatrix jpk) {
-    	SimpleMatrix propre_vec = projection.getEigenfaces().getValPropres();
-        int k = propre_vec.getNumRows(); // Nombre de composantes (K)
-    	
-    	// La matrice de covariance des coordonnées projetées est diagonale (les valeurs propres)
-    	SimpleMatrix propreInv = new SimpleMatrix(k, k);
-    	propreInv.zero();
-    	for (int i=0; i<k; i++) {
-    		propreInv.set(i, i, 1.0 / propre_vec.get(i, 0));
-    	}
-    	
-    	// Différence entre les deux vecteurs de coordonnées (taille K x 1)
-    	SimpleMatrix difference = jp.minus(jpk);
-        
-        // Formule : d = (jp - jpk)^T * D^-1 * (jp - jpk)
-        return difference.transpose().mult(propreInv).dot(difference);
+        SimpleMatrix lambdaK = projection.getEigenfaces().getValPropresK(); // K×1
+        int k = lambdaK.getNumRows();
+
+        SimpleMatrix lambdaInv = new SimpleMatrix(k, k);
+        for (int i = 0; i < k; i++) {
+            double lambda = lambdaK.get(i, 0);
+            lambdaInv.set(i, i, (lambda > 1e-12) ? 1.0 / lambda : 0.0);
+        }
+
+        SimpleMatrix difference = jp.minus(jpk);
+        return difference.transpose().mult(lambdaInv).dot(difference);
     }
 
+    // -------------------------------------------------------------------------
+    // Calibration du seuil
+    // -------------------------------------------------------------------------
+
     /**
-     * Calcule le ratio de bonnes identifications par rapport au nombre total de tests.
-     * 
-     * @return le taux d'identification (entre 0.0 et 1.0)
+     * Calcule automatiquement le seuil comme 1,5 × la distance euclidienne
+     * moyenne entre toutes les paires de signatures de référence.
      */
-    public double tauxIdentification() {
-        int totalTests = 0; 
-        int reussites = 0;
-        
-        for (ImageVect imgTest : baseRef.getTests()) {
-            totalTests++;
-            String identiteTrouvee = identifier(imgTest,"euclidienne");
-            
-            // On déduit le nom attendu à partir du nom du fichier image
-            // (Assurez-vous que cette ligne correspond à votre façon de nommer les fichiers tests)
-            String nomAttendu = imgTest.getNom().replaceAll("[0-9]", ""); 
-            
-            if (identiteTrouvee.equals(nomAttendu)) {
-                reussites++;
-            } else {
-                System.out.println("Erreur : " + imgTest.getNom() + " identifié(e) comme " + identiteTrouvee);
+    public void calibrerSeuil() {
+        if (signaturesRef.size() < 2) return;
+        double somme = 0;
+        int count = 0;
+        for (int i = 0; i < signaturesRef.size(); i++) {
+            for (int j = i + 1; j < signaturesRef.size(); j++) {
+                somme += distance_euclidienne(signaturesRef.get(i), signaturesRef.get(j));
+                count++;
             }
         }
-        
-        if (totalTests == 0) return 0.0;
-        return (double) reussites / totalTests;
+        this.seuil = (somme / count) * 1.5;
     }
-    
+
+    // -------------------------------------------------------------------------
+    // Évaluation
+    // -------------------------------------------------------------------------
 
     /**
-     * Déclenche une série de tests sur la base de données de test et 
+     * Taux d'identification par validation croisée leave-one-out (LOO)
+     * sur la base d'apprentissage.
+     *
+     * @param methode méthode de distance (euclidienne, cosinus, mahalanobis)
+     * @return taux de bonnes identifications entre 0.0 et 1.0
+     */
+    public double tauxIdentification(String methode) {
+        int total = signaturesRef.size();
+        if (total == 0) return 0.0;
+
+        int reussites = 0;
+        for (int i = 0; i < total; i++) {
+            SimpleMatrix sigI        = signaturesRef.remove(i);
+            String       veriteTerrain = baseRef.getIdentite(i);
+
+            double distMin         = Double.MAX_VALUE;
+            String identiteTrouvee = "Inconnu";
+
+            for (int j = 0; j < signaturesRef.size(); j++) {
+                double d = distance(sigI, signaturesRef.get(j), methode);
+                if (d < distMin) {
+                    distMin         = d;
+                    identiteTrouvee = baseRef.getIdentite(j < i ? j : j + 1);
+                }
+            }
+            if (distMin <= seuil && identiteTrouvee.equals(veriteTerrain)) reussites++;
+            signaturesRef.add(i, sigI);
+        }
+        return (double) reussites / total;
+    }
+
+    /**
+     * Déclenche une série de tests sur la base de données de test et
      * affiche le taux d'identification global dans la console.
      */
     public void testerScenarios() {
         System.out.println("Lancement des scénarios de test...");
-        double taux = tauxIdentification();
+        double taux = tauxIdentification("euclidienne");
         System.out.println("Taux d'identification global : " + (taux * 100) + " %");
+    }
+
+    // -------------------------------------------------------------------------
+    // Getters
+    // -------------------------------------------------------------------------
+
+    public double getSeuil() {
+        return seuil;
     }
 
     public double getDerniereDistance() {
