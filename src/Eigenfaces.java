@@ -43,7 +43,7 @@ public class Eigenfaces {
 
         SimpleMatrix vpTrie = new SimpleMatrix(m, 1);
         SimpleMatrix vecTrie = new SimpleMatrix(vec.getNumRows(), m);
-
+        
         for (int j = 0; j < m; j++) {
             int src = indices[j];
             vpTrie.set(j, 0, vp.get(src, 0));
