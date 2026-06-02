@@ -76,7 +76,7 @@ public class Reconnaissance {
         	case "euclidienne" ->
         		distance= this.distance_euclidenne(jp, jpk);
         	case "cosinus" ->
-        		distance = 1+this.distance_cosinus(jp, jpk);
+        		distance = 1-this.distance_cosinus(jp, jpk);
         	case "mahalanobis"->
         		distance = this.distance_mahalanobis(jp, jpk);
         	default -> // Par défaut on prend la distance euclidienne
