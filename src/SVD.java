@@ -6,6 +6,7 @@ import org.ejml.simple.SimpleMatrix;
 //Définition de la classe SVD
 public class SVD {
     
+    // Attributs tels qu'écrits sur ton diagramme
     private SimpleMatrix matriceVarCov;
     private SimpleMatrix bValSinguliere;
     private SimpleMatrix vectPropATA;
@@ -71,8 +72,8 @@ public class SVD {
             U.insertIntoThis(0, j, colonne);
         }
         
-        // On sauvegarde U (les vraies eigenfaces de taille Pixels x N)
-        this.vectPropATA = U;
+        // On sauvegarde V (les vraies eigenfaces de taille Images x Images)
+        this.vectPropATA = V;
         
         System.out.println("Décomposition Réussie");
     }
@@ -84,6 +85,10 @@ public class SVD {
     
     public SimpleMatrix getVectPropATA() {
     	return this.vectPropATA;
+    }
+    
+    public SimpleMatrix getMatriceVarCov() {
+    	return this.matriceVarCov;
     }
 
 	@Override
