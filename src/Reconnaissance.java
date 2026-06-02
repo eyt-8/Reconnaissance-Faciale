@@ -75,14 +75,22 @@ public class Reconnaissance {
     public void confiances(ArrayList<Double> distances) {
     	ArrayList<Double> confiances = new ArrayList<Double>();
     	Double somme=0.0;
+    	Double maximum = Collections.max(distances);
+    	ArrayList<Double> dist_inv = new ArrayList<Double>();
+    	
+    	// On centre
     	for (int i=0;i<distances.size();i++) {
-    		// On passe les distances entre 0 et 1
-    		distances.set(i, 1.0-distances.get(i)/Collections.max(distances));
-    		somme = somme + 1.0 - distances.get(i)/Collections.max(distances);
+    		dist_inv.add(maximum-distances.get(i));
+    		somme = somme + maximum - distances.get(i);
     	}
     	
+    	// On normalise à 100
     	for (int i=0;i<distances.size();i++) {
-    		confiances.add(distances.get(i)/somme*100);
+    		confiances.add((dist_inv.get(i)/somme)*100);
+    	}
+    	somme = 0.0;
+    	for (int i=0;i<distances.size();i++) {
+    		somme = somme + confiances.get(i);
     	}
     	// On trie les confiances
     	Collections.sort(confiances);
