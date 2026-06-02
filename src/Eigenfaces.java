@@ -11,22 +11,28 @@ import org.ejml.simple.SimpleMatrix;
  */
 public class Eigenfaces {
     private SimpleMatrix visageMoyen;
-    private SimpleMatrix base;        // eigenfaces sélectionnées (colonnes)
+    private SVD svd;
+    private SimpleMatrix base_reduite;        // eigenfaces sélectionnées (colonnes) => Matrice A centrée
     private SimpleMatrix valPropres;  // valeurs propres associées
     private int k;                    // nombre d'eigenfaces retenues
 
-    public Eigenfaces() {
+public Eigenfaces(SVD svd) {
         this.k = 0;
+        this.svd = svd;
     }
 
     /**
      * Construit la base d'eigenfaces à partir des valeurs propres et vecteurs propres.
-     *
-     * @param vp  vecteur colonne des valeurs propres (taille m x 1)
-     * @param vec matrice des vecteurs propres en colonnes (taille n x m)
      */
-    public void construire(SimpleMatrix vp, SimpleMatrix vec) {
+    public void construire() {
         // Tri décroissant des valeurs propres (et réorganisation des vecteurs)
+    	
+        // vp  vecteur colonne des valeurs propres (taille m x 1)
+    	// vec matrice des vecteurs propres en colonnes (taille n x m)
+
+    	SimpleMatrix vp = svd.getbValSinguliere();
+    	SimpleMatrix vec = svd.getVectPropATA();
+    	
         int m = vp.getNumRows();
         Integer[] indices = new Integer[m];
         for (int i = 0; i < m; i++) indices[i] = i;
@@ -47,7 +53,7 @@ public class Eigenfaces {
         }
 
         this.valPropres = vpTrie;
-        this.base = vecTrie;     // par défaut, on garde toutes les composantes
+        this.base_reduite = vecTrie;     // par défaut, on garde toutes les composantes
         this.k = vecTrie.getNumCols();
     }
 
@@ -72,7 +78,7 @@ public class Eigenfaces {
 
         this.k = kChoisi;
         // On tronque la base aux K premières colonnes : base[:, 0..k-1]
-        this.base = this.base.extractMatrix(0, this.base.getNumRows(), 0, this.k);
+        this.base_reduite = this.base_reduite.extractMatrix(0, this.base_reduite.getNumRows(), 0, this.k);
     }
 
     /**
@@ -101,7 +107,7 @@ public class Eigenfaces {
     }
 
     public SimpleMatrix getBase() {
-        return base;
+        return base_reduite;
     }
 
     public SimpleMatrix getValPropres() {
@@ -118,5 +124,9 @@ public class Eigenfaces {
 
     public SimpleMatrix getVisageMoyen() {
         return this.visageMoyen;
+    }
+    
+    public SVD getSvd() {
+        return this.svd;
     }
 }
