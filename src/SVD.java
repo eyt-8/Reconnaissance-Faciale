@@ -1,9 +1,7 @@
-/** @author : SOULEZ-DAMAZIE Soraya et Virgile CAUMONT*/
-
-
 //On importe la classe SimpleMatrix de la bibliothèque
 import org.ejml.simple.SimpleMatrix;
 
+/**@author : SOULEZ-DAMAZIE Soraya et Virgile CAUMONT*/
 
 //Définition de la classe SVD
 public class SVD {
