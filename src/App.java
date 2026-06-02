@@ -26,7 +26,7 @@ public class App {
         faces.setVisageMoyen(acp.getVisage_moyen());
         
         // 1. Charger une image bien précise en indiquant son chemin d'accès
-        ImageVect monImageTest = new ImageVect("donnees/test/2.jpg");
+        ImageVect monImageTest = new ImageVect("donnees/test/1.jpg");
         // 2. Demander au système de l'identifier (ici en utilisant la distance de Mahalanobis)
         String prediction = rec.identifier(monImageTest, "cosinus"); // tu peux aussi mettre "euclidienne"
         // 3. Afficher le résultat dans la console
