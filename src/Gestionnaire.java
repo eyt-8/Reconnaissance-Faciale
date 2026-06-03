@@ -16,12 +16,13 @@ public class Gestionnaire {
 
     /** L'interface graphique affichée dans la fenêtre principale */
     private Ecran ecran;
-    // private BaseDeDonnees bdd;
     /** Référence à la fenêtre principale de l'application */
     private Stage fenetrePrincipale;
-
+    /** Base de données utilisée pour l'apprentissage et la recherche de visages */
     private BaseDeDonnees bdd;
+    /** Moteur de reconnaissance qui identifie un visage à partir d'une image */
     private Reconnaissance reco;
+    /** Projection des images sur les composantes principales (Eigenfaces) */
     private Projection proj;
 
     /**
@@ -37,14 +38,18 @@ public class Gestionnaire {
         this.enregistrerEcouteurs();
     }
 
-
+    /**
+     * Initialise les composants de reconnaissance faciale :
+     * charge la base de données, calcule les composantes principales,
+     * sélectionne le nombre de composantes utiles, crée la projection
+     * et calibre le seuil de reconnaissance.
+     */
     private void initialiserReco() {
         System.out.println("Démarrage de l'apprentissage...");
         try {
             this.bdd = new BaseDeDonnees();
-
-            Acp        acp   = new Acp(this.bdd);
-            SVD        svd   = new SVD(acp.getMatrice_centree());
+            Acp acp = new Acp(this.bdd);
+            SVD svd = new SVD(acp.getMatrice_centree());
             Eigenfaces faces = new Eigenfaces(svd, acp.getVisage_moyen());
             faces.construire();
             faces.selectionnerK(0.95);
