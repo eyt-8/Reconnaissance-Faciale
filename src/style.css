@@ -1,0 +1,78 @@
+/* Style par défaut pour tous les boutons */
+.button {
+    -fx-background-color: #f0f0f0;
+    -fx-text-fill: #333333;
+    -fx-font-size: 14px;
+    -fx-padding: 10 20;
+    -fx-background-radius: 6;
+    -fx-border-radius: 6;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 5, 0, 0, 1); /* Ombre */
+    -fx-transition: -fx-background-color 0.3s;
+}
+
+/* Survol */
+.button:hover {
+    -fx-background-color: #e0e0e0;
+}
+
+/* OnClick */
+.button:pressed {
+    -fx-background-color: #d0d0d0;
+    -fx-effect: none;
+}
+
+/* Bouton pour lancer la reconnaissance */
+.btn-action {
+    -fx-background-color: #4CAF50;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+}
+
+.btn-action:hover {
+    -fx-background-color: #45a049;
+}
+
+.btn-action:disabled {
+    -fx-background-color: #cccccc;
+    -fx-text-fill: #999999;
+}
+
+/* Style pour la ComboBox */
+.combo-box {
+    -fx-background-color: #f0f0f0;
+    -fx-background-radius: 6;
+    -fx-border-color: #d0d0d0;
+    -fx-border-radius: 6;
+    -fx-font-size: 14px;
+    -fx-padding: 5;
+    -fx-cursor: hand;
+}
+
+/* Survol */
+.combo-box:hover {
+    -fx-background-color: #e0e0e0;
+    -fx-border-color: #c0c0c0;
+    
+}
+
+/* Style du menu déroulant */
+.combo-box-popup .list-view {
+    -fx-background-color: white;
+    -fx-border-color: #d0d0d0;
+    -fx-cursor: hand;
+}
+
+/* Style des éléments du menu */
+.combo-box-popup .list-view .list-cell {
+    -fx-padding: 8;
+    -fx-background-color: white;
+    -fx-text-fill: #333333;
+    -fx-cursor: hand;
+}
+
+/* Survol */
+.combo-box-popup .list-view .list-cell:filled:hover {
+    -fx-background-color: #f0f0f0;
+    -fx-text-fill: #000000;
+}

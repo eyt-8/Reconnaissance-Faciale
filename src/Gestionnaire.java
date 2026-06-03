@@ -1,32 +1,32 @@
 /** Importation des classes nécessaires */
 import java.io.File;
-
-import javafx.scene.control.RadioButton;
 import javafx.scene.image.Image;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
 /**
- * Gestionnaire central de l'interface utilisateur.
- * Il relie l'écran JavaFX aux actions de sélection de fichier et de traitement.
+ * Gestionnaire central de l'application JavaFX.
+ * Il relie l'écran aux actions utilisateur et gère la reconnaissance faciale.
  *
  * @author Maël Lescoulié
  * @version 1.0
  */
 public class Gestionnaire {
 
-    /** L'interface graphique affichée dans la fenêtre principale */
+    /** Écran principal géré par le gestionnaire */
     private Ecran ecran;
-    /** Référence à la fenêtre principale de l'application */
+    /** Fenêtre JavaFX principale */
     private Stage fenetrePrincipale;
-    /** Base de données utilisée pour l'apprentissage et la recherche de visages */
+    /** Base de données d'apprentissage */
     private BaseDeDonnees bdd;
-    /** Moteur de reconnaissance qui identifie un visage à partir d'une image */
+    /** Moteur de reconnaissance faciale */
     private Reconnaissance reco;
-    /** Projection des images sur les composantes principales (Eigenfaces) */
+    /** Projection des images dans l'espace des eigenfaces */
     private Projection proj;
-    /* Distance choisie */
+    /** Distance choisie par l'utilisateur pour l'identification */
     private String distChoisie;
+    /** Fichier sélectionné pour l'analyse */
+    private File fichierSelectionne;
 
     /**
      * Initialise le gestionnaire avec la fenêtre principale.
@@ -36,16 +36,18 @@ public class Gestionnaire {
         this.fenetrePrincipale = stage;
         this.ecran = new Ecran();
         this.distChoisie = "euclidienne";
+        
+        // Initialisation de l'état du menu
+        this.ecran.getMenuLateral().getLancerReconnaissance().setDisable(true);
+        
         this.initialiserReco();
-
         this.enregistrerEcouteurs();
     }
 
     /**
      * Initialise les composants de reconnaissance faciale :
-     * charge la base de données, calcule les composantes principales,
-     * sélectionne le nombre de composantes utiles, crée la projection
-     * et calibre le seuil de reconnaissance.
+     * charge la base de données, calcule les eigenfaces, crée la projection
+     * et calibre le seuil de décision.
      */
     private void initialiserReco() {
         System.out.println("Démarrage de l'apprentissage...");
@@ -55,8 +57,6 @@ public class Gestionnaire {
             SVD svd = new SVD(acp.getMatrice_centree());
             Eigenfaces faces = new Eigenfaces(svd, acp.getVisage_moyen());
             faces.construire();
-            
-            // On sélectionne la variance cumulée nécessaire à 95%
             faces.selectionnerK(0.95);
 
             this.proj = new Projection(faces);
@@ -65,53 +65,56 @@ public class Gestionnaire {
 
             System.out.println("Apprentissage terminé - K = " + faces.getK());
         } catch (Exception e) {
-            System.err.println("Erreur lors de l'initialisation de la reconnaissance : " + e.getMessage());
-            e.printStackTrace();
+            System.err.println("Erreur d'initialisation : " + e.getMessage());
         }
     }
 
     /**
-     * Enregistre les actions utilisateur sur l'interface.
+     * Enregistre les écouteurs pour les boutons et la navigation de l'interface.
      */
     private void enregistrerEcouteurs() {
-        this.ecran.getChoisirFichier().setOnAction(e -> {
+        MenuLateral menu = this.ecran.getMenuLateral();
+
+        // Bouton "Choisir une image"
+        menu.getChoisirFichier().setOnAction(e -> {
             FileChooser fileChooser = new FileChooser();
             fileChooser.setTitle("Sélectionner un visage à analyser");
-            fileChooser.getExtensionFilters().addAll(
-                new FileChooser.ExtensionFilter("Images", "*.jpg", "*.png", "*.pgm")
-            );
-            File fichierSelectionne = fileChooser.showOpenDialog(fenetrePrincipale);
+            fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Images", "*.jpg", "*.png", "*.pgm"));
+            File file = fileChooser.showOpenDialog(fenetrePrincipale);
             
-            if (fichierSelectionne != null) {
-                this.traiterReconnaissance(fichierSelectionne);
+            if (file != null) {
+                this.fichierSelectionne = file;
+                // On active le lancement maintenant qu'un fichier est prêt
+                menu.getLancerReconnaissance().setDisable(false);
             }
         });
-        // On récupère le RadioButton des distances sélectionnées
-        this.ecran.getGroupeDistances().selectedToggleProperty().addListener((entree, toggle_prec, toggle_suiv) -> {
-        	if (toggle_suiv != null) {
-        		RadioButton bouton_pres = (RadioButton) toggle_suiv;
-        		String distance = bouton_pres.getText();
-        		switch (distance) {
-        			case "Euclidienne":
-        				this.distChoisie = "euclidienne";
-        				break;
-        			case "Mahalanobis":
-        				this.distChoisie = "mahalanobis";
-        				break;
-        			case "Cosinus":
-        				this.distChoisie = "cosinus";
-        				break;
-        			default:
-        				this.distChoisie = "euclidienne";
-        		}
-        		System.out.println("Distance mise à jour");
-        	}
+
+        // Bouton "Lancer la reconnaissance"
+        menu.getLancerReconnaissance().setOnAction(e -> {
+            if (this.fichierSelectionne != null) {
+                // Récupération de la distance depuis la ComboBox
+                this.distChoisie = menu.getComboDistance().getValue().toLowerCase();
+                traiterReconnaissance(this.fichierSelectionne);
+            }
         });
+
+        // Boutons de navigation
+        menu.getBtnNavReco().setOnAction(e -> {
+            ecran.getConteneurPrincipal().afficherReconnaissance();
+            menu.getBtnNavReco().setDisable(true);
+            menu.getBtnNavVisu().setDisable(false);
+        });
+
+        menu.getBtnNavVisu().setOnAction(e -> {
+            ecran.getConteneurPrincipal().afficherVisualisation();
+            menu.getBtnNavReco().setDisable(false);
+            menu.getBtnNavVisu().setDisable(true); 
+        });
+
     }
-    
 
     /**
-     * Traite l'image sélectionnée et met à jour l'interface.
+     * Traite l'image sélectionnée et met à jour l'interface en conséquence.
      * @param fichierImage image choisie par l'utilisateur
      */
     private void traiterReconnaissance(File fichierImage) {
@@ -119,8 +122,10 @@ public class Gestionnaire {
             Image imgEntree = new Image(fichierImage.toURI().toString());
             ImageVect imageTest = new ImageVect(fichierImage.getAbsolutePath());
             String nomTrouve = this.reco.identifier(imageTest, this.distChoisie);
+            
             Image imgTrouvee = null;
             double tauxRessemblance = 0.0;
+            
             if (!nomTrouve.equals("Inconnu")) {
                 File dossierPersonne = new File("donnees/apprentissage/" + nomTrouve);                
                 if (dossierPersonne.exists() && dossierPersonne.isDirectory()) {
@@ -133,15 +138,14 @@ public class Gestionnaire {
                 double seuilMax = this.reco.getSeuil();
                 double calculTaux = 100.0 * (1.0 - (vraiDistance / seuilMax));
                 tauxRessemblance = Math.max(0.0, Math.min(100.0, calculTaux));
-            } 
-            else {
-                tauxRessemblance = 0.0;
             }
-            this.ecran.majInterface(imgEntree, imgTrouvee, nomTrouve, tauxRessemblance);
+
+            // Mise à jour du PanneauReconnaissance situé dans le ConteneurPrincipal
+            this.ecran.getConteneurPrincipal().getPanneauReco().majInterface(imgEntree, imgTrouvee, nomTrouve, tauxRessemblance);
             
         } catch (Exception e) {
-            System.err.println("Erreur lors de la reconnaissance de l'image : " + e.getMessage());
-            this.ecran.majInterface(null, null, "Erreur de lecture", 0.0);
+            System.err.println("Erreur lors de la reconnaissance : " + e.getMessage());
+            this.ecran.getConteneurPrincipal().getPanneauReco().majInterface(null, null, "Erreur", 0.0);
         }
     }
 
