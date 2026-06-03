@@ -31,6 +31,7 @@ public class Projection {
     
 
     
+
     /**
      * Projette une image sur la base d'eigenfaces.
      * @param img l'image à projeter
@@ -46,6 +47,7 @@ public class Projection {
         this.coords = baseEigenfaces.transpose().mult(vCentre);
         return this.coords;
     }
+    
     
 
     /**

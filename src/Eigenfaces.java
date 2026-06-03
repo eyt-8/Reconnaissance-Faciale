@@ -25,13 +25,13 @@ public class Eigenfaces {
      * Construit la base d'eigenfaces à partir des valeurs propres et vecteurs propres.
      */
     public void construire() {
-        // Tri décroissant des valeurs propres (et réorganisation des vecteurs)
+// Tri décroissant des valeurs propres (et réorganisation des vecteurs)
     	
         // vp  vecteur colonne des valeurs propres (taille m x 1)
     	// vec matrice des vecteurs propres en colonnes (taille n x m)
 
     	SimpleMatrix vp = svd.getbValSinguliere();
-    	SimpleMatrix vec = svd.getVectPropATA();
+    	SimpleMatrix vec = svd.getU();
     	
         int m = vp.getNumRows();
         Integer[] indices = new Integer[m];
