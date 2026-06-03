@@ -2,7 +2,7 @@ import org.ejml.simple.SimpleMatrix;
 import java.util.List;
 
 /**
- * Benchmark du système de reconnaissance faciale par ACP.
+ * APPLICATION PRINCIPALE : Benchmark du système de reconnaissance faciale par ACP.
  *
  * Pour chaque seuil de variance (70 %, 80 %, 90 %, 95 %, 99 %), affiche :
  *   - K : nombre d'eigenfaces retenues
@@ -18,6 +18,10 @@ import java.util.List;
 public class App {
 
     public static void main(String[] args) throws Exception {
+    	
+    	// ============================================================
+        // INITIALISATION ET CHARGEMENT DES DONNÉES
+        // ============================================================
 
         System.out.println("Benchmark Reconnaissance Faciale par ACP\n");
 
@@ -30,7 +34,12 @@ public class App {
         List<ImageVect> tests     = bdd.getTests();
         String[]        distances = {"euclidienne", "cosinus", "mahalanobis"};
         double[]        seuilsVar = {0.70, 0.80, 0.90, 0.95, 0.99};
-
+        
+        // ============================================================
+        // PHASE DE TEST (BOUCLE SUR LES SEUILS DE VARIANCE)
+        // ============================================================
+        
+        // En-tête du tableau de résultats
         System.out.printf("%-6s %-8s %-10s %-10s %-10s  %s%n",
             "K", "Var%", "EQM", "REQM", "Biais",
             "Taux LOO (eucl. / cos. / maha.)");
@@ -38,6 +47,7 @@ public class App {
 
         for (double seuilVariance : seuilsVar) {
 
+        	// --- Préparation de l'espace réduit ---
             Eigenfaces faces = new Eigenfaces(svd, acp.getVisage_moyen());
             faces.construire();
             faces.selectionnerK(seuilVariance);
@@ -45,7 +55,7 @@ public class App {
 
             Projection proj = new Projection(faces);
 
-            // Erreurs de reconstruction sur la base d'apprentissage
+            // --- Calcul des erreurs de reconstruction ---
             double eqmTotal   = 0;
             double biaisTotal = 0;
             for (ImageVect img : refs) {
@@ -59,7 +69,7 @@ public class App {
             double eqmMoy  = eqmTotal   / refs.size();
             double biasMoy = biaisTotal / refs.size();
 
-            // Taux d'identification LOO
+            // --- Calcul du Taux d'Identification (Leave-One-Out : LOO) ---
             Reconnaissance reco = new Reconnaissance(bdd, proj, Double.MAX_VALUE);
             reco.calibrerSeuil();
 
@@ -68,19 +78,25 @@ public class App {
                 taux[d] = reco.tauxIdentification(distances[d]);
             }
 
+            // --- Affichage de la ligne de résultat ---
             System.out.printf("%-6d %-8.0f %-10.2f %-10.2f %-10.2f  %.1f%% / %.1f%% / %.1f%%%n",
                 k, seuilVariance * 100,
                 eqmMoy, Math.sqrt(eqmMoy), biasMoy,
                 taux[0] * 100, taux[1] * 100, taux[2] * 100);
         }
 
-        // Prédictions brutes sur les images de test
+        // ============================================================
+        // PRÉDICTIONS SUR LES IMAGES INCONNUES (DOSSIER TEST)
+        // ============================================================
+        
         if (!tests.isEmpty()) {
             System.out.println("\n--- Prédictions sur donnees/test/ (K = 95 % de variance) ---");
 
+            // Configuration optimale pour le test final
             Eigenfaces faces95 = new Eigenfaces(svd, acp.getVisage_moyen());
             faces95.construire();
             faces95.selectionnerK(0.95);
+            
             Projection    proj95 = new Projection(faces95);
             Reconnaissance reco95 = new Reconnaissance(bdd, proj95, Double.MAX_VALUE);
             reco95.calibrerSeuil();
@@ -88,6 +104,7 @@ public class App {
             System.out.printf("  %-12s  %-22s  %-22s  %-22s%n",
                 "Image", "Euclidienne", "Cosinus", "Mahalanobis");
             System.out.println("  " + "-".repeat(82));
+            
             for (ImageVect imgTest : tests) {
                 String predEucl = reco95.identifier(imgTest, "euclidienne");
                 String predCos  = reco95.identifier(imgTest, "cosinus");

@@ -1,4 +1,3 @@
-
 import org.ejml.simple.SimpleMatrix;
 
 /**
