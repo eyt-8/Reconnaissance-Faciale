@@ -48,7 +48,6 @@ public class Projection {
         return this.coords;
     }
     
-    
 
     /**
      * Reconstruit une image à partir de coordonnées dans l'espace des eigenfaces.

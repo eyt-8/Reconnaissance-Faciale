@@ -2,6 +2,8 @@
 
 import java.util.Scanner;
 
+import org.ejml.simple.SimpleMatrix;
+
 public class App {
 
     public static void main(String[] args) throws Exception {
@@ -25,6 +27,26 @@ public class App {
         // List<ImageVect> images_test = bdd.getTests();
         
         Projection p = new Projection(faces,acp);
+        
+        // Calcul de l'erreur de reconstitution de la base d'apprentissage
+        
+        
+        double eqmTotal=0;
+        double biaisTotal = 0;
+        /*
+        for (ImageVect img : bdd.getReferences()) {
+            SimpleMatrix coords = p.projeter(img);
+            ImageVect reconstruit = p.reconstruire(coords);
+            Comparaison  comp = new Comparaison(img.getVecteurCol(), reconstruit.getVecteurCol());
+            eqmTotal   += comp.calcul_eqm();
+            biaisTotal += comp.biais();
+        }
+        */
+        double eqmMoy  = eqmTotal   / bdd.getReferences().size();
+        double biasMoy = biaisTotal / bdd.getReferences().size();
+        
+        System.out.println("Erreur de reconstitution dans la base d'apprentissage");
+        
         Reconnaissance rec = new Reconnaissance(bdd,p,Double.MAX_VALUE);
         
         // Visage moyen à récupérer

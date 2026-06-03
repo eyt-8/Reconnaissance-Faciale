@@ -29,10 +29,10 @@ public class Comparaison {
 	 * @param projete matrice prédite Modifie {@link Comparaison#image},
 	 *                {@link Comparaison#projete} et {@link Comparaison#taille}
 	 */
-	public Comparaison(SimpleMatrix image, SimpleMatrix projete, int taille) {
+	public Comparaison(SimpleMatrix image, SimpleMatrix projete) {
 		this.image = image;
 		this.projete = projete;
-		this.taille = taille;
+		this.taille = image.getNumRows();
 	}
 
 	/**
@@ -126,7 +126,7 @@ public class Comparaison {
 
 		// On crée la Comparaison et on teste la classe
 
-		Comparaison c = new Comparaison(a, a2, 2);
+		Comparaison c = new Comparaison(a, a2);
 
 		// EQM
 		System.out.println("EQM : " + c.calcul_eqm());
