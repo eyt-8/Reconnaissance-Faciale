@@ -25,6 +25,7 @@ public class PanneauVisualisation extends VBox {
     public PanneauVisualisation() {
         this.setPadding(new Insets(20));
         this.setSpacing(20);
+        this.setStyle("-fx-background-color: white;");
 
         this.imageMoyenne = new ImageView();
         this.imageMoyenne.setFitWidth(200);
