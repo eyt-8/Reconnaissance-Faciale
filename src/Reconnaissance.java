@@ -150,33 +150,7 @@ public class Reconnaissance {
         return (jp.minus(jpk)).normF();
     }
     
-    /**
-     * Calcule la distance de Mahalanobis entre 
-     * les coordonnées projetées de deux visages. Plus la distance est proche de 0, 
-     * plus les visages sont similaires.
-     * source : https://link-springer-com.bibdocs.u-cergy.fr/chapter/10.1007/978-3-642-30958-8_17
-     * 
-     * @param jp  les coordonnées projetées du premier visage (test)
-     * @param jpk les coordonnées projetées du deuxième visage (référence k)
-     * @return la distance calculée entre les deux vecteurs de coordonnées
-     */
-    public double distance_mahalanobis(SimpleMatrix jp, SimpleMatrix jpk) {
-    	SimpleMatrix propre_vec = projection.getEigenfaces().getValPropres();
-        int k = propre_vec.getNumRows(); // Nombre de composantes (K)
-    	
-    	// La matrice de covariance des coordonnées projetées est diagonale (les valeurs propres)
-    	SimpleMatrix propreInv = new SimpleMatrix(k, k);
-    	propreInv.zero();
-    	for (int i=0; i<k; i++) {
-    		propreInv.set(i, i, 1.0 / propre_vec.get(i, 0));
-    	}
-    	
-    	// Différence entre les deux vecteurs de coordonnées (taille K x 1)
-    	SimpleMatrix difference = jp.minus(jpk);
-        
-        // Formule : d = (jp - jpk)^T * D^-1 * (jp - jpk)
-        return difference.transpose().mult(propreInv).dot(difference);
-    }
+    
 
     /**
      * Calcule le ratio de bonnes identifications par rapport au nombre total de tests.
@@ -206,7 +180,24 @@ public class Reconnaissance {
         return (double) reussites / totalTests;
     }
     
+    /**
+     * Distance de Mahalanobis dans l'espace réduit (K composantes sélectionnées).
+     * La matrice de covariance est diagonale : d = (jp−jpk)ᵀ × Λ⁻¹ × (jp−jpk).
+     */
+    public double distance_mahalanobis(SimpleMatrix jp, SimpleMatrix jpk) {
+        SimpleMatrix lambdaK = projection.getEigenfaces().getValPropres(); // K×1
+        int k = lambdaK.getNumRows();
 
+        SimpleMatrix lambdaInv = new SimpleMatrix(k, k);
+        for (int i = 0; i < k; i++) {
+            double lambda = lambdaK.get(i, 0);
+            lambdaInv.set(i, i, (lambda > 1e-12) ? 1.0 / lambda : 0.0);
+        }
+
+        SimpleMatrix difference = jp.minus(jpk);
+        return difference.transpose().mult(lambdaInv).dot(difference);
+    }
+    
     /**
      * Déclenche une série de tests sur la base de données de test et 
      * affiche le taux d'identification global dans la console.
