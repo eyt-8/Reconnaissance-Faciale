@@ -55,23 +55,14 @@ public class Propre {
         SimpleMatrix D = new SimpleMatrix(n, 1);
         // P : matrice qui recevra les vecteurs propres, rangés en colonnes.
         SimpleMatrix P = new SimpleMatrix(n, n);
-
-        // On parcourt chaque couple (valeur propre, vecteur propre), indexé par j.
         for (int j = 0; j < n; j++) {
             double lambda = evd.getEigenvalue(j).getReal();
             D.set(j, 0, lambda);
-
-            // Récupère le vecteur propre associé à cette valeur propre (colonne n x 1).
-            // EJML renvoie null si la valeur propre est complexe : on s'en protège.
             SimpleMatrix v = evd.getEigenVector(j);
             if (v != null) {
                 double norme = v.normF();
-                // On ne divise que si la norme n'est pas quasi nulle, pour éviter
-                // une division par zéro (1e-12 = seuil de sécurité numérique).
+                // 1e-12 = seuil de sécurité numérique)
                 if (norme > 1e-12) v = v.divide(norme);
-
-                // Recopie composante par composante le vecteur v dans la colonne j de P.
-                // i parcourt les lignes : P[i][j] reçoit la i-ème composante de v.
                 for (int i = 0; i < n; i++) {
                     P.set(i, j, v.get(i, 0));
                 }
