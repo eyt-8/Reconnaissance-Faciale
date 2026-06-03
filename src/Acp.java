@@ -126,36 +126,4 @@ public class Acp {
 			}
 		}
 	}
-
-	public static void main(String[] args) {
-		System.out.println("Classe ACP (TEST)");
-		SimpleMatrix a = new SimpleMatrix(3, 2);
-
-		// Création d'une matrice de test
-		/*
-		 * ( 3 2 ) ( 5 3 ) ( 7 5 )
-		 */
-		double[][] arr = { { 3, 2 }, { 5, 3 }, { 7, 5 } };
-
-		for (int i = 0; i < 3; i++) {
-
-			// Matrice 1
-
-			System.out.print("(");
-			for (int j = 0; j < 2; j++) {
-				System.out.print(" " + arr[i][j] + "");
-				// On copie la matrice 1 en parallèle
-				a.set(i, j, arr[i][j]);
-			}
-			System.out.println(" )");
-		}
-
-		System.out.println(a.toString());
-
-		Acp acp = new Acp(a);
-		// Affichage du visage moyen
-		System.out.println(acp.getVisage_moyen().toString());
-		// Affichage de la matrice centrée
-		System.out.println(acp.getMatrice_centree());
-	}
 }
