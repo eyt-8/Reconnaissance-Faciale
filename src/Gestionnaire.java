@@ -1,6 +1,7 @@
 /** Importation des classes nécessaires */
 import java.io.File;
 
+import javafx.scene.control.RadioButton;
 import javafx.scene.image.Image;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
@@ -24,6 +25,8 @@ public class Gestionnaire {
     private Reconnaissance reco;
     /** Projection des images sur les composantes principales (Eigenfaces) */
     private Projection proj;
+    /* Distance choisie */
+    private String distChoisie;
 
     /**
      * Initialise le gestionnaire avec la fenêtre principale.
@@ -32,7 +35,7 @@ public class Gestionnaire {
     public Gestionnaire(Stage stage) {
         this.fenetrePrincipale = stage;
         this.ecran = new Ecran();
-        
+        this.distChoisie = "euclidienne";
         this.initialiserReco();
 
         this.enregistrerEcouteurs();
@@ -52,13 +55,15 @@ public class Gestionnaire {
             SVD svd = new SVD(acp.getMatrice_centree());
             Eigenfaces faces = new Eigenfaces(svd, acp.getVisage_moyen());
             faces.construire();
+            
+            // On sélectionne la variance cumulée nécessaire à 95%
             faces.selectionnerK(0.95);
 
             this.proj = new Projection(faces);
             this.reco = new Reconnaissance(this.bdd, this.proj, Double.MAX_VALUE);
             this.reco.calibrerSeuil();
 
-            System.out.println("Apprentissage terminé — K = " + faces.getK());
+            System.out.println("Apprentissage terminé - K = " + faces.getK());
         } catch (Exception e) {
             System.err.println("Erreur lors de l'initialisation de la reconnaissance : " + e.getMessage());
             e.printStackTrace();
@@ -81,7 +86,29 @@ public class Gestionnaire {
                 this.traiterReconnaissance(fichierSelectionne);
             }
         });
+        // On récupère le RadioButton des distances sélectionnées
+        this.ecran.getGroupeDistances().selectedToggleProperty().addListener((entree, toggle_prec, toggle_suiv) -> {
+        	if (toggle_suiv != null) {
+        		RadioButton bouton_pres = (RadioButton) toggle_suiv;
+        		String distance = bouton_pres.getText();
+        		switch (distance) {
+        			case "Euclidienne":
+        				this.distChoisie = "euclidienne";
+        				break;
+        			case "Mahalanobis":
+        				this.distChoisie = "mahalanobis";
+        				break;
+        			case "Cosinus":
+        				this.distChoisie = "cosinus";
+        				break;
+        			default:
+        				this.distChoisie = "euclidienne";
+        		}
+        		System.out.println("Distance mise à jour");
+        	}
+        });
     }
+    
 
     /**
      * Traite l'image sélectionnée et met à jour l'interface.
@@ -91,7 +118,7 @@ public class Gestionnaire {
         try {
             Image imgEntree = new Image(fichierImage.toURI().toString());
             ImageVect imageTest = new ImageVect(fichierImage.getAbsolutePath());
-            String nomTrouve = this.reco.identifier(imageTest, "euclidienne");
+            String nomTrouve = this.reco.identifier(imageTest, this.distChoisie);
             Image imgTrouvee = null;
             double tauxRessemblance = 0.0;
             if (!nomTrouve.equals("Inconnu")) {

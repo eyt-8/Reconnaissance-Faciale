@@ -1,9 +1,13 @@
 /** Importation des classes nécessaires */
+import java.util.ArrayList;
+
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
+import javafx.scene.control.RadioButton;
+import javafx.scene.control.ToggleGroup;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
@@ -21,6 +25,9 @@ import javafx.scene.layout.VBox;
 public class Ecran extends BorderPane {
     /** Bouton permettant de sélectionner une image à analyser */
     private Button choisirFichier;
+    /** Liste des distances possibles sous forme de boutons Radio */
+    private ArrayList<RadioButton> distances;
+    private ToggleGroup groupeDistances;
     /** Zone d'affichage de l'image entrée par l'utilisateur */
     private ImageView visageEntre;
     /** Zone d'affichage de l'image correspondant à la personne trouvée */
@@ -46,6 +53,20 @@ public class Ecran extends BorderPane {
     private void initialiserComposants() {
         this.choisirFichier = new Button("Choisir un fichier");
         this.choisirFichier.setStyle("-fx-background-color: #dcdcdc; -fx-text-fill: black; -fx-padding: 8 15;");
+        
+        // On crée les boutons Radio liés à la distance
+        this.distances = new ArrayList<RadioButton>();
+        this.distances.add(new RadioButton("Euclidienne"));
+        this.distances.add(new RadioButton("Mahalanobis"));
+        this.distances.add(new RadioButton("Cosinus"));
+        
+        this.groupeDistances = new ToggleGroup();
+        // Ajoute toutes les distances dans un ToggleGroup pour n'en sélectionner qu'une
+        for (int i=0;i<distances.size();i++) {
+        	distances.get(i).setToggleGroup(groupeDistances);
+        }
+        // La distance euclidienne est sélectionnée
+        this.distances.get(0).setSelected(true);
 
         this.visageEntre = new ImageView();
         this.configurerImageView(this.visageEntre);
@@ -74,12 +95,17 @@ public class Ecran extends BorderPane {
         bandeauHaut.getChildren().get(0).setStyle("-fx-text-fill: black; -fx-font-size: 18px; -fx-font-weight: bold;");
         this.setTop(bandeauHaut);
 
-        VBox barreLaterale = new VBox(this.choisirFichier);
+        VBox barreLaterale = new VBox();
+        // On ajoute les distances dans les blocs une par une
+        for (int i=0;i<distances.size();i++) {
+        	barreLaterale.getChildren().add(distances.get(i));
+        }
+        barreLaterale.getChildren().add(this.choisirFichier);
         barreLaterale.setStyle("-fx-background-color: #f4f4f4; -fx-padding: 40 20;");
         barreLaterale.setAlignment(Pos.TOP_CENTER);
         barreLaterale.setPrefWidth(200);
         this.setRight(barreLaterale);
-
+        
         VBox blocImage1 = new VBox(10, this.visageEntre, new Label("Visage entré"));
         blocImage1.setAlignment(Pos.CENTER);
         VBox blocImage2 = new VBox(10, this.visageTrouve, new Label("Personne trouvée"));
@@ -118,6 +144,13 @@ public class Ecran extends BorderPane {
      */
     public Button getChoisirFichier() {
         return this.choisirFichier;
+    }
+    
+    /**
+     * @return le groupe de distances utilisé pour sélectionner un fichier d'image
+     */
+    public ToggleGroup getGroupeDistances() {
+        return this.groupeDistances;
     }
 
     /**
