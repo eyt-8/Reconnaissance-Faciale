@@ -19,7 +19,7 @@ public class App {
 
     public static void main(String[] args) throws Exception {
 
-        System.out.println("=== Benchmark Reconnaissance Faciale par ACP ===\n");
+        System.out.println("Benchmark Reconnaissance Faciale par ACP\n");
 
         // Chargement de la base et calcul ACP / SVD (fait une seule fois)
         BaseDeDonnees bdd = new BaseDeDonnees();
@@ -77,7 +77,6 @@ public class App {
         // Prédictions brutes sur les images de test
         if (!tests.isEmpty()) {
             System.out.println("\n--- Prédictions sur donnees/test/ (K = 95 % de variance) ---");
-            System.out.println("(Aucune vérité terrain : on affiche la prédiction du système)");
 
             Eigenfaces faces95 = new Eigenfaces(svd, acp.getVisage_moyen());
             faces95.construire();
