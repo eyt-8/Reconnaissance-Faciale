@@ -16,17 +16,17 @@ public class Eigenfaces {
     private SimpleMatrix valPropres;  // valeurs propres associées
     private int k;                    // nombre d'eigenfaces retenues
 
-    public Eigenfaces(SVD svd) {
-        this.k = 0;
-        this.svd = svd;
-    }
-
     public Eigenfaces(SVD svd, SimpleMatrix visageMoyen) {
         this.k = 0;
         this.svd = svd;
         this.visageMoyen = visageMoyen;
     }
 
+    public Eigenfaces(SVD svd) {
+        this.k = 0;
+        this.svd = svd;
+    }
+    
     /**
      * Construit la base d'eigenfaces à partir des valeurs propres et vecteurs propres.
      */

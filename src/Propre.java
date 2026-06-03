@@ -30,6 +30,7 @@ public class Propre {
  
     public Propre() {
     }
+
     /**
      * Setter de la matrice à décomposer
      * 
@@ -40,8 +41,8 @@ public class Propre {
     }
 
     /**
-     * Méthode permettant de fiare la décomposition de matrice à l'aide de la méthode eig de EJML
-     * Cette méthode instancie matP et vectD permattant ensuite de les réustiliser
+     * Méthode permettant de faire la décomposition de matrice à l'aide de la méthode eig de EJML
+     * Cette méthode instancie matP et vectD permattant ensuite de les réutiliser
      */
     public void decomposer() {
         // Dimension de la matrice (carrée) : n lignes = n colonnes = n valeurs propres.
@@ -50,7 +51,7 @@ public class Propre {
         // L'objet evd contient les valeurs propres et les vecteurs propres.
         SimpleEVD<SimpleMatrix> evd = matrice.eig();
 
-        // D : matrice diagonale qui recevra les valeurs propres (zéros ailleurs).
+        // D : vecteur qui recevra les valeurs propres (en colonne).
         SimpleMatrix D = new SimpleMatrix(n, 1);
         // P : matrice qui recevra les vecteurs propres, rangés en colonnes.
         SimpleMatrix P = new SimpleMatrix(n, n);
