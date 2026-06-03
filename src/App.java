@@ -6,6 +6,12 @@ import org.ejml.simple.SimpleMatrix;
 
 public class App {
 
+	public static void titre(String texte) {
+		System.out.println("===================================================================");
+		System.out.println("           "+texte);
+		System.out.println("===================================================================");
+	}
+	
     public static void main(String[] args) throws Exception {
 
     	
@@ -58,9 +64,7 @@ public class App {
         Scanner scanner = new Scanner(System.in);
         
         // 1. Choix de l'image de test
-        System.out.println("===================================================================");
-        System.out.println("Entrez le chemin de l'image de test [Défaut: donnees/test/1.jpg] : ");
-        System.out.println("===================================================================");
+        titre("Entrez le chemin de l'image de test [Défaut: donnees/test/1.jpg] : ");
         
         // Montre tous les choix possibles d'images (donc celles présentes dans test à l'origine)
         
@@ -132,9 +136,7 @@ public class App {
         System.out.println("\n[+] Analyse en cours...");
         ImageVect monImageTest = new ImageVect(cheminImage);
         // 3. Afficher le résultat dans la console
-        System.out.println("===================================================================");
-        System.out.println("          RÉSULTATS DE LA RECONNAISSANCE ACP           ");
-        System.out.println("===================================================================");
+        titre("Résultats de l'ACP");
      // Demander au système de l'identifier
         String prediction = rec.identifier(monImageTest, typeDistance); // tu peux aussi mettre "euclidienne"
         System.out.println(" Image analysée    : " + cheminImage);
@@ -144,9 +146,7 @@ public class App {
         
         // On passe les eigenfaces en image
         
-        System.out.println("===================================================================");
-        System.out.println("         Passage des Eigenfaces en image (voir répertoire principal)           ");
-        System.out.println("===================================================================\n");
+        titre("Eigenfaces => Images (voir répertoire principal)");
         for (int i=0;i<faces.getBase().getNumCols();i++) {
         	ImageVect im = new ImageVect(faces.getBase().getColumn(i),i);
         	System.out.print("-");
