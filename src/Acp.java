@@ -3,15 +3,15 @@ import org.ejml.simple.SimpleMatrix;
 
 /**
  * Classe mettant en place l'ACP
- * 
  * @author virgile
- * @version 0.1
+ * Représente le visage moyen, un vecteur Sur ejml un vecteur est défini par
+ * SimpleMatrix avec seulement une colonne
  */
 public class Acp {
-	/**
-	 * Représente le visage moyen, un vecteur Sur ejml un vecteur est défini par
-	 * SimpleMatrix avec seulement une colonne
-	 */
+
+	// ============================================================
+    // ATTRIBUTS
+    // ============================================================
 	private SimpleMatrix visage_moyen;
 
 	/**
@@ -23,12 +23,22 @@ public class Acp {
 	 */
 	private BaseDeDonnees donnees;
 
+	
+	// ============================================================
+    // CONSTRUCTEURS
+    // ============================================================
+	
+	/**
+     * Constructeur standard à partir d'une base de données.
+     * @param donnees La base contenant les images de référence.
+     */
 	public Acp(BaseDeDonnees donnees) {
 		this.donnees = donnees;
 		this.calcVisageMoyen(this.donnees.getMatriceImages());
 		this.centrer(this.donnees.getMatriceImages());
 	}
 
+	
 	/**
 	 * Constructeur utilisant directement une matrice Utilisée principalement pour
 	 * réaliser des tests
@@ -40,40 +50,17 @@ public class Acp {
 		this.calcVisageMoyen(test);
 		this.centrer(test);
 	}
-
-	/**
-	 * Getters / Setters
-	 */
-	public SimpleMatrix getVisage_moyen() {
-		return visage_moyen;
-	}
-
-	public void setVisage_moyen(SimpleMatrix visage_moyen) {
-		this.visage_moyen = visage_moyen;
-	}
-
-	public SimpleMatrix getMatrice_centree() {
-		return matrice_centree;
-	}
-
-	public void setMatrice_centree(SimpleMatrix matrice_centree) {
-		this.matrice_centree = matrice_centree;
-	}
-
-	public BaseDeDonnees getDonnees() {
-		return donnees;
-	}
-
-	public void setDonnees(BaseDeDonnees donnees) {
-		this.donnees = donnees;
-	}
+	
+	
+	// ============================================================
+    // MÉTHODES DE CALCUL 
+    // ============================================================
 
 	/**
 	 * Permet de calculer le visage moyen à partir de la base de données Modifie
 	 * {@link Acp#visage_moyen}
-	 * 
 	 * @param visages Utilise {@link BaseDeDonnees#matriceImage} ou une matrice de
-	 *                test
+	 * test
 	 */
 	public void calcVisageMoyen(SimpleMatrix visages) {
 		// Le nombre d'images correspond au nombre de colonnes 
@@ -126,4 +113,34 @@ public class Acp {
 			}
 		}
 	}
+
+
+	// ============================================================
+	// GETTERS ET SETTERS
+	// ============================================================
+
+	public SimpleMatrix getVisage_moyen() {
+		return visage_moyen;
+	}
+	
+	public void setVisage_moyen(SimpleMatrix visage_moyen) {
+		this.visage_moyen = visage_moyen;
+	}
+	
+	public SimpleMatrix getMatrice_centree() {
+		return matrice_centree;
+	}
+	
+	public void setMatrice_centree(SimpleMatrix matrice_centree) {
+		this.matrice_centree = matrice_centree;
+	}
+	
+	public BaseDeDonnees getDonnees() {
+		return donnees;
+	}
+	
+	public void setDonnees(BaseDeDonnees donnees) {
+		this.donnees = donnees;
+	}
+	
 }
