@@ -1,4 +1,15 @@
+package application;
 import org.ejml.simple.SimpleMatrix;
+
+import application.Abstraction.Acp;
+import application.Abstraction.BaseDeDonnees;
+import application.Abstraction.Comparaison;
+import application.Abstraction.Eigenfaces;
+import application.Abstraction.ImageVect;
+import application.Abstraction.Projection;
+import application.Abstraction.Reconnaissance;
+import application.Abstraction.SVD;
+
 import java.util.List;
 
 /**

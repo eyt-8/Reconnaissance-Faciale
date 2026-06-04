@@ -1,5 +1,16 @@
+package application.Controle;
 /** Importation des classes nécessaires */
 import java.io.File;
+
+import application.Abstraction.Acp;
+import application.Abstraction.BaseDeDonnees;
+import application.Abstraction.Eigenfaces;
+import application.Abstraction.ImageVect;
+import application.Abstraction.Projection;
+import application.Abstraction.Reconnaissance;
+import application.Abstraction.SVD;
+import application.Presentation.Ecran;
+import application.Presentation.MenuLateral;
 import javafx.scene.image.Image;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;

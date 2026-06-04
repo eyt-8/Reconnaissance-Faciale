@@ -1,4 +1,6 @@
+package application;
 /** Importation des classes nécessaires */
+import application.Controle.Gestionnaire;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
@@ -22,7 +24,7 @@ public class MainApp extends Application {
 
         // Chargement du CSS
         try {
-            String cssPath = getClass().getResource("style.css").toExternalForm();
+            String cssPath = getClass().getResource("/application/Presentation/style.css").toExternalForm();
             scene.getStylesheets().add(cssPath);
         } catch (Exception e) {
             System.err.println("Erreur : Impossible de charger le fichier style.css");
