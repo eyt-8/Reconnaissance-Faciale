@@ -35,32 +35,6 @@ public class ImageVect {
         this.largeur = this.image.getWidth();
         this.vecteurCol = new SimpleMatrix(this.largeur*this.longueur,1);
     }
-    
-    public ImageVect(SimpleMatrix vec_eigenface, int chiffre) throws IOException {
-    	this.fichier = null;
-    	this.vecteurCol = vec_eigenface;
-    	// On convertit le vecteur en image
-    	
-    	int taille = (int)Math.floor(Math.sqrt(this.vecteurCol.getNumRows()));
-    	
-    	this.vecteurCol.reshape(taille, taille);
-    	
-	    BufferedImage image_dest = new BufferedImage(taille,taille,BufferedImage.TYPE_INT_RGB);
-	    for(int i=0; i<taille; i++) {
-	        for(int j=0; j<taille; j++) {
-	        	double decentrer = this.vecteurCol.get(j, i)+this.vecteurCol.elementMinAbs();
-	        	decentrer = decentrer /(this.vecteurCol.elementMinAbs()+this.vecteurCol.elementMaxAbs());
-	            int a = (int)Math.floor(Math.abs(decentrer*255));
-	            System.out.println(a);
-	            Color newColor = new Color(a,a,a);
-	            image_dest.setRGB(j,i,newColor.getRGB());
-	        }
-	    }
-	    File output = new File("eigenface"+chiffre+".jpg");
-	    ImageIO.write(image_dest, "jpg", output);
-	
-    	
-    }
 
     public ImageVect(SimpleMatrix vecteur) {
         this.devectoriser(vecteur, largeur, longueur);

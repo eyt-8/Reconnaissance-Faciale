@@ -76,7 +76,7 @@ public class SVD {
         this.vectPropATA = V;
         this.U = U;
 
-        System.out.println("Décomposition Réussie");
+        System.out.println("      Décomposition Réussie");
     }
     
     //Les Getters 

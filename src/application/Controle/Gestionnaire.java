@@ -1,6 +1,8 @@
 package application.Controle;
 /** Importation des classes nécessaires */
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.ejml.simple.SimpleMatrix;
 
@@ -43,6 +45,7 @@ public class Gestionnaire {
     /** Fichier sélectionné pour l'analyse */
     private File fichierSelectionne;
     private Image cacheImageMoyenne;
+    private List<Image> cacheEigenfaces;
 
 
     /**
@@ -69,23 +72,23 @@ public class Gestionnaire {
     private void initialiserReco() {
         System.out.println("Démarrage de l'initialisation...");
         try {
-            System.out.println("[1/4] Chargement de la base de données...");
+            System.out.println("[1/6] Chargement de la base de données...");
             this.bdd = new BaseDeDonnees();
-            System.out.println("[2/4] Calcul de l'ACP...");
+            System.out.println("[2/6] Calcul de l'ACP...");
             Acp acp = new Acp(this.bdd);
             SVD svd = new SVD(acp.getMatrice_centree());
-            System.out.println("[3/4] Construction des Eigenfaces...");
+            System.out.println("[3/6] Construction des Eigenfaces...");
             this.faces = new Eigenfaces(svd, acp.getVisage_moyen());
             faces.construire();
             faces.selectionnerK(0.95);
-            System.out.println("[4/4] Préparation de la projection...");
+            System.out.println("[4/6] Préparation de la projection...");
             this.proj = new Projection(faces);
             this.reco = new Reconnaissance(this.bdd, this.proj);
             this.reco.calibrerSeuil();
-            System.out.println("Calcul de l'image moyenne...");
-            SimpleMatrix imgMoyenne = faces.getVisageMoyen();
-            ImageVect img = new ImageVect(imgMoyenne);
-            this.cacheImageMoyenne = SwingFXUtils.toFXImage(img.getBufferedImage(), null);
+            System.out.println("[5/6] Calcul de l'image moyenne...");
+            this.chargerImageMoyenne();
+            System.out.println("[6/6] Calcul des images des eigenfaces...");
+            this.chargerEigenfaces();
             System.out.println("Initialisation terminée avec succès - K = " + faces.getK());
         } catch (Exception e) {
             System.err.println("Erreur d'initialisation : " + e.getMessage());
@@ -132,7 +135,7 @@ public class Gestionnaire {
 
         menu.getBtnNavVisu().setOnAction(e -> {
             this.ecran.getConteneurPrincipal().getPanneauVisu().getImageMoyenne().setImage(this.cacheImageMoyenne);
-            // chargerEigenfaces();
+            ecran.getConteneurPrincipal().getPanneauVisu().afficherEigenfaces(this.cacheEigenfaces);
             ecran.getConteneurPrincipal().afficherVisualisation();
             menu.getBtnNavReco().setDisable(false);
             menu.getBtnNavVisu().setDisable(true); 
@@ -172,6 +175,24 @@ public class Gestionnaire {
             System.err.println("Erreur lors de la reconnaissance : " + e.getMessage());
             this.ecran.getConteneurPrincipal().getPanneauReco().majInterface(null, "Erreur", 0.0);
         }
+    }
+
+    private void chargerImageMoyenne() {
+        SimpleMatrix imgMoyenne = faces.getVisageMoyen();
+        ImageVect img = new ImageVect(imgMoyenne);
+        this.cacheImageMoyenne = SwingFXUtils.toFXImage(img.getBufferedImage(), null);
+    }
+
+    private void chargerEigenfaces() {
+        this.cacheEigenfaces = new ArrayList<>();
+        for (int i = 0; i < 5 && i < faces.getK(); i++) {
+            SimpleMatrix vec = faces.getEigenface(i);
+            ImageVect img = new ImageVect(vec);
+            Image imgFX = SwingFXUtils.toFXImage(img.getBufferedImage(), null);
+            this.cacheEigenfaces.add(imgFX);
+            System.out.println("      ["+(i+1)+"/5]...");
+        }
+        System.out.println("[6/6] Chargement des eigenfaces terminés");
     }
 
     /**

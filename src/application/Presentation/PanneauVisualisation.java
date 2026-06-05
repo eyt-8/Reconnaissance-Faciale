@@ -1,8 +1,11 @@
 package application.Presentation;
+import java.util.List;
+
 /** Importation des classes nécessaires */
 import javafx.geometry.Insets;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.VBox;
@@ -44,6 +47,17 @@ public class PanneauVisualisation extends VBox {
             new Label("Image Moyenne :"), imageMoyenne,
             new Label("Eigenfaces :"), scrollPane
         );
+    }
+
+    public void afficherEigenfaces(List<Image> listeImages) {
+        this.imagesEigenfaces.getChildren().clear();        
+        for (int i = 0; i < listeImages.size(); i++) {
+            ImageView iv = new ImageView(listeImages.get(i));
+            iv.setFitWidth(200);
+            iv.setPreserveRatio(true);
+            VBox vBoxImage = new VBox(new Label("Eigenface " + (i + 1)), iv);
+            this.imagesEigenfaces.getChildren().add(vBoxImage);
+        }
     }
 
     // Getter

@@ -140,4 +140,8 @@ public class Eigenfaces {
     public SVD getSvd() {
         return this.svd;
     }
+
+    public SimpleMatrix getEigenface(int i) {
+        return this.base_reduite.extractVector(false, i);
+    }
 }
