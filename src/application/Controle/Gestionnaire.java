@@ -67,20 +67,26 @@ public class Gestionnaire {
      * et calibre le seuil de décision.
      */
     private void initialiserReco() {
-        System.out.println("Démarrage de l'apprentissage...");
+        System.out.println("Démarrage de l'initialisation...");
         try {
+            System.out.println("[1/4] Chargement de la base de données...");
             this.bdd = new BaseDeDonnees();
+            System.out.println("[2/4] Calcul de l'ACP...");
             Acp acp = new Acp(this.bdd);
             SVD svd = new SVD(acp.getMatrice_centree());
+            System.out.println("[3/4] Construction des Eigenfaces...");
             this.faces = new Eigenfaces(svd, acp.getVisage_moyen());
             faces.construire();
             faces.selectionnerK(0.95);
-
+            System.out.println("[4/4] Préparation de la projection...");
             this.proj = new Projection(faces);
             this.reco = new Reconnaissance(this.bdd, this.proj);
             this.reco.calibrerSeuil();
-
-            System.out.println("Apprentissage terminé - K = " + faces.getK());
+            System.out.println("Calcul de l'image moyenne...");
+            SimpleMatrix imgMoyenne = faces.getVisageMoyen();
+            ImageVect img = new ImageVect(imgMoyenne);
+            this.cacheImageMoyenne = SwingFXUtils.toFXImage(img.getBufferedImage(), null);
+            System.out.println("Initialisation terminée avec succès - K = " + faces.getK());
         } catch (Exception e) {
             System.err.println("Erreur d'initialisation : " + e.getMessage());
         }
@@ -125,23 +131,13 @@ public class Gestionnaire {
         });
 
         menu.getBtnNavVisu().setOnAction(e -> {
-            chargerImageMoyenne();
+            this.ecran.getConteneurPrincipal().getPanneauVisu().getImageMoyenne().setImage(this.cacheImageMoyenne);
             // chargerEigenfaces();
             ecran.getConteneurPrincipal().afficherVisualisation();
             menu.getBtnNavReco().setDisable(false);
             menu.getBtnNavVisu().setDisable(true); 
         });
 
-    }
-
-    private void chargerImageMoyenne() {
-        if (this.cacheImageMoyenne == null) {
-            SimpleMatrix imgMoyenne = faces.getVisageMoyen();
-            ImageVect img = new ImageVect(imgMoyenne);
-            Image imgJavaFX = SwingFXUtils.toFXImage(img.getBufferedImage(), null);
-            this.cacheImageMoyenne = imgJavaFX;
-        }
-        this.ecran.getConteneurPrincipal().getPanneauVisu().getImageMoyenne().setImage(this.cacheImageMoyenne);
     }
 
     /**
