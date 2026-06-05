@@ -27,6 +27,7 @@ public class Reconnaissance {
     private List<SimpleMatrix> signaturesRef;
 
     private double derniereDistance = 0.0;
+    private double distanceMax;
 
     /**
      * Constructeur de la classe Reconnaissance.
@@ -35,12 +36,12 @@ public class Reconnaissance {
      * @param projection l'instance de Projection contenant la base d'Eigenfaces
      * @param seuil      la distance euclidienne maximale tolérée pour une identification
      */
-    public Reconnaissance(BaseDeDonnees baseRef, Projection projection, double seuil) {
+    public Reconnaissance(BaseDeDonnees baseRef, Projection projection) {
         this.baseRef    = baseRef;
         this.projection = projection;
-        this.seuil      = seuil;
         this.signaturesRef = new ArrayList<>();
         this.precalculerSignatures();
+        this.calibrerSeuil();
     }
 
     /**
@@ -63,12 +64,15 @@ public class Reconnaissance {
         SimpleMatrix coordonneesTest = projection.projeter(test);
         double distanceMinimale = Double.MAX_VALUE;
         String identiteTrouvee = "Inconnu";
-
+        this.distanceMax = 0;
         for (int i = 0; i < signaturesRef.size(); i++) {
             double d = distance(coordonneesTest, signaturesRef.get(i), methode);
             if (d < distanceMinimale) {
                 distanceMinimale = d;
                 identiteTrouvee  = baseRef.getIdentite(i);
+            }
+            else if (d>this.distanceMax){
+                this.distanceMax = d;
             }
         }
         this.derniereDistance = distanceMinimale;
@@ -135,6 +139,7 @@ public class Reconnaissance {
      * moyenne entre toutes les paires de signatures de référence.
      */
     public void calibrerSeuil() {
+        this.seuil = 0;
         if (signaturesRef.size() < 2) return;
         double somme = 0;
         int count = 0;
@@ -144,7 +149,9 @@ public class Reconnaissance {
                 count++;
             }
         }
-        this.seuil = (somme / count) * 1.5;
+        if (count != 0) {
+            this.seuil = (somme / count) * 1.5;
+        }
     }
 
     // -------------------------------------------------------------------------
@@ -203,5 +210,9 @@ public class Reconnaissance {
 
     public double getDerniereDistance() {
         return this.derniereDistance;
+    }
+
+    public double getDistanceMax() {
+        return this.distanceMax;
     }
 }

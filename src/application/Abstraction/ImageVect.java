@@ -62,6 +62,10 @@ public class ImageVect {
     	
     }
 
+    public ImageVect(SimpleMatrix vecteur) {
+        this.devectoriser(vecteur, largeur, longueur);
+    }
+
     /**
      * Deuxième constructeur d'ImageVect
      * @param vecteur vecteut colonne
@@ -74,7 +78,7 @@ public class ImageVect {
         this.largeur = largeur;
         this.vecteurCol = vecteur;
         this.fichier = null;
-        this.image = this.devectoriser(vecteur, largeur, longueur);
+        this.devectoriser(vecteur, largeur, longueur);
     }
 
     /**
@@ -140,27 +144,23 @@ public class ImageVect {
      * @param longueur longueur original
      * @return l'image original
      */
-    public BufferedImage devectoriser(SimpleMatrix vecteur, int largeur, int longueur){
-
-        BufferedImage img = new BufferedImage(largeur, longueur, BufferedImage.TYPE_INT_RGB);
-
-        int index = 0;
-
-        for (int i=0;i<largeur;i++){
-            for (int j=0;j<longueur;j++){
-
-                double valeur = vecteur.get(index,0);
-                // Transforme en valeur de gris
-                int pixelGris = (int) Math.max(0,Math.min(255, valeur));
-                // Remet en valeur RGBx 
-                int pixel = (255<<24) | (pixelGris<<16) | (pixelGris<<8) | pixelGris;
-                img.setRGB(i, j, pixel);
-                index++;
-
-            }
-        }
-
-        return img;
+    public void devectoriser(SimpleMatrix vecteur, int largeur, int longueur){
+        this.vecteurCol = vecteur;
+        int taille = (int)Math.floor(Math.sqrt(this.vecteurCol.getNumRows()));
+    	
+    	this.vecteurCol.reshape(taille, taille);
+    	
+	    BufferedImage image_dest = new BufferedImage(taille,taille,BufferedImage.TYPE_INT_RGB);
+	    for(int i=0; i<taille; i++) {
+	        for(int j=0; j<taille; j++) {
+	        	double decentrer = this.vecteurCol.get(j, i)+this.vecteurCol.elementMinAbs();
+	        	decentrer = decentrer /(this.vecteurCol.elementMinAbs()+this.vecteurCol.elementMaxAbs());
+	            int a = (int)Math.floor(Math.abs(decentrer*255));
+	            Color newColor = new Color(a,a,a);
+	            image_dest.setRGB(j,i,newColor.getRGB());
+	        }
+	    }
+        this.image=image_dest;
     }
 
 }

@@ -2,6 +2,8 @@ package application.Controle;
 /** Importation des classes nécessaires */
 import java.io.File;
 
+import org.ejml.simple.SimpleMatrix;
+
 import application.Abstraction.Acp;
 import application.Abstraction.BaseDeDonnees;
 import application.Abstraction.Eigenfaces;
@@ -11,6 +13,7 @@ import application.Abstraction.Reconnaissance;
 import application.Abstraction.SVD;
 import application.Presentation.Ecran;
 import application.Presentation.MenuLateral;
+import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.image.Image;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
@@ -32,12 +35,15 @@ public class Gestionnaire {
     private BaseDeDonnees bdd;
     /** Moteur de reconnaissance faciale */
     private Reconnaissance reco;
+    private Eigenfaces faces;
     /** Projection des images dans l'espace des eigenfaces */
     private Projection proj;
     /** Distance choisie par l'utilisateur pour l'identification */
     private String distChoisie;
     /** Fichier sélectionné pour l'analyse */
     private File fichierSelectionne;
+    private Image cacheImageMoyenne;
+
 
     /**
      * Initialise le gestionnaire avec la fenêtre principale.
@@ -66,12 +72,12 @@ public class Gestionnaire {
             this.bdd = new BaseDeDonnees();
             Acp acp = new Acp(this.bdd);
             SVD svd = new SVD(acp.getMatrice_centree());
-            Eigenfaces faces = new Eigenfaces(svd, acp.getVisage_moyen());
+            this.faces = new Eigenfaces(svd, acp.getVisage_moyen());
             faces.construire();
             faces.selectionnerK(0.95);
 
             this.proj = new Projection(faces);
-            this.reco = new Reconnaissance(this.bdd, this.proj, Double.MAX_VALUE);
+            this.reco = new Reconnaissance(this.bdd, this.proj);
             this.reco.calibrerSeuil();
 
             System.out.println("Apprentissage terminé - K = " + faces.getK());
@@ -97,6 +103,8 @@ public class Gestionnaire {
                 this.fichierSelectionne = file;
                 // On active le lancement maintenant qu'un fichier est prêt
                 menu.getLancerReconnaissance().setDisable(false);
+                Image imgEntree = new Image(fichierSelectionne.toURI().toString());
+                this.ecran.getConteneurPrincipal().getPanneauReco().getVisageEntre().setImage(imgEntree);
             }
         });
 
@@ -117,11 +125,23 @@ public class Gestionnaire {
         });
 
         menu.getBtnNavVisu().setOnAction(e -> {
+            chargerImageMoyenne();
+            // chargerEigenfaces();
             ecran.getConteneurPrincipal().afficherVisualisation();
             menu.getBtnNavReco().setDisable(false);
             menu.getBtnNavVisu().setDisable(true); 
         });
 
+    }
+
+    private void chargerImageMoyenne() {
+        if (this.cacheImageMoyenne == null) {
+            SimpleMatrix imgMoyenne = faces.getVisageMoyen();
+            ImageVect img = new ImageVect(imgMoyenne);
+            Image imgJavaFX = SwingFXUtils.toFXImage(img.getBufferedImage(), null);
+            this.cacheImageMoyenne = imgJavaFX;
+        }
+        this.ecran.getConteneurPrincipal().getPanneauVisu().getImageMoyenne().setImage(this.cacheImageMoyenne);
     }
 
     /**
@@ -130,7 +150,6 @@ public class Gestionnaire {
      */
     private void traiterReconnaissance(File fichierImage) {
         try {
-            Image imgEntree = new Image(fichierImage.toURI().toString());
             ImageVect imageTest = new ImageVect(fichierImage.getAbsolutePath());
             String nomTrouve = this.reco.identifier(imageTest, this.distChoisie);
             
@@ -146,17 +165,16 @@ public class Gestionnaire {
                     }
                 }
                 double vraiDistance = this.reco.getDerniereDistance();
-                double seuilMax = this.reco.getSeuil();
-                double calculTaux = 100.0 * (1.0 - (vraiDistance / seuilMax));
+                double calculTaux = 100.0 * (1.0 - (vraiDistance / this.reco.getDistanceMax()));
                 tauxRessemblance = Math.max(0.0, Math.min(100.0, calculTaux));
             }
 
             // Mise à jour du PanneauReconnaissance situé dans le ConteneurPrincipal
-            this.ecran.getConteneurPrincipal().getPanneauReco().majInterface(imgEntree, imgTrouvee, nomTrouve, tauxRessemblance);
+            this.ecran.getConteneurPrincipal().getPanneauReco().majInterface(imgTrouvee, nomTrouve, tauxRessemblance);
             
         } catch (Exception e) {
             System.err.println("Erreur lors de la reconnaissance : " + e.getMessage());
-            this.ecran.getConteneurPrincipal().getPanneauReco().majInterface(null, null, "Erreur", 0.0);
+            this.ecran.getConteneurPrincipal().getPanneauReco().majInterface(null, "Erreur", 0.0);
         }
     }
 

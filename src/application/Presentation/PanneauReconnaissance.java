@@ -93,9 +93,7 @@ public class PanneauReconnaissance extends VBox {
      * @param nom nom de la personne trouvée
      * @param taux taux de ressemblance en pourcentage
      */
-    public void majInterface(Image imgEntre, Image imgTrouvee, String nom, double taux) {
-        if (imgEntre != null) this.visageEntre.setImage(imgEntre);
-        
+    public void majInterface(Image imgTrouvee, String nom, double taux) {        
         if (imgTrouvee != null) {
             this.visageTrouve.setImage(imgTrouvee);
         } 
@@ -114,4 +112,8 @@ public class PanneauReconnaissance extends VBox {
         this.barreRessemblance.setProgress(taux / 100.0);
         this.pourcentage.setText("Taux de ressemblance : " + String.format("%.1f", taux) + " %");
     }
+
+    public ImageView getVisageEntre() {
+        return this.visageEntre;
+    } 
 }

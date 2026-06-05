@@ -81,7 +81,7 @@ public class App {
             double biasMoy = biaisTotal / refs.size();
 
             // --- Calcul du Taux d'Identification (Leave-One-Out : LOO) ---
-            Reconnaissance reco = new Reconnaissance(bdd, proj, Double.MAX_VALUE);
+            Reconnaissance reco = new Reconnaissance(bdd, proj);
             reco.calibrerSeuil();
 
             double[] taux = new double[distances.length];
@@ -109,8 +109,7 @@ public class App {
             faces95.selectionnerK(0.95);
             
             Projection    proj95 = new Projection(faces95);
-            Reconnaissance reco95 = new Reconnaissance(bdd, proj95, Double.MAX_VALUE);
-            reco95.calibrerSeuil();
+            Reconnaissance reco95 = new Reconnaissance(bdd, proj95);
 
             System.out.printf("  %-12s  %-22s  %-22s  %-22s%n",
                 "Image", "Euclidienne", "Cosinus", "Mahalanobis");
