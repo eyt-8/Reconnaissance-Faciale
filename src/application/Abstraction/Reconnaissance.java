@@ -191,6 +191,17 @@ public class Reconnaissance {
     }
 
     /**
+     * Donne le seuil de validation (sous forme de réel sur lequel on prendra l'index le plus petit en dessous) 
+     * Après lequel les distances seront enlevées
+     * @param pourcentage   le seuil en pourcentage
+     * @param listeDist     la liste de toutes les distances
+     * @return              le seuil en réel
+     */
+    public double seuilValidation(double pourcentage,ArrayList<Double> listeDist) {
+        return pourcentage*listeDist.size();
+    }
+
+    /**
      * Déclenche une série de tests sur la base de données de test et
      * affiche le taux d'identification global dans la console.
      */
