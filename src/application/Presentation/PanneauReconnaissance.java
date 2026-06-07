@@ -22,6 +22,9 @@ public class PanneauReconnaissance extends VBox {
     private ImageView visageTrouve = new ImageView();
     /** Étiquette affichant le nom reconnu */
     private Label nomPrenom = new Label("La personne est ...");
+    /** Conteneur pour les informations supplémentaires (plus proches images) */
+    private VBox infosSupplementaires = new VBox(5);
+
 
     /**
      * Construit le panneau de reconnaissance et met en place la présentation.
@@ -40,6 +43,7 @@ public class PanneauReconnaissance extends VBox {
 
         this.nomPrenom = new Label("La personne est ...");
         this.nomPrenom.setStyle("-fx-font-size: 16px; -fx-font-weight: bold; -fx-font-style: italic;");
+        this.infosSupplementaires.setAlignment(Pos.CENTER);
 
         // Assemblage
         VBox blocImage1 = new VBox(20, this.visageEntre, new Label("Visage entré"));
@@ -51,7 +55,7 @@ public class PanneauReconnaissance extends VBox {
         HBox ligneImages = new HBox(50, blocImage1, blocImage2);
         ligneImages.setAlignment(Pos.CENTER);
 
-        this.getChildren().addAll(ligneImages, this.nomPrenom);
+        this.getChildren().addAll(ligneImages, this.nomPrenom, this.infosSupplementaires);
     }
 
     /**
@@ -80,7 +84,7 @@ public class PanneauReconnaissance extends VBox {
      * @param nom nom de la personne trouvée
      * @param taux taux de ressemblance en pourcentage
      */
-    public void majInterface(Image imgTrouvee, String nom, double taux) {        
+    public void majInterface(Image imgTrouvee, String nom, double taux, java.util.List<String> details) {        
         if (imgTrouvee != null) {
             this.visageTrouve.setImage(imgTrouvee);
         } 
@@ -96,6 +100,18 @@ public class PanneauReconnaissance extends VBox {
             }
         }
         this.nomPrenom.setText("La personne est " + nom);
+        
+        this.infosSupplementaires.getChildren().clear();
+        if (details != null && !details.isEmpty()) {
+            Label titreInfos = new Label("Images les plus proches :");
+            titreInfos.setStyle("-fx-font-size: 14px; -fx-font-weight: bold; -fx-underline: true;");
+            this.infosSupplementaires.getChildren().add(titreInfos);
+            for (String detail : details) {
+                Label lbl = new Label(detail);
+                lbl.setStyle("-fx-font-size: 12px;");
+                this.infosSupplementaires.getChildren().add(lbl);
+            }
+        }
     }
 
     public ImageView getVisageEntre() {

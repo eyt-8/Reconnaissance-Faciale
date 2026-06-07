@@ -1,6 +1,8 @@
 package application.Abstraction;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.ejml.simple.SimpleMatrix;
 import org.apache.commons.math3.distribution.FDistribution;
@@ -21,14 +23,39 @@ public class Reconnaissance {
     /** Objet gérant la projection mathématique dans l'espace réduit (ACP) */
     private Projection projection;
 
-    /** Limite de distance au-delà de laquelle le visage est considéré comme inconnu */
-    private double seuil;
+    /** Méthodes de distance supportées (mêmes clés que le dispatcher distance()). */
+    private static final String[] METHODES = {"euclidienne", "cosinus", "mahalanobis"};
+
+    /** Limite de distance au-delà de laquelle le visage est considéré comme inconnu,
+     *  calibrée séparément pour chaque méthode (les distances cosinus/Mahalanobis
+     *  ne vivent pas sur la même échelle que la distance euclidienne : un seuil
+     *  unique comparé indifféremment aux trois ne serait pertinent pour aucune). */
+    private Map<String, Double> seuils;
 
     /** Signatures pré-calculées des images de référence */
     private List<SimpleMatrix> signaturesRef;
 
     private double derniereDistance = 0.0;
     private double distanceMax;
+
+    public static class DistanceIdentite implements Comparable<DistanceIdentite> {
+        public String identite;
+        public double distance;
+        public DistanceIdentite(String identite, double distance) {
+            this.identite = identite;
+            this.distance = distance;
+        }
+        @Override
+        public int compareTo(DistanceIdentite o) {
+            return Double.compare(this.distance, o.distance);
+        }
+    }
+
+    private List<DistanceIdentite> resultatsPrecedents = new ArrayList<>();
+
+    public List<DistanceIdentite> getResultatsPrecedents() {
+        return this.resultatsPrecedents;
+    }
 
     /** Valeur propre minimale acceptée dans le critère de Hotelling : en dessous de
      *  ce seuil, la composante est ignorée pour éviter une division par une valeur
@@ -40,7 +67,6 @@ public class Reconnaissance {
      *
      * @param baseRef    l'instance de BaseDeDonnees contenant les signatures d'apprentissage
      * @param projection l'instance de Projection contenant la base d'Eigenfaces
-     * @param seuil      la distance euclidienne maximale tolérée pour une identification
      */
     public Reconnaissance(BaseDeDonnees baseRef, Projection projection) {
         this.baseRef    = baseRef;
@@ -71,8 +97,10 @@ public class Reconnaissance {
         double distanceMinimale = Double.MAX_VALUE;
         String identiteTrouvee = "Inconnu";
         this.distanceMax = 0;
+        this.resultatsPrecedents.clear();
         for (int i = 0; i < signaturesRef.size(); i++) {
             double d = distance(coordonneesTest, signaturesRef.get(i), methode);
+            this.resultatsPrecedents.add(new DistanceIdentite(baseRef.getIdentite(i), d));
             if (d < distanceMinimale) {
                 distanceMinimale = d;
                 identiteTrouvee  = baseRef.getIdentite(i);
@@ -81,8 +109,9 @@ public class Reconnaissance {
                 this.distanceMax = d;
             }
         }
+        java.util.Collections.sort(this.resultatsPrecedents);
         this.derniereDistance = distanceMinimale;
-        return (distanceMinimale > this.seuil) ? "Inconnu" : identiteTrouvee;
+        return (distanceMinimale > seuilPour(methode)) ? "Inconnu" : identiteTrouvee;
     }
 
     /**
@@ -201,23 +230,42 @@ public class Reconnaissance {
     // -------------------------------------------------------------------------
 
     /**
-     * Calcule automatiquement le seuil comme 1,5 × la distance euclidienne
-     * moyenne entre toutes les paires de signatures de référence.
+     * Calcule automatiquement, pour CHAQUE méthode de distance, un seuil
+     * égal à 1,5 × la distance moyenne (selon cette méthode) entre toutes
+     * les paires de signatures de référence.
+     *
+     * Un seuil par méthode est nécessaire car les distances cosinus ([0, 2])
+     * et de Mahalanobis (variance-pondérée) ne vivent pas du tout sur la même
+     * échelle que la distance euclidienne (somme de différences de pixels) :
+     * comparer leurs valeurs à un seuil unique calibré sur l'euclidienne
+     * empêcherait structurellement le rejet "Inconnu" pour les deux autres.
      */
     public void calibrerSeuil() {
-        this.seuil = 0;
-        if (signaturesRef.size() < 2) return;
-        double somme = 0;
-        int count = 0;
-        for (int i = 0; i < signaturesRef.size(); i++) {
-            for (int j = i + 1; j < signaturesRef.size(); j++) {
-                somme += distance_euclidienne(signaturesRef.get(i), signaturesRef.get(j));
-                count++;
+        this.seuils = new HashMap<>();
+        for (String methode : METHODES) {
+            double seuilMethode = 0;
+            if (signaturesRef.size() >= 2) {
+                double somme = 0;
+                int count = 0;
+                for (int i = 0; i < signaturesRef.size(); i++) {
+                    for (int j = i + 1; j < signaturesRef.size(); j++) {
+                        somme += distance(signaturesRef.get(i), signaturesRef.get(j), methode);
+                        count++;
+                    }
+                }
+                seuilMethode = (somme / count) * 1.5;
             }
+            this.seuils.put(methode, seuilMethode);
         }
-        if (count != 0) {
-            this.seuil = (somme / count) * 1.5;
-        }
+    }
+
+    /**
+     * Donne le seuil calibré pour une méthode de distance donnée. Retombe sur
+     * le seuil de la méthode "euclidienne" si la méthode demandée est inconnue
+     * (même comportement par défaut que le dispatcher distance()).
+     */
+    private double seuilPour(String methode) {
+        return this.seuils.getOrDefault(methode, this.seuils.get("euclidienne"));
     }
 
     /**
@@ -274,7 +322,7 @@ public class Reconnaissance {
                     identiteTrouvee = baseRef.getIdentite(j < i ? j : j + 1);
                 }
             }
-            if (distMin <= seuil && identiteTrouvee.equals(veriteTerrain)) reussites++;
+            if (distMin <= seuilPour(methode) && identiteTrouvee.equals(veriteTerrain)) reussites++;
             signaturesRef.add(i, sigI);
         }
         return (double) reussites / total;
@@ -305,8 +353,12 @@ public class Reconnaissance {
     // Getters
     // -------------------------------------------------------------------------
 
-    public double getSeuil() {
-        return seuil;
+    /**
+     * Seuil calibré pour une méthode de distance donnée
+     * (euclidienne, cosinus ou mahalanobis).
+     */
+    public double getSeuil(String methode) {
+        return seuilPour(methode);
     }
 
     public double getDerniereDistance() {

@@ -171,12 +171,20 @@ public class Gestionnaire {
                 tauxRessemblance = Math.max(0.0, Math.min(100.0, calculTaux));
             }
 
+            java.util.List<String> details = new java.util.ArrayList<>();
+            java.util.List<application.Abstraction.Reconnaissance.DistanceIdentite> topResults = this.reco.getResultatsPrecedents();
+            int topK = Math.min(5, topResults.size());
+            for (int i = 0; i < topK; i++) {
+                application.Abstraction.Reconnaissance.DistanceIdentite res = topResults.get(i);
+                details.add((i+1) + ". " + res.identite + " - Distance: " + String.format("%.2f", res.distance));
+            }
+
             // Mise à jour du PanneauReconnaissance situé dans le ConteneurPrincipal
-            this.ecran.getConteneurPrincipal().getPanneauReco().majInterface(imgTrouvee, nomTrouve, tauxRessemblance);
+            this.ecran.getConteneurPrincipal().getPanneauReco().majInterface(imgTrouvee, nomTrouve, tauxRessemblance, details);
             
         } catch (Exception e) {
             System.err.println("Erreur lors de la reconnaissance : " + e.getMessage());
-            this.ecran.getConteneurPrincipal().getPanneauReco().majInterface(null, "Erreur", 0.0);
+            this.ecran.getConteneurPrincipal().getPanneauReco().majInterface(null, "Erreur", 0.0, null);
         }
     }
 
