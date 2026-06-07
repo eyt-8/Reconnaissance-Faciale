@@ -3,6 +3,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.ejml.simple.SimpleMatrix;
+import org.apache.commons.math3.distribution.FDistribution;
 
 /**
  * La classe Reconnaissance gère la phase de test du système.
@@ -152,6 +153,30 @@ public class Reconnaissance {
         if (count != 0) {
             this.seuil = (somme / count) * 1.5;
         }
+    }
+
+    /**
+     * Calcule le seuil de décision du critère de Hotelling :
+     *     T²_seuil = (K(n-1) / (n-K)) * F_{1-alpha}(K, n-K)
+     * où K est le nombre d'eigenfaces retenues, n le nombre d'images
+     * d'apprentissage, et F_{1-alpha}(K, n-K) le quantile de la loi de
+     * Fisher à (K, n-K) degrés de liberté pour le risque alpha.
+     *
+     * Contrairement à calibrerSeuil() (seuil empirique calé sur la distance
+     * moyenne entre signatures de référence), ce seuil est dérivé
+     * théoriquement de la loi de Fisher : il ne dépend que de K, n et alpha.
+     *
+     * @param alpha risque choisi (ex. 0.05 pour un seuil à 95 %)
+     * @return T²_seuil, à comparer au T²_min calculé pour le visage test
+     */
+    public double calculerSeuilHotelling(double alpha) {
+        int K = projection.getEigenfaces().getK();
+        int n = baseRef.getNbImages();
+
+        FDistribution loiFisher = new FDistribution(K, n - K);
+        double quantile = loiFisher.inverseCumulativeProbability(1 - alpha);
+
+        return ((double) (K * (n - 1)) / (n - K)) * quantile;
     }
 
     // -------------------------------------------------------------------------
