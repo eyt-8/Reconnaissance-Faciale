@@ -59,7 +59,7 @@ public class Reconnaissance {
 
     /** Valeur propre minimale acceptée dans le critère de Hotelling : en dessous de
      *  ce seuil, la composante est ignorée pour éviter une division par une valeur
-     *  quasi nulle (qui ferait exploser T² sans information statistique fiable). */
+     *  quasi nulle (qui ferait exploser T^2 sans information statistique fiable). */
     private static final double LAMBDA_MIN = 1e-12;
 
     /**
@@ -121,26 +121,26 @@ public class Reconnaissance {
      * empirique this.seuil (calibrerSeuil()) mais sur un seuil statistique
      * dérivé de la loi de Fisher (calculerSeuilHotelling()).
      *
-     * Étapes (voir calculerSeuilHotelling pour le détail du seuil) :
-     *   1. projeter le visage test -> coordsTest (K x 1)
-     *   2-3. pour chaque référence j, calculer T²_j = Σ (coordsTest_i - coordsRef_i)² / λ_i
-     *   4. retenir le minimum T²_min et la référence j* associée
-     *   5. calculer T²_seuil = (K(n-1)/(n-K)) * F_{1-alpha}(K, n-K)
-     *   6. décider : T²_min <= T²_seuil -> identité de j*, sinon "Inconnu"
+     * Étapes :
+     * - Projection sur la base des eigenfaces
+     * - Utilisation de la formule de la statistique de Hotelling
+     * - On récupère la statistique minimale
+     * - Calcul du seuil
+     * - stat min > seuil => rejet donc "Inconnu", sinon pris
      *
      * @param test  l'image vectorisée représentant le visage à identifier
      * @param alpha risque choisi pour le seuil de Hotelling (ex. 0.05)
-     * @return le nom de la personne reconnue, ou "Inconnu" si T²_min dépasse T²_seuil
+     * @return le nom de la personne reconnue, ou "Inconnu"
      */
     public String identifierHotelling(ImageVect test, double alpha) {
-        // Étape 1 : projection du visage test -> coordsTest (K x 1, K = nb d'eigenfaces retenues)
+        // projection du visage test -> coordsTest (K x 1, K = nb d'eigenfaces retenues)
         SimpleMatrix coordsTest = projection.projeter(test);
         int K = coordsTest.getNumRows();
 
-        // λ_i : valeurs propres associées aux K composantes retenues (K x 1)
+        // valeurs propres associées aux K composantes retenues (K x 1)
         SimpleMatrix lambda = projection.getEigenfaces().getValPropresK();
 
-        // Étapes 2 à 4 : calcul de T²_j pour chaque référence, recherche du minimum
+        // calcul de T2_j pour chaque référence, recherche du minimum
         double t2Min = Double.MAX_VALUE;
         String identiteTrouvee = "Inconnu";
         this.distanceMax = 0;
@@ -153,7 +153,7 @@ public class Reconnaissance {
             for (int i = 0; i < K; i++) {
                 double lambda_i = lambda.get(i, 0);
                 // Protection numérique : une valeur propre quasi nulle ferait
-                // exploser (écart_i)² / λ_i sans apporter d'information fiable ;
+                // exploser (écart_i)^2/lambda_i sans apporter d'information fiable ;
                 // on ignore alors cette composante.
                 if (lambda_i < LAMBDA_MIN) continue;
 
@@ -174,7 +174,7 @@ public class Reconnaissance {
         }
         java.util.Collections.sort(this.resultatsPrecedents);
 
-        // Étape 5 : seuil de décision T²_seuil (formule détaillée dans calculerSeuilHotelling)
+        // Étape 5 : seuil de décision T2_seuil 
         double t2Seuil = calculerSeuilHotelling(alpha);
 
         this.derniereDistance = t2Min;
@@ -186,10 +186,10 @@ public class Reconnaissance {
     /**
      * Calcule la distance entre les coordonnées projetées de deux visages.
      *
-     * @param jp      coordonnées du visage test (K×1)
-     * @param jpk     coordonnées du visage de référence (K×1)
+     * @param jp      coordonnées du visage test (Kx1)
+     * @param jpk     coordonnées du visage de référence (Kx1)
      * @param methode euclidienne, cosinus ou mahalanobis
-     * @return distance ≥ 0
+     * @return distance >= 0
      */
     public double distance(SimpleMatrix jp, SimpleMatrix jpk, String methode) {
         switch (methode) {
@@ -200,7 +200,7 @@ public class Reconnaissance {
     }
 
     /**
-     * Distance cosinus entre deux vecteurs de coordonnées : 1 − cos(θ).
+     * Distance cosinus entre deux vecteurs de coordonnées : 1 - cos(jp,jpk).
      */
     public double distance_cosinus(SimpleMatrix jp, SimpleMatrix jpk) {
         double n1 = jp.normF();
@@ -218,7 +218,7 @@ public class Reconnaissance {
 
     /**
      * Distance de Mahalanobis dans l'espace réduit (K composantes sélectionnées).
-     * La matrice de covariance est diagonale : d = (jp−jpk)ᵀ × Λ⁻¹ × (jp−jpk).
+     * La matrice de covariance est diagonale : d = (jp-jpk)T x diag(D)^(-1) x (jp-jpk).
      */
     public double distance_mahalanobis(SimpleMatrix jp, SimpleMatrix jpk) {
         SimpleMatrix lambdaK = projection.getEigenfaces().getValPropresK(); // K×1
@@ -234,9 +234,7 @@ public class Reconnaissance {
         return difference.transpose().mult(lambdaInv).dot(difference);
     }
 
-    // -------------------------------------------------------------------------
     // Calibration du seuil
-    // -------------------------------------------------------------------------
 
     /**
      * Calcule automatiquement, pour CHAQUE méthode de distance, un seuil
@@ -277,7 +275,7 @@ public class Reconnaissance {
 
     /**
      * Calcule le seuil de décision du critère de Hotelling :
-     *     T²_seuil = (K(n-1) / (n-K)) * F_{1-alpha}(K, n-K)
+     *     T^2_seuil = (K(n-1) / (n-K)) * F_{1-alpha}(K, n-K)
      * où K est le nombre d'eigenfaces retenues, n le nombre d'images
      * d'apprentissage, et F_{1-alpha}(K, n-K) le quantile de la loi de
      * Fisher à (K, n-K) degrés de liberté pour le risque alpha.
@@ -287,7 +285,7 @@ public class Reconnaissance {
      * théoriquement de la loi de Fisher : il ne dépend que de K, n et alpha.
      *
      * @param alpha risque choisi (ex. 0.05 pour un seuil à 95 %)
-     * @return T²_seuil, à comparer au T²_min calculé pour le visage test
+     * @return T^2_seuil, à comparer au T^2_min calculé pour le visage test
      */
     public double calculerSeuilHotelling(double alpha) {
         int K = projection.getEigenfaces().getK();
@@ -299,9 +297,7 @@ public class Reconnaissance {
         return ((double) (K * (n - 1)) / (n - K)) * quantile;
     }
 
-    // -------------------------------------------------------------------------
     // Évaluation
-    // -------------------------------------------------------------------------
 
     /**
      * Taux d'identification par validation croisée leave-one-out (LOO)
@@ -316,16 +312,16 @@ public class Reconnaissance {
 
         int reussites = 0;
         for (int i = 0; i < total; i++) {
-            SimpleMatrix sigI        = signaturesRef.remove(i);
-            String       veriteTerrain = baseRef.getIdentite(i);
+            SimpleMatrix sigI = signaturesRef.remove(i);
+            String veriteTerrain = baseRef.getIdentite(i);
 
-            double distMin         = Double.MAX_VALUE;
+            double distMin = Double.MAX_VALUE;
             String identiteTrouvee = "Inconnu";
 
             for (int j = 0; j < signaturesRef.size(); j++) {
                 double d = distance(sigI, signaturesRef.get(j), methode);
                 if (d < distMin) {
-                    distMin         = d;
+                    distMin = d;
                     identiteTrouvee = baseRef.getIdentite(j < i ? j : j + 1);
                 }
             }
