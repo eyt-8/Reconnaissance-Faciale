@@ -352,10 +352,8 @@ public class Reconnaissance {
         System.out.println("Taux d'identification global : " + (taux * 100) + " %");
     }
 
-    // -------------------------------------------------------------------------
     // Getters
-    // -------------------------------------------------------------------------
-
+    
     /**
      * Seuil calibré pour une méthode de distance donnée
      * (euclidienne, cosinus ou mahalanobis).
