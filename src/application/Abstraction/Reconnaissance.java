@@ -236,9 +236,7 @@ public class Reconnaissance {
      *
      * Un seuil par méthode est nécessaire car les distances cosinus ([0, 2])
      * et de Mahalanobis (variance-pondérée) ne vivent pas du tout sur la même
-     * échelle que la distance euclidienne (somme de différences de pixels) :
-     * comparer leurs valeurs à un seuil unique calibré sur l'euclidienne
-     * empêcherait structurellement le rejet "Inconnu" pour les deux autres.
+     * échelle que la distance euclidienne (somme de différences de pixels
      */
     public void calibrerSeuil() {
         this.seuils = new HashMap<>();
