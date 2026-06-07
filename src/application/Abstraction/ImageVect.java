@@ -128,11 +128,16 @@ public class ImageVect {
         SimpleMatrix grille = this.vecteurCol.copy();
         grille.reshape(taille, taille);
 
+        // elementMinAbs()/elementMaxAbs() parcourent toute la matrice : on les calcule
+        // une seule fois ici, plutôt qu'à chaque pixel (la matrice ne change pas pendant la boucle).
+        double minAbs = grille.elementMinAbs();
+        double maxAbs = grille.elementMaxAbs();
+        double denominateur = minAbs + maxAbs;
+
 	    BufferedImage image_dest = new BufferedImage(taille,taille,BufferedImage.TYPE_INT_RGB);
 	    for(int i=0; i<taille; i++) {
 	        for(int j=0; j<taille; j++) {
-	        	double decentrer = grille.get(j, i)+grille.elementMinAbs();
-	        	decentrer = decentrer /(grille.elementMinAbs()+grille.elementMaxAbs());
+	        	double decentrer = (grille.get(j, i) + minAbs) / denominateur;
 	            int a = (int)Math.floor(Math.abs(decentrer*255));
 	            Color newColor = new Color(a,a,a);
 	            image_dest.setRGB(j,i,newColor.getRGB());
