@@ -3,7 +3,6 @@ package application.Presentation;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
-import javafx.scene.control.ProgressBar;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
@@ -13,7 +12,7 @@ import javafx.scene.layout.VBox;
  * Panneau principal de la reconnaissance faciale.
  * Il affiche l'image d'entrée, l'image trouvée et le taux de ressemblance.
  *
- * @author Maël Lescoulié
+ * @author Maël Lescoulié Nylan Paillassa
  * @version 1.0
  */
 public class PanneauReconnaissance extends VBox {
@@ -23,10 +22,6 @@ public class PanneauReconnaissance extends VBox {
     private ImageView visageTrouve = new ImageView();
     /** Étiquette affichant le nom reconnu */
     private Label nomPrenom = new Label("La personne est ...");
-    /** Barre de progression du taux de ressemblance */
-    private ProgressBar barreRessemblance = new ProgressBar(0.0);
-    /** Libellé du pourcentage de ressemblance */
-    private Label pourcentage = new Label("Taux de ressemblance : 0%");
 
     /**
      * Construit le panneau de reconnaissance et met en place la présentation.
@@ -46,14 +41,6 @@ public class PanneauReconnaissance extends VBox {
         this.nomPrenom = new Label("La personne est ...");
         this.nomPrenom.setStyle("-fx-font-size: 16px; -fx-font-weight: bold; -fx-font-style: italic;");
 
-        this.barreRessemblance = new ProgressBar(0.0);
-        this.barreRessemblance.setPrefHeight(20);
-        this.barreRessemblance.setPrefWidth(350);
-        this.barreRessemblance.setStyle("-fx-accent: #7bc07b;");
-
-        this.pourcentage = new Label("Taux de ressemblance :   %");
-        this.pourcentage.setStyle("-fx-font-size: 14px;");
-
         // Assemblage
         VBox blocImage1 = new VBox(20, this.visageEntre, new Label("Visage entré"));
         blocImage1.setAlignment(Pos.CENTER);
@@ -64,7 +51,7 @@ public class PanneauReconnaissance extends VBox {
         HBox ligneImages = new HBox(50, blocImage1, blocImage2);
         ligneImages.setAlignment(Pos.CENTER);
 
-        this.getChildren().addAll(ligneImages, this.nomPrenom, this.barreRessemblance, this.pourcentage);
+        this.getChildren().addAll(ligneImages, this.nomPrenom);
     }
 
     /**
@@ -109,8 +96,6 @@ public class PanneauReconnaissance extends VBox {
             }
         }
         this.nomPrenom.setText("La personne est " + nom);
-        this.barreRessemblance.setProgress(taux / 100.0);
-        this.pourcentage.setText("Taux de ressemblance : " + String.format("%.1f", taux) + " %");
     }
 
     public ImageView getVisageEntre() {
