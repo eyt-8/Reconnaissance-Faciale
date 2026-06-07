@@ -9,7 +9,7 @@ import javafx.stage.Stage;
  * Point d'entrée JavaFX de l'application de reconnaissance faciale.
  * Cette classe initialise la fenêtre principale et affiche l'interface.
  *
- * @author Maël Lescoulié
+ * @author Maël Lescoulié Nylan Paillassa
  * @version 1.0
  */
 public class MainApp extends Application {
@@ -33,6 +33,7 @@ public class MainApp extends Application {
 
         primaryStage.setTitle("Système de Reconnaissance Faciale");
         primaryStage.setScene(scene);
+        primaryStage.setResizable(false); // Empêche le redimensionnement de la fenêtre
         primaryStage.show();
     }
 

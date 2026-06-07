@@ -53,7 +53,7 @@ public class PanneauVisualisation extends VBox {
         this.imagesEigenfaces.getChildren().clear();        
         for (int i = 0; i < listeImages.size(); i++) {
             ImageView iv = new ImageView(listeImages.get(i));
-            iv.setFitWidth(200);
+            iv.setFitWidth(150);
             iv.setPreserveRatio(true);
             VBox vBoxImage = new VBox(new Label("Eigenface " + (i + 1)), iv);
             this.imagesEigenfaces.getChildren().add(vBoxImage);
