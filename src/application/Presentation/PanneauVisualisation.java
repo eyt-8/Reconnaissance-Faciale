@@ -9,6 +9,10 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.chart.LineChart;
+import javafx.scene.chart.NumberAxis;
+import javafx.scene.chart.XYChart;
+import org.ejml.simple.SimpleMatrix;
 
 /**
  * Panneau de visualisation des résultats.
@@ -22,6 +26,8 @@ public class PanneauVisualisation extends VBox {
     private ImageView imageMoyenne = new ImageView();
     /** Conteneur des images eigenfaces */
     private FlowPane imagesEigenfaces;
+    /** Graphique pour visualiser la variance expliquée */
+    private LineChart<Number,Number> graphique;
 
     /**
      * Construit le panneau de visualisation et prépare son contenu.
@@ -43,9 +49,21 @@ public class PanneauVisualisation extends VBox {
         scrollPane.setFitToWidth(true);
         scrollPane.setPrefHeight(600);
 
+        NumberAxis x = new NumberAxis();
+        x.setLabel("Nombre d'eigenfaces (K)");
+        NumberAxis y = new NumberAxis();
+        y.setLabel("Variance expliquée cumulée");
+        this.graphique = new LineChart<>(x, y);
+        this.graphique.setTitle("Évolution de la variance");
+        this.graphique.setCreateSymbols(false);
+        this.graphique.setLegendVisible(false);
+        this.graphique.setPrefHeight(450);
+        this.graphique.setMinHeight(350);
+
         this.getChildren().addAll(
             new Label("Image Moyenne :"), imageMoyenne,
-            new Label("Eigenfaces :"), scrollPane
+            new Label("Eigenfaces :"), scrollPane,
+            new Label("Graphique variance :"), graphique
         );
     }
 
@@ -73,5 +91,25 @@ public class PanneauVisualisation extends VBox {
      */
     public FlowPane getImagesEigenfaces() {
         return imagesEigenfaces;
+    }
+
+    /**
+     * Trace la courbe de variance cumulée
+     * @param varCumulee
+     */
+    public void tracerCourbe(SimpleMatrix varCumulee){
+        double valeur;
+        this.graphique.getData().clear();
+        XYChart.Series<Number,Number> serie = new XYChart.Series<>();
+
+        int nbComposantes = varCumulee.getNumRows();
+
+        for (int i =0;i< nbComposantes;i++){
+            valeur = varCumulee.get(i,0);
+            serie.getData().add(new XYChart.Data<>(i+1,valeur));
+        }
+
+        this.graphique.getData().add(serie);
+
     }
 }

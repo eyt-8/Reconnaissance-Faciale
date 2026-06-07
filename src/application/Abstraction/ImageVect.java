@@ -119,7 +119,7 @@ public class ImageVect {
      * @return l'image original
      */
     public void devectoriser(SimpleMatrix vecteur, int largeur, int longueur){
-        this.vecteurCol = vecteur;
+        this.vecteurCol = vecteur.copy();
         int taille = (int)Math.floor(Math.sqrt(this.vecteurCol.getNumRows()));
     	
     	this.vecteurCol.reshape(taille, taille);

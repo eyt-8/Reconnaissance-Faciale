@@ -80,6 +80,8 @@ public class Gestionnaire {
             System.out.println("[3/6] Construction des Eigenfaces...");
             this.faces = new Eigenfaces(svd, acp.getVisage_moyen());
             faces.construire();
+            SimpleMatrix varianceCumulee = faces.varianceExpliquee();
+            this.ecran.getConteneurPrincipal().getPanneauVisu().tracerCourbe(varianceCumulee);
             faces.selectionnerK(0.95);
             System.out.println("[4/6] Préparation de la projection...");
             this.proj = new Projection(faces);
