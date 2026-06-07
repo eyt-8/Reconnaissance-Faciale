@@ -46,6 +46,7 @@ public class Gestionnaire {
     private File fichierSelectionne;
     private Image cacheImageMoyenne;
     private List<Image> cacheEigenfaces;
+    private List<Double> cacheValeursPropres;
 
 
     /**
@@ -137,7 +138,7 @@ public class Gestionnaire {
 
         menu.getBtnNavVisu().setOnAction(e -> {
             this.ecran.getConteneurPrincipal().getPanneauVisu().getImageMoyenne().setImage(this.cacheImageMoyenne);
-            ecran.getConteneurPrincipal().getPanneauVisu().afficherEigenfaces(this.cacheEigenfaces);
+            ecran.getConteneurPrincipal().getPanneauVisu().afficherEigenfaces(this.cacheEigenfaces, this.cacheValeursPropres);
             ecran.getConteneurPrincipal().afficherVisualisation();
             menu.getBtnNavReco().setDisable(false);
             menu.getBtnNavVisu().setDisable(true); 
@@ -187,11 +188,13 @@ public class Gestionnaire {
 
     private void chargerEigenfaces() {
         this.cacheEigenfaces = new ArrayList<>();
+        this.cacheValeursPropres = new ArrayList<>();
         for (int i = 0; i < 5 && i < faces.getK(); i++) {
             SimpleMatrix vec = faces.getEigenface(i);
             ImageVect img = new ImageVect(vec);
             Image imgFX = SwingFXUtils.toFXImage(img.getBufferedImage(), null);
             this.cacheEigenfaces.add(imgFX);
+            this.cacheValeursPropres.add(faces.getValPropres().get(i, 0));
             System.out.println("      ["+(i+1)+"/5]...");
         }
         System.out.println("[6/6] Chargement des eigenfaces terminés");

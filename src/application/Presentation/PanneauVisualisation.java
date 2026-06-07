@@ -67,13 +67,14 @@ public class PanneauVisualisation extends VBox {
         );
     }
 
-    public void afficherEigenfaces(List<Image> listeImages) {
+    public void afficherEigenfaces(List<Image> listeImages, List<Double> valeursPropres) {
         this.imagesEigenfaces.getChildren().clear();        
         for (int i = 0; i < listeImages.size(); i++) {
             ImageView iv = new ImageView(listeImages.get(i));
             iv.setFitWidth(150);
             iv.setPreserveRatio(true);
-            VBox vBoxImage = new VBox(new Label("Eigenface " + (i + 1)), iv);
+            Label lblVP = new Label(String.format("Valeur propre : %.2f", valeursPropres.get(i)));
+            VBox vBoxImage = new VBox(new Label("Eigenface " + (i + 1)), iv, lblVP);
             this.imagesEigenfaces.getChildren().add(vBoxImage);
         }
     }
