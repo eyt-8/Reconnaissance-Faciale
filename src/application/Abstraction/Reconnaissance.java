@@ -143,6 +143,8 @@ public class Reconnaissance {
         // Étapes 2 à 4 : calcul de T²_j pour chaque référence, recherche du minimum
         double t2Min = Double.MAX_VALUE;
         String identiteTrouvee = "Inconnu";
+        this.distanceMax = 0;
+        this.resultatsPrecedents.clear();
         for (int j = 0; j < signaturesRef.size(); j++) {
             SimpleMatrix coordsRef = signaturesRef.get(j);     // K x 1
             SimpleMatrix ecart = coordsTest.minus(coordsRef);  // K x 1
@@ -159,11 +161,18 @@ public class Reconnaissance {
                 t2 += (ecart_i * ecart_i) / lambda_i;
             }
 
+            // On alimente resultatsPrecedents/distanceMax comme identifier(),
+            // afin que le panneau de reconnaissance (ressemblance, "images les
+            // plus proches") fonctionne aussi avec le critère de Hotelling.
+            this.resultatsPrecedents.add(new DistanceIdentite(baseRef.getIdentite(j), t2));
             if (t2 < t2Min) {
                 t2Min = t2;
                 identiteTrouvee = baseRef.getIdentite(j);
+            } else if (t2 > this.distanceMax) {
+                this.distanceMax = t2;
             }
         }
+        java.util.Collections.sort(this.resultatsPrecedents);
 
         // Étape 5 : seuil de décision T²_seuil (formule détaillée dans calculerSeuilHotelling)
         double t2Seuil = calculerSeuilHotelling(alpha);

@@ -42,6 +42,8 @@ public class Gestionnaire {
     private Projection proj;
     /** Distance choisie par l'utilisateur pour l'identification */
     private String distChoisie;
+    /** Risque alpha utilisé pour le seuil du critère de Hotelling (ex. 0.05 = 95 %) */
+    private static final double ALPHA_HOTELLING = 0.05;
     /** Fichier sélectionné pour l'analyse */
     private File fichierSelectionne;
     private Image cacheImageMoyenne;
@@ -153,7 +155,12 @@ public class Gestionnaire {
     private void traiterReconnaissance(File fichierImage) {
         try {
             ImageVect imageTest = new ImageVect(fichierImage.getAbsolutePath());
-            String nomTrouve = this.reco.identifier(imageTest, this.distChoisie);
+
+            // Le critère de Hotelling utilise une décision statistique (loi de
+            // Fisher) au lieu du seuil empirique : on l'appelle séparément.
+            String nomTrouve = this.distChoisie.equals("hotelling")
+                ? this.reco.identifierHotelling(imageTest, ALPHA_HOTELLING)
+                : this.reco.identifier(imageTest, this.distChoisie);
             
             Image imgTrouvee = null;
             double tauxRessemblance = 0.0;
