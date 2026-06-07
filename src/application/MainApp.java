@@ -20,7 +20,7 @@ public class MainApp extends Application {
     @Override
     public void start(Stage primaryStage) {
         Gestionnaire gestionnaire = new Gestionnaire(primaryStage);
-        Scene scene = new Scene(gestionnaire.getEcran(), 1200, 1080);
+        Scene scene = new Scene(gestionnaire.getEcran(), 1200, 800);
 
         // Chargement du CSS
         try {
@@ -33,7 +33,9 @@ public class MainApp extends Application {
 
         primaryStage.setTitle("Système de Reconnaissance Faciale");
         primaryStage.setScene(scene);
-        primaryStage.setResizable(true); // Empêche le redimensionnement de la fenêtre
+        primaryStage.setMinHeight(800);
+        primaryStage.setMinWidth(1200);
+        primaryStage.setResizable(true);
         primaryStage.show();
     }
 

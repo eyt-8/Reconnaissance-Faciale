@@ -30,6 +30,11 @@ public class Reconnaissance {
     private double derniereDistance = 0.0;
     private double distanceMax;
 
+    /** Valeur propre minimale acceptée dans le critère de Hotelling : en dessous de
+     *  ce seuil, la composante est ignorée pour éviter une division par une valeur
+     *  quasi nulle (qui ferait exploser T² sans information statistique fiable). */
+    private static final double LAMBDA_MIN = 1e-12;
+
     /**
      * Constructeur de la classe Reconnaissance.
      *
@@ -78,6 +83,66 @@ public class Reconnaissance {
         }
         this.derniereDistance = distanceMinimale;
         return (distanceMinimale > this.seuil) ? "Inconnu" : identiteTrouvee;
+    }
+
+    /**
+     * Identifie un visage test à l'aide du critère de Hotelling.
+     *
+     * Contrairement à identifier(), la décision ne s'appuie pas sur le seuil
+     * empirique this.seuil (calibrerSeuil()) mais sur un seuil statistique
+     * dérivé de la loi de Fisher (calculerSeuilHotelling()).
+     *
+     * Étapes (voir calculerSeuilHotelling pour le détail du seuil) :
+     *   1. projeter le visage test -> coordsTest (K x 1)
+     *   2-3. pour chaque référence j, calculer T²_j = Σ (coordsTest_i - coordsRef_i)² / λ_i
+     *   4. retenir le minimum T²_min et la référence j* associée
+     *   5. calculer T²_seuil = (K(n-1)/(n-K)) * F_{1-alpha}(K, n-K)
+     *   6. décider : T²_min <= T²_seuil -> identité de j*, sinon "Inconnu"
+     *
+     * @param test  l'image vectorisée représentant le visage à identifier
+     * @param alpha risque choisi pour le seuil de Hotelling (ex. 0.05)
+     * @return le nom de la personne reconnue, ou "Inconnu" si T²_min dépasse T²_seuil
+     */
+    public String identifierHotelling(ImageVect test, double alpha) {
+        // Étape 1 : projection du visage test -> coordsTest (K x 1, K = nb d'eigenfaces retenues)
+        SimpleMatrix coordsTest = projection.projeter(test);
+        int K = coordsTest.getNumRows();
+
+        // λ_i : valeurs propres associées aux K composantes retenues (K x 1)
+        SimpleMatrix lambda = projection.getEigenfaces().getValPropresK();
+
+        // Étapes 2 à 4 : calcul de T²_j pour chaque référence, recherche du minimum
+        double t2Min = Double.MAX_VALUE;
+        String identiteTrouvee = "Inconnu";
+        for (int j = 0; j < signaturesRef.size(); j++) {
+            SimpleMatrix coordsRef = signaturesRef.get(j);     // K x 1
+            SimpleMatrix ecart = coordsTest.minus(coordsRef);  // K x 1
+
+            double t2 = 0.0;
+            for (int i = 0; i < K; i++) {
+                double lambda_i = lambda.get(i, 0);
+                // Protection numérique : une valeur propre quasi nulle ferait
+                // exploser (écart_i)² / λ_i sans apporter d'information fiable ;
+                // on ignore alors cette composante.
+                if (lambda_i < LAMBDA_MIN) continue;
+
+                double ecart_i = ecart.get(i, 0);
+                t2 += (ecart_i * ecart_i) / lambda_i;
+            }
+
+            if (t2 < t2Min) {
+                t2Min = t2;
+                identiteTrouvee = baseRef.getIdentite(j);
+            }
+        }
+
+        // Étape 5 : seuil de décision T²_seuil (formule détaillée dans calculerSeuilHotelling)
+        double t2Seuil = calculerSeuilHotelling(alpha);
+
+        this.derniereDistance = t2Min;
+
+        // Étape 6 : décision
+        return (t2Min <= t2Seuil) ? identiteTrouvee : "Inconnu";
     }
 
     /**

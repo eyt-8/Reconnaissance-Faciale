@@ -121,14 +121,18 @@ public class ImageVect {
     public void devectoriser(SimpleMatrix vecteur, int largeur, int longueur){
         this.vecteurCol = vecteur.copy();
         int taille = (int)Math.floor(Math.sqrt(this.vecteurCol.getNumRows()));
-    	
-    	this.vecteurCol.reshape(taille, taille);
-    	
+
+        // Grille carrée utilisée uniquement pour la construction de l'image affichable :
+        // on travaille sur une copie, afin que vecteurCol reste un vecteur colonne n x 1
+        // (contrat attendu par getVecteurCol() partout ailleurs : Comparaison, Projection...).
+        SimpleMatrix grille = this.vecteurCol.copy();
+        grille.reshape(taille, taille);
+
 	    BufferedImage image_dest = new BufferedImage(taille,taille,BufferedImage.TYPE_INT_RGB);
 	    for(int i=0; i<taille; i++) {
 	        for(int j=0; j<taille; j++) {
-	        	double decentrer = this.vecteurCol.get(j, i)+this.vecteurCol.elementMinAbs();
-	        	decentrer = decentrer /(this.vecteurCol.elementMinAbs()+this.vecteurCol.elementMaxAbs());
+	        	double decentrer = grille.get(j, i)+grille.elementMinAbs();
+	        	decentrer = decentrer /(grille.elementMinAbs()+grille.elementMaxAbs());
 	            int a = (int)Math.floor(Math.abs(decentrer*255));
 	            Color newColor = new Color(a,a,a);
 	            image_dest.setRGB(j,i,newColor.getRGB());

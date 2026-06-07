@@ -111,16 +111,17 @@ public class App {
             Projection    proj95 = new Projection(faces95);
             Reconnaissance reco95 = new Reconnaissance(bdd, proj95);
 
-            System.out.printf("  %-12s  %-22s  %-22s  %-22s%n",
-                "Image", "Euclidienne", "Cosinus", "Mahalanobis");
-            System.out.println("  " + "-".repeat(82));
-            
+            System.out.printf("  %-12s  %-22s  %-22s  %-22s  %-22s%n",
+                "Image", "Euclidienne", "Cosinus", "Mahalanobis", "Hotelling");
+            System.out.println("  " + "-".repeat(106));
+
             for (ImageVect imgTest : tests) {
                 String predEucl = reco95.identifier(imgTest, "euclidienne");
                 String predCos  = reco95.identifier(imgTest, "cosinus");
                 String predMaha = reco95.identifier(imgTest, "mahalanobis");
-                System.out.printf("  %-12s  %-22s  %-22s  %-22s%n",
-                    imgTest.getNom(), predEucl, predCos, predMaha);
+                String predHot  = reco95.identifierHotelling(imgTest, 0.05);
+                System.out.printf("  %-12s  %-22s  %-22s  %-22s  %-22s%n",
+                    imgTest.getNom(), predEucl, predCos, predMaha, predHot);
             }
         } else {
             System.out.println("\nAucune image dans donnees/test/");
