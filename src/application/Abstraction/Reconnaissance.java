@@ -180,6 +180,8 @@ public class Reconnaissance {
         this.derniereDistance = t2Min;
 
         // Étape 6 : décision
+        System.out.println("t2 min :"+t2Min);
+        System.out.println("t2Seuil :"+t2Seuil);
         return (t2Min <= t2Seuil) ? identiteTrouvee : "Inconnu";
     }
 
