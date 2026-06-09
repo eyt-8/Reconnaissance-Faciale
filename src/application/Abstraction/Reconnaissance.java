@@ -31,7 +31,7 @@ public class Reconnaissance {
     private static final double LAMBDA_MIN = 1e-12;
 
     private final BaseDeDonnees baseRef;
-    private final Projection    projection;
+    private final Projection projection;
 
     /** Projections pré-calculées des images de référence dans l'espace ACP. */
     private final List<SimpleMatrix> signaturesRef;
@@ -55,6 +55,15 @@ public class Reconnaissance {
         public int compareTo(DistanceIdentite o) {
             return Double.compare(this.distance, o.distance);
         }
+    }
+
+    /**
+     * Prend le pourcentage d'images retenu et renvoie l'image à partir de laquelle on ne les prend plus
+     * @param pourcentage le pourcentage demandé
+     * @return
+     */
+    public int critereDeux(double pourcentage){
+        return (int)Math.floor(pourcentage*baseRef.getNbImages());
     }
 
     /**
@@ -142,15 +151,18 @@ public class Reconnaissance {
      */
     private double calculerT2(SimpleMatrix coordsTest, int indexCandidat) {
         SimpleMatrix lambda = projection.getEigenfaces().getValPropresK();
-        SimpleMatrix ecart  = coordsTest.minus(signaturesRef.get(indexCandidat));
+        SimpleMatrix proj  = signaturesRef.get(indexCandidat); // Projection sur la base des eigenfaces de l'image
+        System.out.println("Fonctionne");
         int K = coordsTest.getNumRows();
         double t2 = 0.0;
         for (int i = 0; i < K; i++) {
             double li = lambda.get(i, 0);
             if (li < LAMBDA_MIN) continue;
-            double ei = ecart.get(i, 0);
+            double ei = proj.get(i, 0);
             t2 += (ei * ei) / li;
         }
+        System.out.print("T^2 :");
+        System.out.println(t2);
         return t2;
     }
 
