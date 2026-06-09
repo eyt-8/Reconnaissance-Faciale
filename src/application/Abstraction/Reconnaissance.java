@@ -161,7 +161,7 @@ public class Reconnaissance {
     private double calculerSeuilHotelling(double alpha) {
         int K = projection.getEigenfaces().getK();
         int n = baseRef.getNbImages();
-        FDistribution fisher   = new FDistribution(K, n - K);
+        FDistribution fisher = new FDistribution(K, n - K);
         double quantile = fisher.inverseCumulativeProbability(1.0 - alpha);
         return ((double) K * (n - 1) / (n - K)) * quantile;
     }
