@@ -51,7 +51,7 @@ public class MenuLateral extends VBox {
 
         // ComboBox pour les distances
         this.choixDistance = new ComboBox<>();
-        this.choixDistance.getItems().addAll("Euclidienne", "Mahalanobis", "Cosinus", "Hotelling");
+        this.choixDistance.getItems().addAll("Euclidienne", "Mahalanobis", "Cosinus");
         this.choixDistance.setValue("Euclidienne"); // Valeur par défaut
         this.choixDistance.setPrefWidth(160);
 
