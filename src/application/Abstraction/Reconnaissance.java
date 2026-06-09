@@ -126,7 +126,7 @@ public class Reconnaissance {
      * Étapes :
      * - Projection sur la base des eigenfaces
      * - Utilisation de la formule de la statistique de Hotelling
-     * - On récupère la statistique minimale
+     * - On récupère la statistique de la distance minimale via les arguments de la fonction
      * - Calcul du seuil
      * - stat min > seuil => rejet donc "Inconnu", sinon pris
      *
