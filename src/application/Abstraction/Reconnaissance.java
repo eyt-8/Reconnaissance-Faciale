@@ -11,8 +11,8 @@ import org.ejml.simple.SimpleMatrix;
 /**
  * Reconnaissance faciale par ACP/Eigenfaces.
  *
- * Calculer la distance (euclidienne, cosinus ou Mahalanobis) sert à trouver le plus proche voisin parmi les images de référence.
- * et le critère de Hotelling T^2 qui détermine si ce voisin est suffisamment proche pour être considéré comme "connu" ou si le visage est "Inconnu".
+ * Calculer la distance (euclidienne, cosinus ou Mahalanobis) sert à trouver l'image la plus proche de l'image de test.
+ * Le critère de Hotelling T^2 détermine si ce voisin est suffisamment proche pour être considéré comme "connu" ou si le visage est "Inconnu".
  *
  * @author SOULEZ-DAMAZIE Soraya, PAILLASSA Nylan, CAUMONT Virgile
  */
@@ -64,8 +64,8 @@ public class Reconnaissance {
      * @param projection moteur de projection dans l'espace des eigenfaces
      */
     public Reconnaissance(BaseDeDonnees baseRef, Projection projection) {
-        this.baseRef       = baseRef;
-        this.projection    = projection;
+        this.baseRef = baseRef;
+        this.projection = projection;
         this.signaturesRef = new ArrayList<>();
         for (ImageVect img : baseRef.getReferences()) {
             this.signaturesRef.add(projection.projeter(img));
@@ -147,8 +147,8 @@ public class Reconnaissance {
         int    n = baseRef.getNbImages();
         double t2 = 0.0;
         for (int i = 0; i < K; i++) {
-            // λᵢ est l'eigenvalue de A^T*A (somme des carrés) ;
-            // la variance réelle de la projection est λᵢ/n
+            // lambda i est l'eigenvalue de A^T*A (somme des carrés) ;
+            // la variance réelle de la projection est lambda i/n
             double li = lambda.get(i, 0) / n;
             if (li < LAMBDA_MIN) continue;
             double ei = ecart.get(i, 0);
@@ -171,13 +171,19 @@ public class Reconnaissance {
     /**
      * Prend le pourcentage d'images retenu et renvoie l'image à partir de laquelle on ne les prend plus
      * @param pourcentage le pourcentage demandé
-     * @return
+     * @return le rang de l'image après laquelle on n'en conserve plus
      */
     public int critereDeux(double pourcentage){
         return (int)Math.floor(pourcentage*baseRef.getNbImages());
     }
 
-
+    /**
+     * Calcule la distance
+     * @param jp vecteur de l'image de test
+     * @param jpk le vecteur de l'image d'apprentissage
+     * @param methode type de distance utilisé (Euclidienne, Mahalanobis, Cosinus)
+     * @return la distance
+     */
     private double distance(SimpleMatrix jp, SimpleMatrix jpk, String methode) {
         return switch (methode) {
             case "cosinus" -> distanceCosinus(jp, jpk);
@@ -186,11 +192,22 @@ public class Reconnaissance {
         };
     }
 
-
+    /**
+     * Calcule la distance euclidienne
+     * @param jp la vecteur image de test
+     * @param jpk le vecteur image d'apprentissage
+     * @return la distance euclidienne
+     */
     private double distanceEuclidienne(SimpleMatrix jp, SimpleMatrix jpk) {
         return jp.minus(jpk).normF();
     }
 
+    /**
+     * Calcule la distance cosinus
+     * @param jp le vecteur image de test
+     * @param jpk le vecteur image d'apprentissage
+     * @return le cosinus
+     */
     private double distanceCosinus(SimpleMatrix jp, SimpleMatrix jpk) {
         double n1 = jp.normF(), n2 = jpk.normF();
         if (n1 < 1e-12 || n2 < 1e-12) return 1.0;
@@ -225,7 +242,6 @@ public class Reconnaissance {
 
     /**
      * Trouve le plus proche voisin d'une image test et retourne son T² de Hotelling.
-     * Ne modifie pas la base de référence (contrairement au LOO).
      *
      * @return tableau [nomPPV, String.valueOf(t2)]
      */
@@ -288,6 +304,7 @@ public class Reconnaissance {
         return resultats;
     }
 
+    // Getters
 
     /** Résultats triés par distance du dernier appel à identifier(). */
     public List<DistanceIdentite> getResultatsPrecedents() {
