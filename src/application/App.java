@@ -82,7 +82,6 @@ public class App {
 
             // --- Calcul du Taux d'Identification (Leave-One-Out : LOO) ---
             Reconnaissance reco = new Reconnaissance(bdd, proj);
-            reco.calibrerSeuil();
 
             double[] taux = new double[distances.length];
             for (int d = 0; d < distances.length; d++) {
@@ -119,9 +118,8 @@ public class App {
                 String predEucl = reco95.identifier(imgTest, "euclidienne");
                 String predCos  = reco95.identifier(imgTest, "cosinus");
                 String predMaha = reco95.identifier(imgTest, "mahalanobis");
-                String predHot  = reco95.identifierHotelling(imgTest, 0.05);
-                System.out.printf("  %-12s  %-22s  %-22s  %-22s  %-22s%n",
-                    imgTest.getNom(), predEucl, predCos, predMaha, predHot);
+                System.out.printf(" %-12s  %-22s  %-22s  %-22s  %-22s%n",
+                    imgTest.getNom(), predEucl, predCos, predMaha);
             }
         } else {
             System.out.println("\nAucune image dans donnees/test/");
