@@ -78,7 +78,7 @@ public class Reconnaissance {
      * Point d'entrée utilisé par l'interface graphique (Gestionnaire).
      *
      * @param cheminFichier chemin absolu de l'image à identifier
-     * @param methode       "euclidienne", "cosinus" ou "mahalanobis"
+     * @param methode "euclidienne", "cosinus" ou "mahalanobis"
      * @return nom de la personne reconnue, ou "Inconnu"
      */
     public String identifier(String cheminFichier, String methode) throws IOException {
@@ -107,8 +107,8 @@ public class Reconnaissance {
      * Étape 2 : valide le ppv avec le critère de Hotelling T^2.
      *
      * @param coordsTest coordonnées du visage test dans l'espace ACP
-     * @param methode    méthode de distance
-     * @param alpha      risque pour le seuil de Hotelling
+     * @param methode méthode de distance
+     * @param alpha risque pour le seuil de Hotelling
      * @return nom du plus proche voisin si T^2 <= seuil, "Inconnu" sinon
      */
     private String identifier(SimpleMatrix coordsTest, String methode, double alpha) {
@@ -162,16 +162,16 @@ public class Reconnaissance {
         int K = projection.getEigenfaces().getK();
         int n = baseRef.getNbImages();
         FDistribution fisher   = new FDistribution(K, n - K);
-        double        quantile = fisher.inverseCumulativeProbability(1.0 - alpha);
+        double quantile = fisher.inverseCumulativeProbability(1.0 - alpha);
         return ((double) K * (n - 1) / (n - K)) * quantile;
     }
 
 
     private double distance(SimpleMatrix jp, SimpleMatrix jpk, String methode) {
         return switch (methode) {
-            case "cosinus"     -> distanceCosinus(jp, jpk);
+            case "cosinus" -> distanceCosinus(jp, jpk);
             case "mahalanobis" -> distanceMahalanobis(jp, jpk);
-            default            -> distanceEuclidienne(jp, jpk);
+            default -> distanceEuclidienne(jp, jpk);
         };
     }
 
@@ -209,7 +209,7 @@ public class Reconnaissance {
      * @return proportion d'images correctement identifiées (entre 0.0 et 1.0)
      */
     public double tauxIdentification(String methode) {
-        int n       = signaturesRef.size();
+        int n = signaturesRef.size();
         int correct = 0;
         for (int i = 0; i < n; i++) {
             SimpleMatrix coordsTest = signaturesRef.get(i);
@@ -231,14 +231,14 @@ public class Reconnaissance {
     }
 
     /**
-     * Prédictions LOO avec critère de Hotelling, pour un alpha donné.
+     * Prédictions plus petite distance avec critère de Hotelling, pour un alpha donné.
      * Permet de tester différentes valeurs d'alpha dans App.java.
      * Retourne une liste de paires [nom réel, nom prédit].
      *
      * @param methode méthode de distance pour trouver le plus proche voisin
      * @param alpha   risque pour le critère de Hotelling
      */
-    public List<String[]> predictionsLOO(String methode, double alpha) {
+    public List<String[]> predictionsDistMin(String methode, double alpha) {
         List<String[]> resultats = new ArrayList<>();
         int n = signaturesRef.size();
         for (int i = 0; i < n; i++) {
