@@ -60,11 +60,20 @@ public class PanneauVisualisation extends VBox {
         this.graphique.setPrefHeight(450);
         this.graphique.setMinHeight(350);
 
-        this.getChildren().addAll(
-            new Label("Image Moyenne :"), imageMoyenne,
-            new Label("Eigenfaces :"), scrollPane,
-            new Label("Graphique variance :"), graphique
+        VBox contenuPrincipal = new VBox(20);
+        contenuPrincipal.setPadding(new Insets(10));
+        contenuPrincipal.setAlignment(javafx.geometry.Pos.CENTER);
+        contenuPrincipal.getChildren().addAll(
+            creerTitre("Image Moyenne"), imageMoyenne,
+            creerTitre("Eigenfaces"), scrollPane,
+            graphique
         );
+
+        ScrollPane scrollPrincipal = new ScrollPane(contenuPrincipal);
+        scrollPrincipal.setFitToWidth(true);
+        scrollPrincipal.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
+
+        this.getChildren().add(scrollPrincipal);
     }
 
     public void afficherEigenfaces(List<Image> listeImages, List<Double> valeursPropres) {
@@ -112,5 +121,13 @@ public class PanneauVisualisation extends VBox {
 
         this.graphique.getData().add(serie);
 
+    }
+
+    private Label creerTitre(String texte) {
+        Label titre = new Label(texte);
+        titre.getStyleClass().add("titre-section");
+        titre.setMaxWidth(Double.MAX_VALUE);
+        titre.setAlignment(javafx.geometry.Pos.CENTER);
+        return titre;
     }
 }
