@@ -91,16 +91,16 @@ public class Reconnaissance {
     }
 
     /**
-     * Tente d'identifier une image test en la comparant avec toutes les signatures de la base.
+     * Trouve le plus proche voisin par la méthode de distance choisie.
+     * Remplit resultatsPrecedents (classé par distance croissante) et met à jour indexDistMin.
+     * Aucun seuil n'est appliqué : la décision connu/inconnu est laissée à l'appelant.
      *
-     * @param test    l'image vectorisée (ImageVect) représentant le visage à identifier
-     * @param methode la distance utilisée (euclidienne, cosinus, mahalanobis)
-     * @return le nom de la personne si elle est reconnue, ou "Inconnu" si la distance dépasse le seuil
+     * @param test    l'image vectorisée à comparer
+     * @param methode méthode de distance (euclidienne, cosinus, mahalanobis)
      */
-    public String identifier(ImageVect test, String methode) {
+    private void trouverPlusProche(ImageVect test, String methode) {
         SimpleMatrix coordonneesTest = projection.projeter(test);
         double distanceMinimale = Double.MAX_VALUE;
-        String identiteTrouvee = "Inconnu";
         this.distanceMax = 0;
         this.resultatsPrecedents.clear();
         for (int i = 0; i < signaturesRef.size(); i++) {
@@ -108,16 +108,25 @@ public class Reconnaissance {
             this.resultatsPrecedents.add(new DistanceIdentite(baseRef.getIdentite(i), d));
             if (d < distanceMinimale) {
                 distanceMinimale = d;
-                identiteTrouvee  = baseRef.getIdentite(i);
                 this.indexDistMin = i;
-            }
-            else if (d>this.distanceMax){
+            } else if (d > this.distanceMax) {
                 this.distanceMax = d;
             }
         }
         java.util.Collections.sort(this.resultatsPrecedents);
         this.derniereDistance = distanceMinimale;
-        return (distanceMinimale > seuilPour(methode)) ? "Inconnu" : identiteTrouvee;
+    }
+
+    /**
+     * Identifie une image par distance + seuil empirique (utilisé pour l'évaluation LOO).
+     *
+     * @param test    l'image vectorisée représentant le visage à identifier
+     * @param methode la distance utilisée (euclidienne, cosinus, mahalanobis)
+     * @return le nom de la personne si elle est reconnue, ou "Inconnu" si la distance dépasse le seuil
+     */
+    public String identifier(ImageVect test, String methode) {
+        this.trouverPlusProche(test, methode);
+        return (this.derniereDistance > seuilPour(methode)) ? "Inconnu" : baseRef.getIdentite(this.indexDistMin);
     }
 
     /**
@@ -275,7 +284,7 @@ public class Reconnaissance {
      */
     public String identifierFichier(String cheminFichier, String methode) throws IOException {
         ImageVect imageTest = new ImageVect(cheminFichier);
-        this.identifier(imageTest, methode);
+        this.trouverPlusProche(imageTest, methode);
         return this.identifierHotelling(imageTest, ALPHA_HOTELLING, this.indexDistMin);
     }
 

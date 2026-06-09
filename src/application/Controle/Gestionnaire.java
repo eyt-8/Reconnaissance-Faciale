@@ -87,7 +87,6 @@ public class Gestionnaire {
             System.out.println("[4/6] Préparation de la projection...");
             this.proj = new Projection(faces);
             this.reco = new Reconnaissance(this.bdd, this.proj);
-            this.reco.calibrerSeuil();
             System.out.println("[5/6] Calcul de l'image moyenne...");
             this.chargerImageMoyenne();
             System.out.println("[6/6] Calcul des images des eigenfaces...");
@@ -99,7 +98,7 @@ public class Gestionnaire {
     }
 
     /**
-     * Enregistre les écouteurs pour les boutons et la navigation de l'interface.
+     * Enregistre les écouteurs pour les boutons et la navigation de l'interface..
      */
     private void enregistrerEcouteurs() {
         MenuLateral menu = this.ecran.getMenuLateral();
