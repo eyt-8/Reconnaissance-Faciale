@@ -232,7 +232,7 @@ public class Reconnaissance {
         return new String[]{baseRef.getIdentite(indexPPV), String.valueOf(t2)};
     }
 
-    /**
+        /**
      * Prédictions plus petite distance avec critère de Hotelling, pour un alpha donné.
      * Permet de tester différentes valeurs d'alpha dans App.java.
      * Retourne une liste de paires [nom réel, nom prédit].
@@ -273,7 +273,6 @@ public class Reconnaissance {
         }
         return resultats;
     }
-
 
 
     /** Résultats triés par distance du dernier appel à identifier(). */
