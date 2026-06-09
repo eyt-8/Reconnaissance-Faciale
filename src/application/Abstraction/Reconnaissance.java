@@ -58,15 +58,6 @@ public class Reconnaissance {
     }
 
     /**
-     * Prend le pourcentage d'images retenu et renvoie l'image à partir de laquelle on ne les prend plus
-     * @param pourcentage le pourcentage demandé
-     * @return
-     */
-    public int critereDeux(double pourcentage){
-        return (int)Math.floor(pourcentage*baseRef.getNbImages());
-    }
-
-    /**
      * Initialise la reconnaissance et précalcule les signatures des références.
      *
      * @param baseRef    base d'images d'apprentissage
