@@ -170,14 +170,6 @@ public class Reconnaissance {
         return ((double) K * (n - 1) / (n - K)) * quantile;
     }
 
-    /**
-     * Prend le pourcentage d'images retenu et renvoie l'image à partir de laquelle on ne les prend plus
-     * @param pourcentage le pourcentage demandé
-     * @return
-     */
-    public int critereDeux(double pourcentage){
-        return (int)Math.floor(pourcentage*baseRef.getNbImages());
-    }
 
 
 
