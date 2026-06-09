@@ -200,37 +200,6 @@ public class Reconnaissance {
     // Évaluation Leave-One-Out (réservé à App.java)
 
     /**
-     * Taux d'identification par validation croisée Leave-One-Out.
-     * Chaque image de référence est temporairement retirée de la base, puis
-     * identifiée par distance seule (sans Hotelling) pour mesurer la qualité
-     * de chaque méthode de distance indépendamment.
-     *
-     * @param methode méthode de distance à évaluer
-     * @return proportion d'images correctement identifiées (entre 0.0 et 1.0)
-     */
-    public double tauxIdentification(String methode) {
-        int n = signaturesRef.size();
-        int correct = 0;
-        for (int i = 0; i < n; i++) {
-            SimpleMatrix coordsTest = signaturesRef.get(i);
-            SimpleMatrix sigI       = signaturesRef.remove(i);
-
-            int    indexPPVReduit = 0;
-            double distMin       = Double.MAX_VALUE;
-            for (int j = 0; j < signaturesRef.size(); j++) {
-                double d = distance(coordsTest, signaturesRef.get(j), methode);
-                if (d < distMin) { distMin = d; indexPPVReduit = j; }
-            }
-            // Correction de l'index : la suppression de i a décalé les indices >= i
-            int indexPPVOriginal = (indexPPVReduit < i) ? indexPPVReduit : indexPPVReduit + 1;
-            if (baseRef.getIdentite(indexPPVOriginal).equals(baseRef.getIdentite(i))) correct++;
-
-            signaturesRef.add(i, sigI);
-        }
-        return (double) correct / n;
-    }
-
-    /**
      * Prédictions plus petite distance avec critère de Hotelling, pour un alpha donné.
      * Permet de tester différentes valeurs d'alpha dans App.java.
      * Retourne une liste de paires [nom réel, nom prédit].
