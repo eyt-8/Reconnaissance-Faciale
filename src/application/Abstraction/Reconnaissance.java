@@ -121,64 +121,38 @@ public class Reconnaissance {
     }
 
     /**
-     * Identifie un visage test à l'aide du critère de Hotelling.
+     * Valide par le critère de Hotelling T² si le candidat à l'index j
+     * est suffisamment proche du visage test pour être considéré comme connu.
      *
-     * Contrairement à identifier(), la décision ne s'appuie pas sur le seuil
-     * empirique this.seuil (calibrerSeuil()) mais sur un seuil statistique
-     * dérivé de la loi de Fisher (calculerSeuilHotelling()).
+     * Cette méthode est appelée après identifier() qui a déjà trouvé
+     * le plus proche voisin par distance et peuplé resultatsPrecedents.
+     * Elle ne modifie pas ce classement.
      *
      * @param test  l'image vectorisée représentant le visage à identifier
      * @param alpha risque choisi pour le seuil de Hotelling (ex. 0.05)
-     * @param j     index de l'image ayant la distance minimale
-     * @return le nom de la personne reconnue, ou "Inconnu"
+     * @param j     index du candidat retenu par identifier()
+     * @return le nom du candidat si T² ≤ seuil, "Inconnu" sinon
      */
     public String identifierHotelling(ImageVect test, double alpha, int j) {
-        // projection du visage test -> coordsTest (K x 1, K = nb d'eigenfaces retenues)
         SimpleMatrix coordsTest = projection.projeter(test);
         int K = coordsTest.getNumRows();
-
-        // valeurs propres associées aux K composantes retenues (K x 1)
         SimpleMatrix lambda = projection.getEigenfaces().getValPropresK();
 
-        // calcul de T2_j pour chaque référence, recherche du minimum
-        double t2Min = Double.MAX_VALUE;
-        String identiteTrouvee = "Inconnu";
-        this.distanceMax = 0;
-        this.resultatsPrecedents.clear();
-        SimpleMatrix coordsRef = signaturesRef.get(j);     // K x 1
-        SimpleMatrix ecart = coordsTest.minus(coordsRef);  // K x 1
+        SimpleMatrix coordsRef = signaturesRef.get(j);
+        SimpleMatrix ecart = coordsTest.minus(coordsRef);
 
         double t2 = 0.0;
         for (int i = 0; i < K; i++) {
             double lambda_i = lambda.get(i, 0);
-            // Protection numérique : une valeur propre quasi nulle ferait
-            // exploser (écart_i)^2/lambda_i sans apporter d'information fiable ;
-            // on ignore alors cette composante.
             if (lambda_i < LAMBDA_MIN) continue;
-
             double ecart_i = ecart.get(i, 0);
             t2 += (ecart_i * ecart_i) / lambda_i;
         }
 
-        // On alimente resultatsPrecedents/distanceMax comme identifier(),
-        // afin que le panneau de reconnaissance (ressemblance, "images les
-        // plus proches") fonctionne aussi avec le critère de Hotelling.
-        this.resultatsPrecedents.add(new DistanceIdentite(baseRef.getIdentite(j), t2));
-        if (t2 < t2Min) {
-            t2Min = t2;
-            identiteTrouvee = baseRef.getIdentite(j);
-        } else if (t2 > this.distanceMax) {
-            this.distanceMax = t2;
-        }
-        java.util.Collections.sort(this.resultatsPrecedents);
+        this.derniereDistance = t2;
 
-        // Étape 5 : seuil de décision T2_seuil 
         double t2Seuil = calculerSeuilHotelling(alpha);
-
-        this.derniereDistance = t2Min;
-
-        // Étape 6 : décision
-        return (t2Min <= t2Seuil) ? identiteTrouvee : "Inconnu";
+        return (t2 <= t2Seuil) ? baseRef.getIdentite(j) : "Inconnu";
     }
 
     /**
@@ -290,8 +264,9 @@ public class Reconnaissance {
     }
 
     /**
-     * Identifie le visage contenu dans un fichier image en appliquant
-     * successivement la distance choisie puis le critère de Hotelling.
+     * Identifie le visage contenu dans un fichier image.
+     * La distance choisie trouve le plus proche voisin et classe le top 5 ;
+     * le critère de Hotelling décide ensuite si ce candidat est connu ou non.
      *
      * @param cheminFichier chemin absolu vers l'image à identifier
      * @param methode       méthode de distance (euclidienne, cosinus, mahalanobis)
@@ -300,11 +275,8 @@ public class Reconnaissance {
      */
     public String identifierFichier(String cheminFichier, String methode) throws IOException {
         ImageVect imageTest = new ImageVect(cheminFichier);
-        String nomTrouve = this.identifier(imageTest, methode);
-        if (!nomTrouve.equals("Inconnu")) {
-            nomTrouve = this.identifierHotelling(imageTest, ALPHA_HOTELLING, this.indexDistMin);
-        }
-        return nomTrouve;
+        this.identifier(imageTest, methode);
+        return this.identifierHotelling(imageTest, ALPHA_HOTELLING, this.indexDistMin);
     }
 
     // Évaluation

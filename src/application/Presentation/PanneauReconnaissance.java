@@ -77,14 +77,13 @@ public class PanneauReconnaissance extends VBox {
     }
 
     /**
-     * Met à jour l'interface en affichant le visage d'entrée, le visage trouvé,
-     * le nom reconnu et le taux de ressemblance.
-     * @param imgEntre image d'entrée
-     * @param imgTrouvee image reconnue
+     * Met à jour l'interface en affichant le visage trouvé, le nom reconnu
+     * et les 5 candidats les plus proches.
+     * @param imgTrouvee image reconnue (null si inconnu)
      * @param nom nom de la personne trouvée
-     * @param taux taux de ressemblance en pourcentage
+     * @param details liste des candidats avec leur distance T²
      */
-    public void majInterface(Image imgTrouvee, String nom, double taux, java.util.List<String> details) {        
+    public void majInterface(Image imgTrouvee, String nom, java.util.List<String> details) {
         if (imgTrouvee != null) {
             this.visageTrouve.setImage(imgTrouvee);
         } 

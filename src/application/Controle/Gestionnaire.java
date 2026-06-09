@@ -40,7 +40,7 @@ public class Gestionnaire {
     private Eigenfaces faces;
     /** Projection des images dans l'espace des eigenfaces */
     private Projection proj;
-    /** Distance choisie par l'utilisateur pour l'identification */
+    /** Distance choisie par l'utilisateur pour trouver le plus proche voisin */
     private String distChoisie;
     /** Fichier sélectionné pour l'analyse */
     private File fichierSelectionne;
@@ -57,7 +57,7 @@ public class Gestionnaire {
         this.fenetrePrincipale = stage;
         this.ecran = new Ecran();
         this.distChoisie = "euclidienne";
-        
+
         // Initialisation de l'état du menu
         this.ecran.getMenuLateral().getLancerReconnaissance().setDisable(true);
         
@@ -123,7 +123,6 @@ public class Gestionnaire {
         // Bouton "Lancer la reconnaissance"
         menu.getLancerReconnaissance().setOnAction(e -> {
             if (this.fichierSelectionne != null) {
-                // Récupération de la distance depuis la ComboBox
                 this.distChoisie = menu.getComboDistance().getValue().toLowerCase();
                 traiterReconnaissance(this.fichierSelectionne);
             }
@@ -155,8 +154,6 @@ public class Gestionnaire {
             String nomTrouve = this.reco.identifierFichier(fichierImage.getAbsolutePath(), this.distChoisie);
 
             Image imgTrouvee = null;
-            double tauxRessemblance = 0.0;
-
             if (!nomTrouve.equals("Inconnu")) {
                 File dossierPersonne = new File("donnees/apprentissage/" + nomTrouve);
                 if (dossierPersonne.exists() && dossierPersonne.isDirectory()) {
@@ -165,12 +162,7 @@ public class Gestionnaire {
                         imgTrouvee = new Image(fichiersImages[0].toURI().toString());
                     }
                 }
-                double vraiDistance = this.reco.getDerniereDistance();
-                double calculTaux = 100.0 * (1.0 - (vraiDistance / this.reco.getDistanceMax()));
-                tauxRessemblance = Math.max(0.0, Math.min(100.0, calculTaux));
-            }
-            else{
-                // Sinon met un point d'interrogation
+            } else {
                 imgTrouvee = new Image("donnees/inconnu.jpg");
             }
 
@@ -179,14 +171,14 @@ public class Gestionnaire {
             int topK = Math.min(5, topResults.size());
             for (int i = 0; i < topK; i++) {
                 Reconnaissance.DistanceIdentite res = topResults.get(i);
-                details.add((i + 1) + ". " + res.identite + " - Distance: " + String.format("%.2f", res.distance));
+                details.add((i + 1) + ". " + res.identite + " - " + String.format("%.2f", res.distance));
             }
 
-            this.ecran.getConteneurPrincipal().getPanneauReco().majInterface(imgTrouvee, nomTrouve, tauxRessemblance, details);
+            this.ecran.getConteneurPrincipal().getPanneauReco().majInterface(imgTrouvee, nomTrouve, details);
 
         } catch (Exception e) {
             System.err.println("Erreur lors de la reconnaissance : " + e.getMessage());
-            this.ecran.getConteneurPrincipal().getPanneauReco().majInterface(null, "Erreur", 0.0, null);
+            this.ecran.getConteneurPrincipal().getPanneauReco().majInterface(null, "Erreur", null);
         }
     }
 
