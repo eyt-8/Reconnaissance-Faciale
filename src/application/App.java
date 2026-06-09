@@ -115,8 +115,9 @@ public class App {
                 String predEucl = reco95.identifier(imgTest, "euclidienne");
                 String predCos  = reco95.identifier(imgTest, "cosinus");
                 String predMaha = reco95.identifier(imgTest, "mahalanobis");
+                String predHot  = reco95.identifier(imgTest, "euclidienne");
                 System.out.printf("  %-12s  %-22s  %-22s  %-22s  %-22s%n",
-                    imgTest.getNom(), predEucl, predCos, predMaha);
+                    imgTest.getNom(), predEucl, predCos, predMaha, predHot);
             }
         }
 
@@ -132,7 +133,7 @@ public class App {
 
         List<List<String[]>> tousResultats = new ArrayList<>();
         for (double alpha : alphas) {
-            tousResultats.add(reco95.preditionsHotellingLOO("euclidienne", alpha));
+            tousResultats.add(reco95.predictionsLOO("euclidienne", alpha));
         }
         int nbImages = tousResultats.get(0).size();
         for (int i = 0; i < nbImages; i++) {

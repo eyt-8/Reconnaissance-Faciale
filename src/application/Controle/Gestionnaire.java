@@ -150,7 +150,7 @@ public class Gestionnaire {
      */
     private void traiterReconnaissance(File fichierImage) {
         try {
-            String nomTrouve = this.reco.identifierHotelling(fichierImage.getAbsolutePath(), this.reco.ALPHA_HOTELLING, this.distChoisie);
+            String nomTrouve = this.reco.identifier(fichierImage.getAbsolutePath(), this.distChoisie);
 
             Image imgTrouvee = null;
             if (!nomTrouve.equals("Inconnu")) {
