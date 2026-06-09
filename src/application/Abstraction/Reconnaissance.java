@@ -11,11 +11,8 @@ import org.ejml.simple.SimpleMatrix;
 /**
  * Reconnaissance faciale par ACP/Eigenfaces.
  *
- * Principe en deux étapes :
- *   1. La distance (euclidienne, cosinus ou Mahalanobis) sert à trouver le plus
- *      proche voisin parmi les images de référence.
- *   2. Le critère de Hotelling T² détermine si ce voisin est suffisamment
- *      proche pour être considéré comme "connu" ou si le visage est "Inconnu".
+ * Calculer la distance (euclidienne, cosinus ou Mahalanobis) sert à trouver le plus proche voisin parmi les images de référence.
+ * et le critère de Hotelling T² qui détermine si ce voisin est suffisamment proche pour être considéré comme "connu" ou si le visage est "Inconnu".
  *
  * @author SOULEZ-DAMAZIE Soraya, PAILLASSA Nylan, CAUMONT Virgile
  */
@@ -28,7 +25,7 @@ public class Reconnaissance {
      * Plus la valeur est élevée, plus le seuil T² est bas et plus le critère
      * est strict (le système retourne "Inconnu" plus facilement).
      */
-    public static final double ALPHA_HOTELLING = 0.05;
+    public static final double ALPHA_HOTELLING = 0.9;
 
     /** En dessous de cette valeur propre, la composante est ignorée (évite div/0). */
     private static final double LAMBDA_MIN = 1e-12;
