@@ -154,8 +154,6 @@ public class Reconnaissance {
             double ei = ecart.get(i, 0);
             t2 += (ei * ei) / li;
         }
-        System.out.print("T^2 :");
-        System.out.println(t2);
         return t2;
     }
 
@@ -243,7 +241,7 @@ public class Reconnaissance {
     public List<String[]> predictionsDistMin(String methode, double alpha) {
         List<String[]> resultats = new ArrayList<>();
         int n = signaturesRef.size();
-        double crDeux = critereDeux(0.2);
+        double crDeux = critereDeux(0.01);
         for (int i = 0; i < n; i++) {
             SimpleMatrix coordsTest = signaturesRef.get(i);
             SimpleMatrix sigI = signaturesRef.remove(i);
