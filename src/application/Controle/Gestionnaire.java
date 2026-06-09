@@ -177,6 +177,10 @@ public class Gestionnaire {
                 double calculTaux = 100.0 * (1.0 - (vraiDistance / this.reco.getDistanceMax()));
                 tauxRessemblance = Math.max(0.0, Math.min(100.0, calculTaux));
             }
+            else{
+                // Sinon met un point d'interrogation
+                imgTrouvee = new Image("donnees/inconnu.jpg");
+            }
 
             java.util.List<String> details = new java.util.ArrayList<>();
             java.util.List<application.Abstraction.Reconnaissance.DistanceIdentite> topResults = this.reco.getResultatsPrecedents();
