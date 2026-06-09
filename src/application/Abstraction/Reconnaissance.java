@@ -179,6 +179,16 @@ public class Reconnaissance {
         return ((double) K * (n - 1) / (n - K)) * quantile;
     }
 
+    /**
+     * Prend le pourcentage d'images retenu et renvoie l'image à partir de laquelle on ne les prend plus
+     * @param pourcentage le pourcentage demandé
+     * @return
+     */
+    public int critereDeux(double pourcentage){
+        return (int)Math.floor(pourcentage*baseRef.getNbImages());
+    }
+
+
 
     private double distance(SimpleMatrix jp, SimpleMatrix jpk, String methode) {
         return switch (methode) {
@@ -211,41 +221,7 @@ public class Reconnaissance {
         return diff.transpose().mult(lambdaInv).dot(diff);
     }
 
-    /**
-     * Prédictions plus petite distance avec critère de Hotelling, pour un alpha donné.
-     * Permet de tester différentes valeurs d'alpha dans App.java.
-     * Retourne une liste de paires [nom réel, nom prédit].
-     *
-     * @param methode méthode de distance pour trouver le plus proche voisin
-     * @param alpha   risque pour le critère de Hotelling
-     */
-    public List<String[]> predictionsDistMin(String methode, double alpha) {
-        List<String[]> resultats = new ArrayList<>();
-        int n = signaturesRef.size();
-        for (int i = 0; i < n; i++) {
-            SimpleMatrix coordsTest = signaturesRef.get(i);
-            SimpleMatrix sigI       = signaturesRef.remove(i);
 
-            int    indexPPVReduit = 0;
-            double distMin       = Double.MAX_VALUE;
-            for (int j = 0; j < signaturesRef.size(); j++) {
-                double d = distance(coordsTest, signaturesRef.get(j), methode);
-                if (d < distMin) { distMin = d; indexPPVReduit = j; }
-            }
-            int indexPPVOriginal = (indexPPVReduit < i) ? indexPPVReduit : indexPPVReduit + 1;
-
-            // Valider avec Hotelling (signaturesRef est réduite, indexPPVReduit est correct)
-            double t2    = calculerT2(coordsTest, indexPPVReduit);
-            double seuil = calculerSeuilHotelling(alpha);
-            String nomPredit = (t2 <= seuil)
-                               ? baseRef.getIdentite(indexPPVOriginal)
-                               : "Inconnu";
-
-            resultats.add(new String[]{baseRef.getIdentite(i), nomPredit, String.valueOf(t2)});
-            signaturesRef.add(i, sigI);
-        }
-        return resultats;
-    }
 
 
     /**
@@ -265,6 +241,49 @@ public class Reconnaissance {
         double t2 = calculerT2(coordsTest, indexPPV);
         return new String[]{baseRef.getIdentite(indexPPV), String.valueOf(t2)};
     }
+
+        /**
+     * Prédictions plus petite distance avec critère de Hotelling, pour un alpha donné.
+     * Permet de tester différentes valeurs d'alpha dans App.java.
+     * Retourne une liste de paires [nom réel, nom prédit].
+     *
+     * @param methode méthode de distance pour trouver le plus proche voisin
+     * @param alpha   risque pour le critère de Hotelling
+     */
+    public List<String[]> predictionsDistMin(String methode, double alpha) {
+        List<String[]> resultats = new ArrayList<>();
+        int n = signaturesRef.size();
+        double crDeux = critereDeux(0.2);
+        for (int i = 0; i < n; i++) {
+            SimpleMatrix coordsTest = signaturesRef.get(i);
+            SimpleMatrix sigI = signaturesRef.remove(i);
+
+            int indexPPVReduit = 0;
+            double distMin = Double.MAX_VALUE;
+
+            if (crDeux>signaturesRef.size()){
+                crDeux = signaturesRef.size();
+            }
+
+            for (int j = 0; j < crDeux; j++) {
+                double d = distance(coordsTest, signaturesRef.get(j), methode);
+                if (d < distMin) { distMin = d; indexPPVReduit = j; }
+            }
+            int indexPPVOriginal = (indexPPVReduit < i) ? indexPPVReduit : indexPPVReduit + 1;
+
+            // Valider avec Hotelling (signaturesRef est réduite, indexPPVReduit est correct)
+            double t2    = calculerT2(coordsTest, indexPPVReduit);
+            double seuil = calculerSeuilHotelling(alpha);
+            String nomPredit = (t2 <= seuil)
+                               ? baseRef.getIdentite(indexPPVOriginal)
+                               : "Inconnu";
+
+            resultats.add(new String[]{baseRef.getIdentite(i), nomPredit});
+            signaturesRef.add(i, sigI);
+        }
+        return resultats;
+    }
+
 
     /** Résultats triés par distance du dernier appel à identifier(). */
     public List<DistanceIdentite> getResultatsPrecedents() {
