@@ -12,17 +12,17 @@ import org.ejml.simple.SimpleMatrix;
  * Reconnaissance faciale par ACP/Eigenfaces.
  *
  * Calculer la distance (euclidienne, cosinus ou Mahalanobis) sert à trouver le plus proche voisin parmi les images de référence.
- * et le critère de Hotelling T² qui détermine si ce voisin est suffisamment proche pour être considéré comme "connu" ou si le visage est "Inconnu".
+ * et le critère de Hotelling T^2 qui détermine si ce voisin est suffisamment proche pour être considéré comme "connu" ou si le visage est "Inconnu".
  *
  * @author SOULEZ-DAMAZIE Soraya, PAILLASSA Nylan, CAUMONT Virgile
  */
 public class Reconnaissance {
 
-    // ── Constantes ────────────────────────────────────────────────────────────
+    // Constantes
 
     /**
      * Risque alpha du critère de Hotelling.
-     * Plus la valeur est élevée, plus le seuil T² est bas et plus le critère
+     * Plus la valeur est élevée, plus le seuil T^2 est bas et plus le critère
      * est strict (le système retourne "Inconnu" plus facilement).
      */
     public static final double ALPHA_HOTELLING = 0.9;
@@ -39,7 +39,7 @@ public class Reconnaissance {
     /** Résultats triés par distance croissante après le dernier appel à identifier(). */
     private List<DistanceIdentite> derniersResultats = new ArrayList<>();
 
-    // ── Classe interne ────────────────────────────────────────────────────────
+    // Classe interne
 
     /** Associe une identité à la distance calculée vis-à-vis du visage testé. */
     public static class DistanceIdentite implements Comparable<DistanceIdentite> {
@@ -104,12 +104,12 @@ public class Reconnaissance {
      *
      * Étape 1 : calcule les distances à toutes les références, trouve le NN,
      *           remplit derniersResultats (triés par distance croissante).
-     * Étape 2 : valide le NN avec le critère de Hotelling T².
+     * Étape 2 : valide le NN avec le critère de Hotelling T^2.
      *
      * @param coordsTest coordonnées du visage test dans l'espace ACP
      * @param methode    méthode de distance
      * @param alpha      risque pour le seuil de Hotelling
-     * @return nom du NN si T² ≤ seuil, "Inconnu" sinon
+     * @return nom du NN si T^2 <= seuil, "Inconnu" sinon
      */
     private String identifier(SimpleMatrix coordsTest, String methode, double alpha) {
         derniersResultats.clear();
@@ -197,7 +197,7 @@ public class Reconnaissance {
         return diff.transpose().mult(lambdaInv).dot(diff);
     }
 
-    // ── Évaluation Leave-One-Out (réservé à App.java) ─────────────────────────
+    // Évaluation Leave-One-Out (réservé à App.java)
 
     /**
      * Taux d'identification par validation croisée Leave-One-Out.
