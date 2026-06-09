@@ -9,7 +9,7 @@ import application.Abstraction.ImageVect;
 import application.Abstraction.Projection;
 import application.Abstraction.Reconnaissance;
 import application.Abstraction.SVD;
-
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -99,21 +99,18 @@ public class App {
         // PRÉDICTIONS SUR LES IMAGES INCONNUES (DOSSIER TEST)
         // ============================================================
         
+        Eigenfaces faces95 = new Eigenfaces(svd, acp.getVisage_moyen());
+        faces95.construire();
+        faces95.selectionnerK(0.95);
+        Projection     proj95 = new Projection(faces95);
+        Reconnaissance reco95 = new Reconnaissance(bdd, proj95);
+
+        // --- Images du dossier test/ ---
         if (!tests.isEmpty()) {
             System.out.println("\n--- Prédictions sur donnees/test/ (K = 95 % de variance) ---");
-
-            // Configuration optimale pour le test final
-            Eigenfaces faces95 = new Eigenfaces(svd, acp.getVisage_moyen());
-            faces95.construire();
-            faces95.selectionnerK(0.95);
-            
-            Projection    proj95 = new Projection(faces95);
-            Reconnaissance reco95 = new Reconnaissance(bdd, proj95);
-
             System.out.printf("  %-12s  %-22s  %-22s  %-22s  %-22s%n",
-                "Image", "Euclidienne", "Cosinus", "Mahalanobis", "Hotelling");
+                "Image", "Euclidienne", "Cosinus", "Mahalanobis", "Hotelling(0.05)");
             System.out.println("  " + "-".repeat(106));
-
             for (ImageVect imgTest : tests) {
                 String predEucl = reco95.identifier(imgTest, "euclidienne");
                 String predCos  = reco95.identifier(imgTest, "cosinus");
@@ -121,8 +118,31 @@ public class App {
                 System.out.printf("  %-12s  %-22s  %-22s  %-22s  %-22s%n",
                     imgTest.getNom(), predEucl, predCos, predMaha);
             }
-        } else {
-            System.out.println("\nAucune image dans donnees/test/");
+        }
+
+        // --- LOO Hotelling sur toutes les images de référence ---
+        // Chaque image est temporairement retirée de la base avant d'être évaluée,
+        // ce qui simule un visage présenté "de l'extérieur". On teste 4 valeurs d'alpha
+        // (plus alpha est grand, plus le seuil est bas et plus le critère est strict).
+        double[] alphas = {0.05, 0.10, 0.20, 0.50};
+        System.out.println("\n--- LOO Hotelling sur toutes les images de référence (euclidienne) ---");
+        System.out.printf("  %-6s  %-20s  %-22s  %-22s  %-22s  %-22s%n",
+            "#", "Identité réelle", "alpha=0.05", "alpha=0.10", "alpha=0.20", "alpha=0.50");
+        System.out.println("  " + "-".repeat(120));
+
+        List<List<String[]>> tousResultats = new ArrayList<>();
+        for (double alpha : alphas) {
+            tousResultats.add(reco95.preditionsHotellingLOO("euclidienne", alpha));
+        }
+        int nbImages = tousResultats.get(0).size();
+        for (int i = 0; i < nbImages; i++) {
+            String nomVrai = tousResultats.get(0).get(i)[0];
+            String p05 = tousResultats.get(0).get(i)[1];
+            String p10 = tousResultats.get(1).get(i)[1];
+            String p20 = tousResultats.get(2).get(i)[1];
+            String p50 = tousResultats.get(3).get(i)[1];
+            System.out.printf("  %-6d  %-20s  %-22s  %-22s  %-22s  %-22s%n",
+                i + 1, nomVrai, p05, p10, p20, p50);
         }
     }
 }

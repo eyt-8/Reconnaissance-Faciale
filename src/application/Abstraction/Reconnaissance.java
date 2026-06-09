@@ -59,7 +59,7 @@ public class Reconnaissance {
     }
 
     /** Risque alpha utilisé pour le seuil du critère de Hotelling (95 %). */
-    private static final double ALPHA_HOTELLING = 0.05;
+    private static final double ALPHA_HOTELLING = 0.50;
 
     /** Valeur propre minimale acceptée dans le critère de Hotelling : en dessous de
      *  ce seuil, la composante est ignorée pour éviter une division par une valeur
@@ -242,6 +242,21 @@ public class Reconnaissance {
     }
 
     /**
+     * Identifie un visage à partir d'un ImageVect déjà chargé, avec un alpha personnalisable.
+     * La distance choisie trouve le plus proche voisin ;
+     * le critère de Hotelling (au risque alpha) décide connu ou non.
+     *
+     * @param imageTest image vectorisée à identifier
+     * @param methode   méthode de distance (euclidienne, cosinus, mahalanobis)
+     * @param alpha     risque pour le seuil de Hotelling (plus alpha est grand, plus c'est strict)
+     * @return nom de la personne reconnue, ou "Inconnu"
+     */
+    public String identifierAvecHotelling(ImageVect imageTest, String methode, double alpha) {
+        this.trouverPlusProche(imageTest, methode);
+        return this.identifierHotelling(imageTest, alpha, this.indexDistMin);
+    }
+
+    /**
      * Identifie le visage contenu dans un fichier image.
      * La distance choisie trouve le plus proche voisin et classe le top 5 ;
      * le critère de Hotelling décide ensuite si ce candidat est connu ou non.
@@ -258,6 +273,28 @@ public class Reconnaissance {
     }
 
     // Évaluation
+
+    /**
+     * Prédit, pour chaque image de la base d'apprentissage, si elle est connue ou inconnue
+     * selon le critère de Hotelling, en mode leave-one-out (LOO) : l'image testée est
+     * temporairement retirée de la base avant d'être évaluée.
+     *
+     * @param methode méthode de distance pour trouver le plus proche voisin
+     * @param alpha   risque pour le seuil de Hotelling
+     * @return liste de tableaux {nomVrai, nomPredit} pour chaque image de référence
+     */
+    public List<String[]> preditionsHotellingLOO(String methode, double alpha) {
+        List<String[]> resultats = new ArrayList<>();
+        int total = signaturesRef.size();
+        for (int i = 0; i < total; i++) {
+            SimpleMatrix sigI = signaturesRef.remove(i);
+            String nomVrai = baseRef.getIdentite(i);
+            String nomPredit = this.identifierAvecHotelling(baseRef.getReferences().get(i), methode, alpha);
+            resultats.add(new String[]{nomVrai, nomPredit});
+            signaturesRef.add(i, sigI);
+        }
+        return resultats;
+    }
 
     /**
      * Taux d'identification par validation croisée leave-one-out (LOO)
