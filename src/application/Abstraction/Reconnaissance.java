@@ -197,13 +197,24 @@ public class Reconnaissance {
         return 1.0 - jp.dot(jpk) / (n1 * n2);
     }
 
+    /**
+     * Calcule la distance de Mahalanobis entre deux images
+     * @param jp vecteur de l'image de test
+     * @param jpk vecteur d'une image d'apprentissage
+     * @return distance entre les deux
+     */
     private double distanceMahalanobis(SimpleMatrix jp, SimpleMatrix jpk) {
-        SimpleMatrix lambdaK   = projection.getEigenfaces().getValPropresK();
-        int          k         = lambdaK.getNumRows();
+        SimpleMatrix lambdaK = projection.getEigenfaces().getValPropresK();
+        int k = lambdaK.getNumRows();
         SimpleMatrix lambdaInv = new SimpleMatrix(k, k);
         for (int i = 0; i < k; i++) {
             double lam = lambdaK.get(i, 0);
-            lambdaInv.set(i, i, lam > 1e-12 ? 1.0 / lam : 0.0);
+            if (lam > 1e-12){
+                lambdaInv.set(i, i, 1.0 / lam);
+            }
+            else{
+                lambdaInv.set(i, i, 0.0);
+            }
         }
         SimpleMatrix diff = jp.minus(jpk);
         return diff.transpose().mult(lambdaInv).dot(diff);
@@ -220,11 +231,16 @@ public class Reconnaissance {
      */
     public String[] trouverPPVAvecT2(ImageVect test, String methode) {
         SimpleMatrix coordsTest = projection.projeter(test);
-        int    indexPPV = 0;
+        int indexPPV = 0;
         double distMin  = Double.MAX_VALUE;
         for (int i = 0; i < signaturesRef.size(); i++) {
             double d = distance(coordsTest, signaturesRef.get(i), methode);
-            if (d < distMin) { distMin = d; indexPPV = i; }
+            if (d < distMin) {
+                 distMin = d;
+            }
+            else{
+                indexPPV = i; 
+            }
         }
         double t2 = calculerT2(coordsTest, indexPPV);
         return new String[]{baseRef.getIdentite(indexPPV), String.valueOf(t2)};
