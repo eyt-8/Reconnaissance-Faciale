@@ -102,9 +102,8 @@ public class Reconnaissance {
     /**
      * Méthode interne d'identification sur des coordonnées déjà projetées.
      *
-     * Étape 1 : calcule les distances à toutes les références, trouve le plus proche voisin,
-     *           remplit derniersResultats (triés par distance croissante).
-     * Étape 2 : valide le ppv avec le critère de Hotelling T^2.
+     * calcule les distances à toutes les références, trouve le plus proche voisin,
+     * remplit derniersResultats (triés par distance croissante) puis valide le ppv avec le critère de Hotelling T^2.
      *
      * @param coordsTest coordonnées du visage test dans l'espace ACP
      * @param methode méthode de distance
@@ -175,6 +174,7 @@ public class Reconnaissance {
         };
     }
 
+
     private double distanceEuclidienne(SimpleMatrix jp, SimpleMatrix jpk) {
         return jp.minus(jpk).normF();
     }
@@ -196,8 +196,6 @@ public class Reconnaissance {
         SimpleMatrix diff = jp.minus(jpk);
         return diff.transpose().mult(lambdaInv).dot(diff);
     }
-
-    // Évaluation Leave-One-Out (réservé à App.java)
 
     /**
      * Prédictions plus petite distance avec critère de Hotelling, pour un alpha donné.
