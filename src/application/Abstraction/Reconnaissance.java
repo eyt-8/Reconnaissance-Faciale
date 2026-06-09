@@ -1,5 +1,4 @@
 package application.Abstraction;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -38,6 +37,16 @@ public class Reconnaissance {
     private int indexDistMin = 0;
     private double derniereDistance = 0.0;
     private double distanceMax;
+    private List<DistanceIdentite> resultatsPrecedents = new ArrayList<>();
+
+    /** Risque alpha utilisé pour le seuil du critère de Hotelling (95 %). */
+    public static final double ALPHA_HOTELLING = 0.50;
+
+    /** Valeur propre minimale acceptée dans le critère de Hotelling : en dessous de
+     *  ce seuil, la composante est ignorée pour éviter une division par une valeur
+     *  quasi nulle (qui ferait exploser T^2 sans information statistique fiable). */
+    private static final double LAMBDA_MIN = 1e-12;
+
 
     public static class DistanceIdentite implements Comparable<DistanceIdentite> {
         public String identite;
@@ -52,20 +61,9 @@ public class Reconnaissance {
         }
     }
 
-    private List<DistanceIdentite> resultatsPrecedents = new ArrayList<>();
-
     public List<DistanceIdentite> getResultatsPrecedents() {
         return this.resultatsPrecedents;
     }
-
-    /** Risque alpha utilisé pour le seuil du critère de Hotelling (95 %). */
-    private static final double ALPHA_HOTELLING = 0.50;
-
-    /** Valeur propre minimale acceptée dans le critère de Hotelling : en dessous de
-     *  ce seuil, la composante est ignorée pour éviter une division par une valeur
-     *  quasi nulle (qui ferait exploser T^2 sans information statistique fiable). */
-    private static final double LAMBDA_MIN = 1e-12;
-
     /**
      * Constructeur de la classe Reconnaissance.
      *
@@ -77,7 +75,6 @@ public class Reconnaissance {
         this.projection = projection;
         this.signaturesRef = new ArrayList<>();
         this.precalculerSignatures();
-        //this.calibrerSeuil();
     }
 
     /**
@@ -125,7 +122,7 @@ public class Reconnaissance {
      */
     public String identifier(ImageVect test, String methode) {
         this.trouverPlusProche(test, methode);
-        return (this.derniereDistance > seuilPour(methode)) ? "Inconnu" : baseRef.getIdentite(this.indexDistMin);
+        return baseRef.getIdentite(this.indexDistMin);
     }
 
     /**
@@ -215,15 +212,6 @@ public class Reconnaissance {
     }
 
     /**
-     * Donne le seuil calibré pour une méthode de distance donnée. Retombe sur
-     * le seuil de la méthode "euclidienne" si la méthode demandée est inconnue
-     * (même comportement par défaut que le dispatcher distance()).
-     */
-    private double seuilPour(String methode) {
-        return this.seuils.getOrDefault(methode, this.seuils.get("euclidienne"));
-    }
-
-    /**
      * Contrairement à calibrerSeuil() (seuil empirique calé sur la distance
      * moyenne entre signatures de référence), ce seuil est dérivé
      * théoriquement de la loi de Fisher : il ne dépend que de K, n et alpha.
@@ -241,92 +229,7 @@ public class Reconnaissance {
         return ((double) (K * (n - 1)) / (n - K)) * quantile;
     }
 
-    /**
-     * Identifie un visage à partir d'un ImageVect déjà chargé, avec un alpha personnalisable.
-     * La distance choisie trouve le plus proche voisin ;
-     * le critère de Hotelling (au risque alpha) décide connu ou non.
-     *
-     * @param imageTest image vectorisée à identifier
-     * @param methode   méthode de distance (euclidienne, cosinus, mahalanobis)
-     * @param alpha     risque pour le seuil de Hotelling (plus alpha est grand, plus c'est strict)
-     * @return nom de la personne reconnue, ou "Inconnu"
-     */
-    public String identifierAvecHotelling(ImageVect imageTest, String methode, double alpha) {
-        this.trouverPlusProche(imageTest, methode);
-        return this.identifierHotelling(imageTest, alpha, this.indexDistMin);
-    }
-
-    /**
-     * Identifie le visage contenu dans un fichier image.
-     * La distance choisie trouve le plus proche voisin et classe le top 5 ;
-     * le critère de Hotelling décide ensuite si ce candidat est connu ou non.
-     *
-     * @param cheminFichier chemin absolu vers l'image à identifier
-     * @param methode       méthode de distance (euclidienne, cosinus, mahalanobis)
-     * @return nom de la personne reconnue, ou "Inconnu"
-     * @throws IOException si le fichier image est illisible
-     */
-    public String identifierFichier(String cheminFichier, String methode) throws IOException {
-        ImageVect imageTest = new ImageVect(cheminFichier);
-        this.trouverPlusProche(imageTest, methode);
-        return this.identifierHotelling(imageTest, ALPHA_HOTELLING, this.indexDistMin);
-    }
-
     // Évaluation
-
-    /**
-     * Prédit, pour chaque image de la base d'apprentissage, si elle est connue ou inconnue
-     * selon le critère de Hotelling, en mode leave-one-out (LOO) : l'image testée est
-     * temporairement retirée de la base avant d'être évaluée.
-     *
-     * @param methode méthode de distance pour trouver le plus proche voisin
-     * @param alpha   risque pour le seuil de Hotelling
-     * @return liste de tableaux {nomVrai, nomPredit} pour chaque image de référence
-     */
-    public List<String[]> preditionsHotellingLOO(String methode, double alpha) {
-        List<String[]> resultats = new ArrayList<>();
-        int total = signaturesRef.size();
-        for (int i = 0; i < total; i++) {
-            SimpleMatrix sigI = signaturesRef.remove(i);
-            String nomVrai = baseRef.getIdentite(i);
-            String nomPredit = this.identifierAvecHotelling(baseRef.getReferences().get(i), methode, alpha);
-            resultats.add(new String[]{nomVrai, nomPredit});
-            signaturesRef.add(i, sigI);
-        }
-        return resultats;
-    }
-
-    /**
-     * Taux d'identification par validation croisée leave-one-out (LOO)
-     * sur la base d'apprentissage.
-     *
-     * @param methode méthode de distance (euclidienne, cosinus, mahalanobis)
-     * @return taux de bonnes identifications entre 0.0 et 1.0
-     */
-    public double tauxIdentification(String methode) {
-        int total = signaturesRef.size();
-        if (total == 0) return 0.0;
-
-        int reussites = 0;
-        for (int i = 0; i < total; i++) {
-            SimpleMatrix sigI = signaturesRef.remove(i);
-            String veriteTerrain = baseRef.getIdentite(i);
-
-            double distMin = Double.MAX_VALUE;
-            String identiteTrouvee = "Inconnu";
-
-            for (int j = 0; j < signaturesRef.size(); j++) {
-                double d = distance(sigI, signaturesRef.get(j), methode);
-                if (d < distMin) {
-                    distMin = d;
-                    identiteTrouvee = baseRef.getIdentite(j < i ? j : j + 1);
-                }
-            }
-            if (distMin <= seuilPour(methode) && identiteTrouvee.equals(veriteTerrain)) reussites++;
-            signaturesRef.add(i, sigI);
-        }
-        return (double) reussites / total;
-    }
 
     /**
      * Donne le seuil de validation (sous forme de réel sur lequel on prendra l'index le plus petit en dessous) 
@@ -339,26 +242,8 @@ public class Reconnaissance {
         return pourcentage*listeDist.size();
     }
 
-    /**
-     * Déclenche une série de tests sur la base de données de test et
-     * affiche le taux d'identification global dans la console.
-     */
-    public void testerScenarios() {
-        System.out.println("Lancement des scénarios de test...");
-        double taux = tauxIdentification("euclidienne");
-        System.out.println("Taux d'identification global : " + (taux * 100) + " %");
-    }
-
     // Getters
     
-    /**
-     * Seuil calibré pour une méthode de distance donnée
-     * (euclidienne, cosinus ou mahalanobis).
-     */
-    public double getSeuil(String methode) {
-        return seuilPour(methode);
-    }
-
     public double getDerniereDistance() {
         return this.derniereDistance;
     }
