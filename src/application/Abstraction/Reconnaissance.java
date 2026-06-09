@@ -151,12 +151,14 @@ public class Reconnaissance {
      */
     private double calculerT2(SimpleMatrix coordsTest, int indexCandidat) {
         SimpleMatrix lambda = projection.getEigenfaces().getValPropresK();
-        SimpleMatrix proj  = signaturesRef.get(indexCandidat); // Projection sur la base des eigenfaces de l'image
-        System.out.println("Fonctionne");
-        int K = coordsTest.getNumRows();
+        SimpleMatrix ecart  = coordsTest.minus(signaturesRef.get(indexCandidat));
+        int    K = coordsTest.getNumRows();
+        int    n = baseRef.getNbImages();
         double t2 = 0.0;
         for (int i = 0; i < K; i++) {
-            double li = lambda.get(i, 0);
+            // λᵢ est l'eigenvalue de A^T*A (somme des carrés) ;
+            // la variance réelle de la projection est λᵢ/n
+            double li = lambda.get(i, 0) / n;
             if (li < LAMBDA_MIN) continue;
             double ei = proj.get(i, 0);
             t2 += (ei * ei) / li;
@@ -169,7 +171,7 @@ public class Reconnaissance {
     /**
      * Seuil théorique issu de la loi de Fisher, fonction de K, n et alpha.
      */
-    private double calculerSeuilHotelling(double alpha) {
+    public double calculerSeuilHotelling(double alpha) {
         int K = projection.getEigenfaces().getK();
         int n = baseRef.getNbImages();
         FDistribution fisher = new FDistribution(K, n - K);
@@ -239,12 +241,30 @@ public class Reconnaissance {
                                ? baseRef.getIdentite(indexPPVOriginal)
                                : "Inconnu";
 
-            resultats.add(new String[]{baseRef.getIdentite(i), nomPredit});
+            resultats.add(new String[]{baseRef.getIdentite(i), nomPredit, String.valueOf(t2)});
             signaturesRef.add(i, sigI);
         }
         return resultats;
     }
 
+
+    /**
+     * Trouve le plus proche voisin d'une image test et retourne son T² de Hotelling.
+     * Ne modifie pas la base de référence (contrairement au LOO).
+     *
+     * @return tableau [nomPPV, String.valueOf(t2)]
+     */
+    public String[] trouverPPVAvecT2(ImageVect test, String methode) {
+        SimpleMatrix coordsTest = projection.projeter(test);
+        int    indexPPV = 0;
+        double distMin  = Double.MAX_VALUE;
+        for (int i = 0; i < signaturesRef.size(); i++) {
+            double d = distance(coordsTest, signaturesRef.get(i), methode);
+            if (d < distMin) { distMin = d; indexPPV = i; }
+        }
+        double t2 = calculerT2(coordsTest, indexPPV);
+        return new String[]{baseRef.getIdentite(indexPPV), String.valueOf(t2)};
+    }
 
     /** Résultats triés par distance du dernier appel à identifier(). */
     public List<DistanceIdentite> getResultatsPrecedents() {

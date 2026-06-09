@@ -9,7 +9,6 @@ import application.Abstraction.ImageVect;
 import application.Abstraction.Projection;
 import application.Abstraction.Reconnaissance;
 import application.Abstraction.SVD;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -99,28 +98,45 @@ public class App {
         }
 
         // ============================================================
-        // LOO HOTELLING : IMPACT D'ALPHA SUR LA DÉTECTION DES INCONNUS
+        // STATISTIQUES HOTELLING SUR LES IMAGES DE TEST
         // ============================================================
 
-        double[] alphas = {0.05, 0.10, 0.20, 0.50, 0.70, 0.90};
-        System.out.println("\n--- LOO Hotelling sur toutes les images de référence (euclidienne) ---");
-        System.out.printf("  %-6s  %-20s", "#", "Identité réelle");
-        for (double a : alphas) System.out.printf("  %-22s", String.format("alpha=%.2f", a));
-        System.out.println();
-        System.out.println("  " + "-".repeat(162));
+        double[] alphas  = {0.05, 0.10, 0.20, 0.50, 0.70, 0.90};
+        int      K       = faces95.getK();
+        int      n       = bdd.getNbImages();
+        double   facteur = (double) K * (n - 1) / (n - K);
 
-        List<List<String[]>> tousResultats = new ArrayList<>();
+        // Seuils par alpha (valeurs fixes, indépendantes des images)
+        System.out.println("\nSeuils Hotelling (K=" + K + ", n=" + n + ") :");
+        System.out.printf("  %-10s  %-14s  %-12s%n", "alpha", "T² seuil", "F seuil");
+        System.out.println("  " + "-".repeat(40));
         for (double alpha : alphas) {
-            tousResultats.add(reco95.predictionsDistMin("euclidienne", alpha));
+            double seuil  = reco95.calculerSeuilHotelling(alpha);
+            double fSeuil = seuil / facteur;
+            System.out.printf("  %-10.2f  %-14.4f  %-12.4f%n", alpha, seuil, fSeuil);
         }
-        int nbImages = tousResultats.get(0).size();
-        for (int i = 0; i < nbImages; i++) {
-            String nomVrai = tousResultats.get(0).get(i)[0];
-            System.out.printf("  %-6d  %-20s", i + 1, nomVrai);
-            for (List<String[]> res : tousResultats) {
-                System.out.printf("  %-22s", res.get(i)[1]);
-            }
+
+        // T² et prédictions par alpha pour chaque image de test
+        if (!tests.isEmpty()) {
+            System.out.println("\n--- Statistiques Hotelling sur donnees/test/");
+            System.out.printf("  %-12s  %-10s  %-10s", "Image", "T²", "F stat");
+            for (double a : alphas) System.out.printf("  %-18s", String.format("alpha=%.2f", a));
             System.out.println();
+            System.out.println("  " + "-".repeat(160));
+
+            for (ImageVect imgTest : tests) {
+                String[] detail = reco95.trouverPPVAvecT2(imgTest, "cosinus");
+                String   nomPPV = detail[0];
+                double   t2     = Double.parseDouble(detail[1]);
+                double   fStat  = t2 / facteur;
+                System.out.printf("  %-12s  %-10.4f  %-10.4f", imgTest.getNom(), t2, fStat);
+                for (double alpha : alphas) {
+                    double seuil = reco95.calculerSeuilHotelling(alpha);
+                    String pred  = (t2 <= seuil) ? nomPPV : "Inconnu";
+                    System.out.printf("  %-18s", pred);
+                }
+                System.out.println();
+            }
         }
     }
 }
