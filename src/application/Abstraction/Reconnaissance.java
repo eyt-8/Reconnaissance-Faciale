@@ -34,7 +34,7 @@ public class Reconnaissance {
     private final Projection    projection;
 
     /** Projections pré-calculées des images de référence dans l'espace ACP. */
-    private final List<SimpleMatrix>    signaturesRef;
+    private final List<SimpleMatrix> signaturesRef;
 
     /** Résultats triés par distance croissante après le dernier appel à identifier(). */
     private List<DistanceIdentite> derniersResultats = new ArrayList<>();
@@ -102,18 +102,18 @@ public class Reconnaissance {
     /**
      * Méthode interne d'identification sur des coordonnées déjà projetées.
      *
-     * Étape 1 : calcule les distances à toutes les références, trouve le NN,
+     * Étape 1 : calcule les distances à toutes les références, trouve le plus proche voisin,
      *           remplit derniersResultats (triés par distance croissante).
-     * Étape 2 : valide le NN avec le critère de Hotelling T^2.
+     * Étape 2 : valide le ppv avec le critère de Hotelling T^2.
      *
      * @param coordsTest coordonnées du visage test dans l'espace ACP
      * @param methode    méthode de distance
      * @param alpha      risque pour le seuil de Hotelling
-     * @return nom du NN si T^2 <= seuil, "Inconnu" sinon
+     * @return nom du plus proche voisin si T^2 <= seuil, "Inconnu" sinon
      */
     private String identifier(SimpleMatrix coordsTest, String methode, double alpha) {
         derniersResultats.clear();
-        int    indexNN = 0;
+        int    indexPPV = 0;
         double distMin = Double.MAX_VALUE;
 
         for (int i = 0; i < signaturesRef.size(); i++) {
@@ -121,13 +121,13 @@ public class Reconnaissance {
             derniersResultats.add(new DistanceIdentite(baseRef.getIdentite(i), d));
             if (d < distMin) {
                 distMin  = d;
-                indexNN  = i;
+                indexPPV  = i;
             }
         }
         Collections.sort(derniersResultats);
 
-        return estConnu(coordsTest, indexNN, alpha)
-               ? baseRef.getIdentite(indexNN)
+        return estConnu(coordsTest, indexPPV, alpha)
+               ? baseRef.getIdentite(indexPPV)
                : "Inconnu";
     }
 
@@ -215,15 +215,15 @@ public class Reconnaissance {
             SimpleMatrix coordsTest = signaturesRef.get(i);
             SimpleMatrix sigI       = signaturesRef.remove(i);
 
-            int    indexNNReduit = 0;
+            int    indexPPVReduit = 0;
             double distMin       = Double.MAX_VALUE;
             for (int j = 0; j < signaturesRef.size(); j++) {
                 double d = distance(coordsTest, signaturesRef.get(j), methode);
-                if (d < distMin) { distMin = d; indexNNReduit = j; }
+                if (d < distMin) { distMin = d; indexPPVReduit = j; }
             }
             // Correction de l'index : la suppression de i a décalé les indices >= i
-            int indexNNOriginal = (indexNNReduit < i) ? indexNNReduit : indexNNReduit + 1;
-            if (baseRef.getIdentite(indexNNOriginal).equals(baseRef.getIdentite(i))) correct++;
+            int indexPPVOriginal = (indexPPVReduit < i) ? indexPPVReduit : indexPPVReduit + 1;
+            if (baseRef.getIdentite(indexPPVOriginal).equals(baseRef.getIdentite(i))) correct++;
 
             signaturesRef.add(i, sigI);
         }
@@ -245,19 +245,19 @@ public class Reconnaissance {
             SimpleMatrix coordsTest = signaturesRef.get(i);
             SimpleMatrix sigI       = signaturesRef.remove(i);
 
-            int    indexNNReduit = 0;
+            int    indexPPVReduit = 0;
             double distMin       = Double.MAX_VALUE;
             for (int j = 0; j < signaturesRef.size(); j++) {
                 double d = distance(coordsTest, signaturesRef.get(j), methode);
-                if (d < distMin) { distMin = d; indexNNReduit = j; }
+                if (d < distMin) { distMin = d; indexPPVReduit = j; }
             }
-            int indexNNOriginal = (indexNNReduit < i) ? indexNNReduit : indexNNReduit + 1;
+            int indexPPVOriginal = (indexPPVReduit < i) ? indexPPVReduit : indexPPVReduit + 1;
 
-            // Valider avec Hotelling (signaturesRef est réduite, indexNNReduit est correct)
-            double t2    = calculerT2(coordsTest, indexNNReduit);
+            // Valider avec Hotelling (signaturesRef est réduite, indexPPVReduit est correct)
+            double t2    = calculerT2(coordsTest, indexPPVReduit);
             double seuil = calculerSeuilHotelling(alpha);
             String nomPredit = (t2 <= seuil)
-                               ? baseRef.getIdentite(indexNNOriginal)
+                               ? baseRef.getIdentite(indexPPVOriginal)
                                : "Inconnu";
 
             resultats.add(new String[]{baseRef.getIdentite(i), nomPredit});
