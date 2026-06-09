@@ -1,4 +1,5 @@
 package application.Abstraction;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -57,6 +58,9 @@ public class Reconnaissance {
     public List<DistanceIdentite> getResultatsPrecedents() {
         return this.resultatsPrecedents;
     }
+
+    /** Risque alpha utilisé pour le seuil du critère de Hotelling (95 %). */
+    private static final double ALPHA_HOTELLING = 0.05;
 
     /** Valeur propre minimale acceptée dans le critère de Hotelling : en dessous de
      *  ce seuil, la composante est ignorée pour éviter une division par une valeur
@@ -122,6 +126,7 @@ public class Reconnaissance {
      * Contrairement à identifier(), la décision ne s'appuie pas sur le seuil
      * empirique this.seuil (calibrerSeuil()) mais sur un seuil statistique
      * dérivé de la loi de Fisher (calculerSeuilHotelling()).
+<<<<<<< HEAD
      *
      * Étapes :
      * - Projection sur la base des eigenfaces
@@ -130,6 +135,8 @@ public class Reconnaissance {
      * - Calcul du seuil
      * - stat min > seuil => rejet donc "Inconnu", sinon pris
      *
+=======
+>>>>>>> 3fafdad (Changement pour commencer la migration de la partie traitemement avec hotelling)
      * @param test  l'image vectorisée représentant le visage à identifier
      * @param alpha risque choisi pour le seuil de Hotelling (ex. 0.05)
      * @param j     index de l'image ayant la distance minimale
@@ -296,6 +303,24 @@ public class Reconnaissance {
         double quantile = loiFisher.inverseCumulativeProbability(1 - alpha);
 
         return ((double) (K * (n - 1)) / (n - K)) * quantile;
+    }
+
+    /**
+     * Identifie le visage contenu dans un fichier image en appliquant
+     * successivement la distance choisie puis le critère de Hotelling.
+     *
+     * @param cheminFichier chemin absolu vers l'image à identifier
+     * @param methode       méthode de distance (euclidienne, cosinus, mahalanobis)
+     * @return nom de la personne reconnue, ou "Inconnu"
+     * @throws IOException si le fichier image est illisible
+     */
+    public String identifierFichier(String cheminFichier, String methode) throws IOException {
+        ImageVect imageTest = new ImageVect(cheminFichier);
+        String nomTrouve = this.identifier(imageTest, methode);
+        if (!nomTrouve.equals("Inconnu")) {
+            nomTrouve = this.identifierHotelling(imageTest, ALPHA_HOTELLING, this.indexDistMin);
+        }
+        return nomTrouve;
     }
 
     // Évaluation

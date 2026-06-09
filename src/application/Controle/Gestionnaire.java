@@ -42,8 +42,6 @@ public class Gestionnaire {
     private Projection proj;
     /** Distance choisie par l'utilisateur pour l'identification */
     private String distChoisie;
-    /** Risque alpha utilisé pour le seuil du critère de Hotelling (ex. 0.05 = 95 %) */
-    private static final double ALPHA_HOTELLING = 0.05;
     /** Fichier sélectionné pour l'analyse */
     private File fichierSelectionne;
     private Image cacheImageMoyenne;
@@ -154,21 +152,15 @@ public class Gestionnaire {
      */
     private void traiterReconnaissance(File fichierImage) {
         try {
-            ImageVect imageTest = new ImageVect(fichierImage.getAbsolutePath());
+            String nomTrouve = this.reco.identifierFichier(fichierImage.getAbsolutePath(), this.distChoisie);
 
-            // Le critère de Hotelling utilise une décision statistique (loi de
-            // Fisher) au lieu du seuil empirique : on l'appelle séparément.
-            String nomTrouve = this.reco.identifier(imageTest, this.distChoisie);
-            if (!nomTrouve.equals("Inconnu")){
-                nomTrouve = this.reco.identifierHotelling(imageTest, ALPHA_HOTELLING,this.reco.getIndexDistMin());
-            }
             Image imgTrouvee = null;
             double tauxRessemblance = 0.0;
-            
+
             if (!nomTrouve.equals("Inconnu")) {
-                File dossierPersonne = new File("donnees/apprentissage/" + nomTrouve);                
+                File dossierPersonne = new File("donnees/apprentissage/" + nomTrouve);
                 if (dossierPersonne.exists() && dossierPersonne.isDirectory()) {
-                    File[] fichiersImages = dossierPersonne.listFiles((dir, name) -> name.endsWith(".jpg"));                    
+                    File[] fichiersImages = dossierPersonne.listFiles((dir, name) -> name.endsWith(".jpg"));
                     if (fichiersImages != null && fichiersImages.length > 0) {
                         imgTrouvee = new Image(fichiersImages[0].toURI().toString());
                     }
@@ -182,17 +174,16 @@ public class Gestionnaire {
                 imgTrouvee = new Image("donnees/inconnu.jpg");
             }
 
-            java.util.List<String> details = new java.util.ArrayList<>();
-            java.util.List<application.Abstraction.Reconnaissance.DistanceIdentite> topResults = this.reco.getResultatsPrecedents();
+            List<String> details = new ArrayList<>();
+            List<Reconnaissance.DistanceIdentite> topResults = this.reco.getResultatsPrecedents();
             int topK = Math.min(5, topResults.size());
             for (int i = 0; i < topK; i++) {
-                application.Abstraction.Reconnaissance.DistanceIdentite res = topResults.get(i);
-                details.add((i+1) + ". " + res.identite + " - Distance: " + String.format("%.2f", res.distance));
+                Reconnaissance.DistanceIdentite res = topResults.get(i);
+                details.add((i + 1) + ". " + res.identite + " - Distance: " + String.format("%.2f", res.distance));
             }
 
-            // Mise à jour du PanneauReconnaissance situé dans le ConteneurPrincipal
             this.ecran.getConteneurPrincipal().getPanneauReco().majInterface(imgTrouvee, nomTrouve, tauxRessemblance, details);
-            
+
         } catch (Exception e) {
             System.err.println("Erreur lors de la reconnaissance : " + e.getMessage());
             this.ecran.getConteneurPrincipal().getPanneauReco().majInterface(null, "Erreur", 0.0, null);
@@ -214,7 +205,7 @@ public class Gestionnaire {
             Image imgFX = SwingFXUtils.toFXImage(img.getBufferedImage(), null);
             this.cacheEigenfaces.add(imgFX);
             this.cacheValeursPropres.add(faces.getValPropres().get(i, 0));
-            System.out.println("      ["+(i+1)+"/5]...");
+            System.out.println("      ["+(i+1)+"/5]");
         }
         System.out.println("[6/6] Chargement des eigenfaces terminés");
     }
