@@ -78,7 +78,7 @@ public class BaseDeDonnees {
 								ImageVect img = new ImageVect(fichierImage.getAbsolutePath());
 								img.vectoriser();
 								this.references.add(img);
-								this.listeNoms.add(nomPersonne);
+								this.listeNoms.add(nomPersonne + "/" + fichierImage.getName());
 							} catch (IOException e) {
 								System.err.println("Erreur lors du chargement de " + fichierImage.getName() + " : " + e.getMessage());
 							}

@@ -154,12 +154,9 @@ public class Gestionnaire {
 
             Image imgTrouvee = null;
             if (!nomTrouve.equals("Inconnu")) {
-                File dossierPersonne = new File("donnees/apprentissage/" + nomTrouve);
-                if (dossierPersonne.exists() && dossierPersonne.isDirectory()) {
-                    File[] fichiersImages = dossierPersonne.listFiles((dir, name) -> name.endsWith(".jpg"));
-                    if (fichiersImages != null && fichiersImages.length > 0) {
-                        imgTrouvee = new Image(fichiersImages[0].toURI().toString());
-                    }
+                File fichierPersonne = new File("donnees/apprentissage/" + nomTrouve);
+                if (fichierPersonne.exists()) {
+                    imgTrouvee = new Image(fichierPersonne.toURI().toString());
                 }
             } else {
                 imgTrouvee = new Image("donnees/inconnu.jpg");
@@ -173,7 +170,7 @@ public class Gestionnaire {
                 details.add((i + 1) + ". " + res.identite + " - " + String.format("%.2f", res.distance));
             }
 
-            this.ecran.getConteneurPrincipal().getPanneauReco().majInterface(imgTrouvee, nomTrouve, details);
+            this.ecran.getConteneurPrincipal().getPanneauReco().majInterface(imgTrouvee, nomTrouve.split("/")[0], details);
 
         } catch (Exception e) {
             System.err.println("Erreur lors de la reconnaissance : " + e.getMessage());
