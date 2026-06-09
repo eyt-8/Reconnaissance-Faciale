@@ -10,35 +10,29 @@ import org.ejml.simple.SimpleEVD;
 
 public class Propre {
     /**
-     * matrice des VECTEURS PROPRES, rangés en COLONNES
+     * matrice des vecteurs propres, rangés en colonnes
      */
     private SimpleMatrix matP;
     /**
-     * vecteur de taille nx1 des VALEURS PROPRES
+     * vecteur de taille nx1 des valeurs propres
      */
     private SimpleMatrix vectD;
     /**
-     * Matrice à décomposer arrivant par le constructeur ou le setter
+     * Matrice à décomposer arrivant par soit le constructeur soit le setter
      */
     private SimpleMatrix matrice;
 
     /**
-     * Constructeur avec le param
+     * Constructeur partiel
      */
     public Propre(SimpleMatrix matrice) {
         this.matrice = matrice;
     }
  
-    public Propre() {
-    }
-
     /**
-     * Setter de la matrice à décomposer
-     * 
-     * @param matrice matrice à décomposer
+     * Constructeur vide
      */
-    public void setMatrice(SimpleMatrix matrice) {
-        this.matrice = matrice;
+    public Propre() {
     }
 
     /**
@@ -74,17 +68,23 @@ public class Propre {
         this.vectD = D;
     }
     
-    /**
-     * Accesseur de matP (Matrice Vecteurs Propres)
-     */
+    // Getters
+
     public SimpleMatrix getMatP() {
         return matP;
     }
     
-    /**
-     * Accesseur vectD (vecteur des Valeurs Propres)
-     */
     public SimpleMatrix getVectD() {
         return vectD;
+    }
+
+    // Setters
+
+    /**
+     * Setter de la matrice à décomposer
+     * @param matrice matrice à décomposer
+     */
+    public void setMatrice(SimpleMatrix matrice) {
+        this.matrice = matrice;
     }
 }
