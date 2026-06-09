@@ -15,19 +15,13 @@ public class Projection {
     private Eigenfaces eigenfaces;
     private SimpleMatrix coords;
 
-    public Projection(Eigenfaces eigenfaces) {
-        this.eigenfaces = eigenfaces;
-    }
-
     /**
      * Constructeur principal de la projection
      * @param eigenfaces objet contenant la base d'eigenfaces et le visage moyen
      */
-    public Eigenfaces getEigenfaces() {
-        return eigenfaces;
+    public Projection(Eigenfaces eigenfaces) {
+        this.eigenfaces = eigenfaces;
     }
-    
-
     
     /**
      * Projette une image sur la base d'eigenfaces.
@@ -100,9 +94,17 @@ public class Projection {
         return varianceCumulee;
     }
 
+    // Getters
+
+    public Eigenfaces getEigenfaces() {
+        return eigenfaces;
+    }
+
 	public SimpleMatrix getCoords() {
 		return coords;
 	}
+
+    // Setters
 
 	public void setCoords(SimpleMatrix coords) {
 		this.coords = coords;
