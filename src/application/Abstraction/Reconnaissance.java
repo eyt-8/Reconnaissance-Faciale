@@ -160,7 +160,7 @@ public class Reconnaissance {
             // la variance réelle de la projection est λᵢ/n
             double li = lambda.get(i, 0) / n;
             if (li < LAMBDA_MIN) continue;
-            double ei = proj.get(i, 0);
+            double ei = ecart.get(i, 0);
             t2 += (ei * ei) / li;
         }
         System.out.print("T^2 :");
