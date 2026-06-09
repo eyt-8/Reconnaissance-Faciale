@@ -118,7 +118,7 @@ public class App {
                 String predEucl = reco95.identifier(imgTest, "euclidienne");
                 String predCos  = reco95.identifier(imgTest, "cosinus");
                 String predMaha = reco95.identifier(imgTest, "mahalanobis");
-                System.out.printf(" %-12s  %-22s  %-22s  %-22s  %-22s%n",
+                System.out.printf("  %-12s  %-22s  %-22s  %-22s  %-22s%n",
                     imgTest.getNom(), predEucl, predCos, predMaha);
             }
         } else {

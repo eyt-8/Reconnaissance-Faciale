@@ -1,7 +1,6 @@
 package application.Abstraction;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -25,7 +24,7 @@ public class Reconnaissance {
     private Projection projection;
 
     /** Méthodes de distance supportées (mêmes clés que le dispatcher distance()). */
-    private static final String[] METHODES = {"euclidienne", "cosinus", "mahalanobis"};
+    //private static final String[] METHODES = {"euclidienne", "cosinus", "mahalanobis"};
 
     /** Limite de distance au-delà de laquelle le visage est considéré comme inconnu,
      *  calibrée séparément pour chaque méthode (les distances cosinus/Mahalanobis
@@ -78,7 +77,7 @@ public class Reconnaissance {
         this.projection = projection;
         this.signaturesRef = new ArrayList<>();
         this.precalculerSignatures();
-        this.calibrerSeuil();
+        //this.calibrerSeuil();
     }
 
     /**
@@ -213,36 +212,6 @@ public class Reconnaissance {
 
         SimpleMatrix difference = jp.minus(jpk);
         return difference.transpose().mult(lambdaInv).dot(difference);
-    }
-
-    // Calibration du seuil
-
-    /**
-     * Calcule automatiquement, pour CHAQUE méthode de distance, un seuil
-     * égal à 1,5 × la distance moyenne (selon cette méthode) entre toutes
-     * les paires de signatures de référence.
-     *
-     * Un seuil par méthode est nécessaire car les distances cosinus ([0, 2])
-     * et de Mahalanobis (variance-pondérée) ne vivent pas du tout sur la même
-     * échelle que la distance euclidienne (somme de différences de pixels
-     */
-    public void calibrerSeuil() {
-        this.seuils = new HashMap<>();
-        for (String methode : METHODES) {
-            double seuilMethode = 0;
-            if (signaturesRef.size() >= 2) {
-                double somme = 0;
-                int count = 0;
-                for (int i = 0; i < signaturesRef.size(); i++) {
-                    for (int j = i + 1; j < signaturesRef.size(); j++) {
-                        somme += distance(signaturesRef.get(i), signaturesRef.get(j), methode);
-                        count++;
-                    }
-                }
-                seuilMethode = (somme / count) * 1.5;
-            }
-            this.seuils.put(methode, seuilMethode);
-        }
     }
 
     /**
