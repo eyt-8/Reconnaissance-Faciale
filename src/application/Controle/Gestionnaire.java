@@ -158,9 +158,9 @@ public class Gestionnaire {
 
             // Le critère de Hotelling utilise une décision statistique (loi de
             // Fisher) au lieu du seuil empirique : on l'appelle séparément.
-            String nomTrouve = this.reco.identifierHotelling(imageTest, ALPHA_HOTELLING);
+            String nomTrouve = this.reco.identifier(imageTest, this.distChoisie);
             if (!nomTrouve.equals("Inconnu")){
-                nomTrouve = this.reco.identifier(imageTest, this.distChoisie);
+                nomTrouve = this.reco.identifierHotelling(imageTest, ALPHA_HOTELLING,this.reco.getIndexDistMin());
             }
             Image imgTrouvee = null;
             double tauxRessemblance = 0.0;

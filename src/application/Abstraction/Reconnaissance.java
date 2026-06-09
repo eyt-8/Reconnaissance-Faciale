@@ -35,6 +35,7 @@ public class Reconnaissance {
     /** Signatures pré-calculées des images de référence */
     private List<SimpleMatrix> signaturesRef;
 
+    private int indexDistMin = 0;
     private double derniereDistance = 0.0;
     private double distanceMax;
 
@@ -104,6 +105,7 @@ public class Reconnaissance {
             if (d < distanceMinimale) {
                 distanceMinimale = d;
                 identiteTrouvee  = baseRef.getIdentite(i);
+                this.indexDistMin = i;
             }
             else if (d>this.distanceMax){
                 this.distanceMax = d;
@@ -130,9 +132,10 @@ public class Reconnaissance {
      *
      * @param test  l'image vectorisée représentant le visage à identifier
      * @param alpha risque choisi pour le seuil de Hotelling (ex. 0.05)
+     * @param j     index de l'image ayant la distance minimale
      * @return le nom de la personne reconnue, ou "Inconnu"
      */
-    public String identifierHotelling(ImageVect test, double alpha) {
+    public String identifierHotelling(ImageVect test, double alpha, int j) {
         // projection du visage test -> coordsTest (K x 1, K = nb d'eigenfaces retenues)
         SimpleMatrix coordsTest = projection.projeter(test);
         int K = coordsTest.getNumRows();
@@ -145,32 +148,30 @@ public class Reconnaissance {
         String identiteTrouvee = "Inconnu";
         this.distanceMax = 0;
         this.resultatsPrecedents.clear();
-        for (int j = 0; j < signaturesRef.size(); j++) {
-            SimpleMatrix coordsRef = signaturesRef.get(j);     // K x 1
-            SimpleMatrix ecart = coordsTest.minus(coordsRef);  // K x 1
+        SimpleMatrix coordsRef = signaturesRef.get(j);     // K x 1
+        SimpleMatrix ecart = coordsTest.minus(coordsRef);  // K x 1
 
-            double t2 = 0.0;
-            for (int i = 0; i < K; i++) {
-                double lambda_i = lambda.get(i, 0);
-                // Protection numérique : une valeur propre quasi nulle ferait
-                // exploser (écart_i)^2/lambda_i sans apporter d'information fiable ;
-                // on ignore alors cette composante.
-                if (lambda_i < LAMBDA_MIN) continue;
+        double t2 = 0.0;
+        for (int i = 0; i < K; i++) {
+            double lambda_i = lambda.get(i, 0);
+            // Protection numérique : une valeur propre quasi nulle ferait
+            // exploser (écart_i)^2/lambda_i sans apporter d'information fiable ;
+            // on ignore alors cette composante.
+            if (lambda_i < LAMBDA_MIN) continue;
 
-                double ecart_i = ecart.get(i, 0);
-                t2 += (ecart_i * ecart_i) / lambda_i;
-            }
+            double ecart_i = ecart.get(i, 0);
+            t2 += (ecart_i * ecart_i) / lambda_i;
+        }
 
-            // On alimente resultatsPrecedents/distanceMax comme identifier(),
-            // afin que le panneau de reconnaissance (ressemblance, "images les
-            // plus proches") fonctionne aussi avec le critère de Hotelling.
-            this.resultatsPrecedents.add(new DistanceIdentite(baseRef.getIdentite(j), t2));
-            if (t2 < t2Min) {
-                t2Min = t2;
-                identiteTrouvee = baseRef.getIdentite(j);
-            } else if (t2 > this.distanceMax) {
-                this.distanceMax = t2;
-            }
+        // On alimente resultatsPrecedents/distanceMax comme identifier(),
+        // afin que le panneau de reconnaissance (ressemblance, "images les
+        // plus proches") fonctionne aussi avec le critère de Hotelling.
+        this.resultatsPrecedents.add(new DistanceIdentite(baseRef.getIdentite(j), t2));
+        if (t2 < t2Min) {
+            t2Min = t2;
+            identiteTrouvee = baseRef.getIdentite(j);
+        } else if (t2 > this.distanceMax) {
+            this.distanceMax = t2;
         }
         java.util.Collections.sort(this.resultatsPrecedents);
 
@@ -180,8 +181,6 @@ public class Reconnaissance {
         this.derniereDistance = t2Min;
 
         // Étape 6 : décision
-        System.out.println("t2 min :"+t2Min);
-        System.out.println("t2Seuil :"+t2Seuil);
         return (t2Min <= t2Seuil) ? identiteTrouvee : "Inconnu";
     }
 
@@ -370,5 +369,9 @@ public class Reconnaissance {
 
     public double getDistanceMax() {
         return this.distanceMax;
+    }
+
+    public int getIndexDistMin(){
+        return this.indexDistMin;
     }
 }
