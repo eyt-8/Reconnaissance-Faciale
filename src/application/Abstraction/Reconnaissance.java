@@ -125,20 +125,30 @@ public class Reconnaissance {
         }
         Collections.sort(derniersResultats);
 
-        return estConnu(coordsTest, indexPPV, alpha)
-               ? baseRef.getIdentite(indexPPV)
-               : "Inconnu";
+        if (estConnu(coordsTest, indexPPV, alpha)){
+            return baseRef.getIdentite(indexPPV);
+        }
+        else{
+            return "Inconnu";
+        }
     }
 
     /**
-     * Retourne vrai si le T² du candidat est inférieur au seuil théorique de Hotelling.
+     * Retourne vrai si le T^2 du candidat est inférieur au seuil théorique de Hotelling.
+     * @param coordsTest le vecteur de la matrice test
+     * @param indexCandidat l'index du candidat recherché
+     * @param alpha pourcentage de précision pour lequel on cherche le quantile de Fisher
+     * @return vrai si le T^2 du candidat est inférieur au seuil théorique de Hotelling.
      */
     private boolean estConnu(SimpleMatrix coordsTest, int indexCandidat, double alpha) {
         return calculerT2(coordsTest, indexCandidat) <= calculerSeuilHotelling(alpha);
     }
 
     /**
-     * C'est la distance de Mahalanobis au carré dans l'espace ACP réduit.
+     * Calcul de la statistique de Hotelling
+     * @param coordsTest le vecteur de la matrice test
+     * @param indexCandidat l'index du candidat recherché
+     * @return la statistique de Hotelling pour ce vecteur test
      */
     private double calculerT2(SimpleMatrix coordsTest, int indexCandidat) {
         SimpleMatrix lambda = projection.getEigenfaces().getValPropresK();
@@ -158,7 +168,11 @@ public class Reconnaissance {
     }
 
     /**
-     * Seuil théorique issu de la loi de Fisher, fonction de K, n et alpha.
+     * Seuil de Fisher en fonction de K, n et alpha récupérés dans 
+     * {@link Eigenfaces#getK()} pour K et 
+     * {@link BaseDeDonnees#getNbImages()} pour n
+     * @param alpha le pourcentage de précision du quantile de la loi de Fisher
+     * @return le seuil de Hotelling
      */
     public double calculerSeuilHotelling(double alpha) {
         int K = projection.getEigenfaces().getK();
@@ -237,13 +251,12 @@ public class Reconnaissance {
         return diff.transpose().mult(lambdaInv).dot(diff);
     }
 
-
-
-
     /**
-     * Trouve le plus proche voisin d'une image test et retourne son T² de Hotelling.
-     *
-     * @return tableau [nomPPV, String.valueOf(t2)]
+     * Trouve le plus proche voisin d'une image, donc l'image qui ressemble le plus
+     * de celle de test et la retourne.
+     * @param test
+     * @param methode
+     * @return tableau [nomPPV, String.valueOf(t2)] nom d'image la plus proche et la valeur du t^2 passée en chaîne de caractères
      */
     public String[] trouverPPVAvecT2(ImageVect test, String methode) {
         SimpleMatrix coordsTest = projection.projeter(test);
@@ -269,6 +282,7 @@ public class Reconnaissance {
      *
      * @param methode méthode de distance pour trouver le plus proche voisin
      * @param alpha   risque pour le critère de Hotelling
+     * @return liste des images les plus proches
      */
     public List<String[]> predictionsDistMin(String methode, double alpha) {
         List<String[]> resultats = new ArrayList<>();
@@ -287,16 +301,25 @@ public class Reconnaissance {
 
             for (int j = 0; j < crDeux; j++) {
                 double d = distance(coordsTest, signaturesRef.get(j), methode);
-                if (d < distMin) { distMin = d; indexPPVReduit = j; }
+                if (d < distMin) { 
+                    distMin = d;
+                }
+                else{
+                    indexPPVReduit = j; 
+                }
             }
             int indexPPVOriginal = (indexPPVReduit < i) ? indexPPVReduit : indexPPVReduit + 1;
 
             // Valider avec Hotelling (signaturesRef est réduite, indexPPVReduit est correct)
             double t2    = calculerT2(coordsTest, indexPPVReduit);
             double seuil = calculerSeuilHotelling(alpha);
-            String nomPredit = (t2 <= seuil)
-                               ? baseRef.getIdentite(indexPPVOriginal)
-                               : "Inconnu";
+            String nomPredit;
+            if (t2 <= seuil){
+                nomPredit = baseRef.getIdentite(indexPPVOriginal);
+            }
+            else{
+                nomPredit = "Inconnu";
+            }
 
             resultats.add(new String[]{baseRef.getIdentite(i), nomPredit});
             signaturesRef.add(i, sigI);
