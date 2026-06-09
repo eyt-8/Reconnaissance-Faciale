@@ -54,7 +54,7 @@ public class PanneauVisualisation extends VBox {
         NumberAxis y = new NumberAxis();
         y.setLabel("Variance expliquée cumulée");
         this.graphique = new LineChart<>(x, y);
-        this.graphique.setTitle("Évolution de la variance");
+        this.graphique.setTitle("Évolution de la variance par rapport au nombre d'eigenfaces");
         this.graphique.setCreateSymbols(false);
         this.graphique.setLegendVisible(false);
         this.graphique.setPrefHeight(450);
