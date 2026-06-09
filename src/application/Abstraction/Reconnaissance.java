@@ -170,7 +170,14 @@ public class Reconnaissance {
         return ((double) K * (n - 1) / (n - K)) * quantile;
     }
 
-
+    /**
+     * Prend le pourcentage d'images retenu et renvoie l'image à partir de laquelle on ne les prend plus
+     * @param pourcentage le pourcentage demandé
+     * @return
+     */
+    public int critereDeux(double pourcentage){
+        return (int)Math.floor(pourcentage*baseRef.getNbImages());
+    }
 
 
     private double distance(SimpleMatrix jp, SimpleMatrix jpk, String methode) {
@@ -225,7 +232,7 @@ public class Reconnaissance {
         return new String[]{baseRef.getIdentite(indexPPV), String.valueOf(t2)};
     }
 
-        /**
+    /**
      * Prédictions plus petite distance avec critère de Hotelling, pour un alpha donné.
      * Permet de tester différentes valeurs d'alpha dans App.java.
      * Retourne une liste de paires [nom réel, nom prédit].
@@ -266,6 +273,7 @@ public class Reconnaissance {
         }
         return resultats;
     }
+
 
 
     /** Résultats triés par distance du dernier appel à identifier(). */
