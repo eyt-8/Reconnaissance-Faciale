@@ -126,17 +126,7 @@ public class Reconnaissance {
      * Contrairement à identifier(), la décision ne s'appuie pas sur le seuil
      * empirique this.seuil (calibrerSeuil()) mais sur un seuil statistique
      * dérivé de la loi de Fisher (calculerSeuilHotelling()).
-<<<<<<< HEAD
      *
-     * Étapes :
-     * - Projection sur la base des eigenfaces
-     * - Utilisation de la formule de la statistique de Hotelling
-     * - On récupère la statistique de la distance minimale via les arguments de la fonction
-     * - Calcul du seuil
-     * - stat min > seuil => rejet donc "Inconnu", sinon pris
-     *
-=======
->>>>>>> 3fafdad (Changement pour commencer la migration de la partie traitemement avec hotelling)
      * @param test  l'image vectorisée représentant le visage à identifier
      * @param alpha risque choisi pour le seuil de Hotelling (ex. 0.05)
      * @param j     index de l'image ayant la distance minimale
@@ -282,12 +272,6 @@ public class Reconnaissance {
     }
 
     /**
-     * Calcule le seuil de décision du critère de Hotelling :
-     *     T^2_seuil = (K(n-1) / (n-K)) * F_{1-alpha}(K, n-K)
-     * où K est le nombre d'eigenfaces retenues, n le nombre d'images
-     * d'apprentissage, et F_{1-alpha}(K, n-K) le quantile de la loi de
-     * Fisher à (K, n-K) degrés de liberté pour le risque alpha.
-     *
      * Contrairement à calibrerSeuil() (seuil empirique calé sur la distance
      * moyenne entre signatures de référence), ce seuil est dérivé
      * théoriquement de la loi de Fisher : il ne dépend que de K, n et alpha.
