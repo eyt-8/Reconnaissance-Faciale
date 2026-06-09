@@ -111,7 +111,7 @@ public class App {
 
         List<List<String[]>> tousResultats = new ArrayList<>();
         for (double alpha : alphas) {
-            tousResultats.add(reco95.predictionsLOO("euclidienne", alpha));
+            tousResultats.add(reco95.predictionsDistMin("euclidienne", alpha));
         }
         int nbImages = tousResultats.get(0).size();
         for (int i = 0; i < nbImages; i++) {
