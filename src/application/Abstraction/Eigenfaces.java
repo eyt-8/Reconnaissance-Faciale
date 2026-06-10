@@ -140,7 +140,7 @@ public class Eigenfaces {
         return k;
     }
 
-        public SimpleMatrix getVisageMoyen() {
+    public SimpleMatrix getVisageMoyen() {
         return this.visageMoyen;
     }
     
@@ -151,7 +151,7 @@ public class Eigenfaces {
     public SimpleMatrix getEigenface(int i) {
         return this.base_reduite.extractVector(false, i);
     }
-    
+
     // Setters
     public void setVisageMoyen(SimpleMatrix visageMoyen) {
         this.visageMoyen = visageMoyen;
