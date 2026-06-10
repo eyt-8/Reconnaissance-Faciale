@@ -29,6 +29,8 @@ import javafx.stage.Stage;
  */
 public class Gestionnaire {
 
+    // Attributs de la fonction
+
     /** Écran principal géré par le gestionnaire */
     private Ecran ecran;
     /** Fenêtre JavaFX principale */
@@ -49,6 +51,8 @@ public class Gestionnaire {
     private List<Double> cacheValeursPropres;
 
 
+    // Constructeur
+
     /**
      * Initialise le gestionnaire avec la fenêtre principale.
      * @param stage fenêtre JavaFX principale
@@ -64,6 +68,8 @@ public class Gestionnaire {
         this.initialiserReco();
         this.enregistrerEcouteurs();
     }
+
+    // Fonctions
 
     /**
      * Initialise les composants de reconnaissance faciale :
