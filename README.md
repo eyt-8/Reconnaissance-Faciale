@@ -30,6 +30,7 @@ Reconnaissance-Faciale/
 │       └── Presentation/       # Interface JavaFX (écrans, panneaux, CSS)
 ├── donnees/
 │   ├── apprentissage/          # Images de référence organisées par dossier/personne
+│   ├── base/                   # Deuxième base de référence possible
 │   └── test/                   # Images à tester
 ├── lib/                        # Bibliothèques JAR
 └── bin/                        # Classes compilées
