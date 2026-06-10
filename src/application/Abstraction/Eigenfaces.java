@@ -13,16 +13,26 @@ import org.ejml.simple.SimpleMatrix;
 public class Eigenfaces {
     private SimpleMatrix visageMoyen;
     private SVD svd;
-    private SimpleMatrix base_reduite;        // eigenfaces sélectionnées (colonnes) => Matrice A centrée
-    private SimpleMatrix valPropres;  // valeurs propres associées
-    private int k;                    // nombre d'eigenfaces retenues
+    private SimpleMatrix base_reduite; // eigenfaces sélectionnées (colonnes) => Matrice A centrée
+    private SimpleMatrix valPropres; // valeurs propres associées
+    private int k; // nombre d'eigenfaces retenues
 
+    /**
+     * Constructeur de eigenfaces
+     * @param svd
+     * @param visageMoyen
+     */
     public Eigenfaces(SVD svd, SimpleMatrix visageMoyen) {
         this.k = 0;
         this.svd = svd;
         this.visageMoyen = visageMoyen;
     }
 
+    /**
+     * Constructeur chaîné en prenant en compte que l'on peut mettre plus tard
+     * le visageMoyen avec un setter
+     * @param svd
+     */
     public Eigenfaces(SVD svd) {
         this.k = 0;
         this.svd = svd;
@@ -36,7 +46,6 @@ public class Eigenfaces {
     	
         // vp  vecteur colonne des valeurs propres (taille m x 1)
     	// vec matrice des vecteurs propres en colonnes (taille n x m)
-
     	SimpleMatrix vp = svd.getbValSinguliere();
     	SimpleMatrix vec = svd.getU();
     	
@@ -113,6 +122,8 @@ public class Eigenfaces {
         return varCum;
     }
 
+
+    // Getters
     public SimpleMatrix getValPropresK() {
         return this.valPropres.extractMatrix(0, this.k, 0, 1);
     }
@@ -129,11 +140,7 @@ public class Eigenfaces {
         return k;
     }
 
-    public void setVisageMoyen(SimpleMatrix visageMoyen) {
-        this.visageMoyen = visageMoyen;
-    }
-
-    public SimpleMatrix getVisageMoyen() {
+        public SimpleMatrix getVisageMoyen() {
         return this.visageMoyen;
     }
     
@@ -144,4 +151,11 @@ public class Eigenfaces {
     public SimpleMatrix getEigenface(int i) {
         return this.base_reduite.extractVector(false, i);
     }
+    
+    // Setters
+    public void setVisageMoyen(SimpleMatrix visageMoyen) {
+        this.visageMoyen = visageMoyen;
+    }
 }
+
+
