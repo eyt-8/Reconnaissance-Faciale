@@ -177,7 +177,12 @@ public class Gestionnaire {
                     imgTrouvee = new Image(fichierPersonne.toURI().toString());
                 }
             } else {
-                imgTrouvee = new Image("donnees/inconnu.jpg");
+                File fichierInconnu = new File("donnees/inconnu.jpg");
+                if (fichierInconnu.exists()) {
+                    imgTrouvee = new Image(fichierInconnu.toURI().toString());
+                } else {
+                    System.err.println("Attention : l'image donnees/inconnu.jpg est introuvable !");
+                }
             }
 
             List<String> details = new ArrayList<>();

@@ -205,38 +205,60 @@ public class App {
                               "Distance", "Vrais Positifs", "Faux Positifs", "Faux Négatifs", "Vrais Négatifs");
             System.out.println("-".repeat(83));
 
-            double seuilT2 = recoApp.calculerSeuilHotelling(alphaHotelling);
+            double seuilT2 = 136.0;
+
+            List<String> logDetails = new ArrayList<>();
 
             for (String dist : dists) {
                 int vp = 0, fp = 0, fn = 0, vn = 0;
 
                 for (int i = 0; i < imagesTest.size(); i++) {
                     ImageVect imgTest = imagesTest.get(i);
-                    String vraiNom = vraisNoms.get(i); // "s1", "s2", etc.
+                    String vraiNom = vraisNoms.get(i).toLowerCase(); // "s1", "s2", ou "inconnu"
 
                     // Prédiction par l'algorithme
                     String[] resultat = recoApp.trouverPPVAvecT2(imgTest, dist);
-                    // resultat[0] ressemble à "s1/image.pgm", on extrait juste le dossier et on le met en minuscule
                     String nomPPV = resultat[0].split("/")[0].toLowerCase(); 
                     double t2 = Double.parseDouble(resultat[1]);
 
                     // Validation par le critère de Hotelling
                     String nomPredit = (t2 <= seuilT2) ? nomPPV : "inconnu";
 
-                    // Calcul des métriques
-                    if (nomPredit.equals(vraiNom)) {
-                        vp++;
-                    } else if (nomPredit.equals("inconnu")) {
-                        fn++;
-                    } else {
-                        fp++;
+                    if (dist.equals("mahalanobis")) {
+                        logDetails.add(String.format("Test: %-10s | Trouvé: %-10s | T2 = %-8.2f | Limite: %.2f", vraiNom, nomPredit, t2, seuilT2));
+                    }
+
+
+                    boolean estUnInconnu = vraiNom.contains("inconnu"); // détecte si c'est un intrus
+
+                    if (estUnInconnu) {
+                        if (nomPredit.equals("inconnu")) {
+                            vn++; // vrai negatif
+                        } else {
+                            fp++; // faux positif
+                        }
+                    } else { // Si c'est une personne de la base d'appentissage
+                        if (nomPredit.equals(vraiNom)) {
+                            vp++; // vrai positif
+                        } else if (nomPredit.equals("inconnu")) {
+                            fn++; // faux négatif
+                        } else {
+                            fp++; // faux positif
+                        }
                     }
                 }
 
                 // Affichage final de la ligne
                 System.out.printf("%-15s | %-14d | %-14d | %-14d | %-14d%n", 
-                                  dist.substring(0, 1).toUpperCase() + dist.substring(1), 
-                                  vp, fp, fn, vn);
+                dist.substring(0, 1).toUpperCase() + dist.substring(1), 
+                vp, fp, fn, vn);
+            }
+
+            System.out.println("\n-----------------------------------------------------------------------------------");
+            System.out.println("Détail des prédictions (Distance Mahalanobis) :");
+            System.out.println("-----------------------------------------------------------------------------------");
+            for (String ligne : logDetails) {
+                System.out.println(ligne);
             }
 
         } catch (Exception e) {

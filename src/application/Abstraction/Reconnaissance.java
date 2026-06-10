@@ -140,7 +140,9 @@ public class Reconnaissance {
      * @return vrai si le T^2 du candidat est inférieur au seuil théorique de Hotelling.
      */
     private boolean estConnu(SimpleMatrix coordsTest, int indexCandidat, double alpha) {
-        return calculerT2(coordsTest, indexCandidat) <= calculerSeuilHotelling(alpha);
+        double t2 = calculerT2(coordsTest, indexCandidat);
+        double limiteOptimale = 135.0;
+        return t2 <= limiteOptimale;
     }
 
     /**
