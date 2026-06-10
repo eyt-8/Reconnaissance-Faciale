@@ -80,12 +80,20 @@ Les images doivent être placées dans `donnees/apprentissage/` dans un sous-dos
 ```
 donnees/apprentissage/
 ├── Prénom Nom/
-│   ├── 1.jpg
-│   ├── 2.jpg
+│   ├── Prénom Nom1.jpg
+│   ├── Prénom Nom2.jpg
 │   └── ...
 ```
 
-La base fournie contient 10 personnalités : Alysa Liu, Anok Yai, Bruno Mars, Cristiano Ronaldo, Emma Watson, Lady Gaga, Omar Sy, Philippe Etchebest, Tom Cruise, Zendaya.
+## Base de données de test
+
+La base fournie contient 10 personnalités : Alysa Liu, Anok Yai, Bruno Mars, Cristiano Ronaldo, Emma Watson, Lady Gaga, Omar Sy, Philippe Etchebest, Tom Cruise, Zendaya présents dans le sous-dossier suivant :
+```
+donnees/test/
+├── 1.jpg
+├── 2.jpg
+└── ...
+```
 
 ---
 
