@@ -36,16 +36,16 @@ Reconnaissance-Faciale/
 └── bin/
 ```
 
-- Abstraction : Fonctions mathématiques (ACP, SVD, Eigenfaces, Reconnaissance...) et récupération des images (BaseDeDonnees)
-- Controle : Gestionnaire central (lien UI / traitement)
-- Presentation : Interface JavaFX (écrans, panneaux, CSS)
+- `Abstraction` : Fonctions mathématiques (ACP, SVD, Eigenfaces, Reconnaissance...) et récupération des images (BaseDeDonnees)
+- `Controle` : Gestionnaire central (lien UI / traitement)
+- `Presentation` : Interface JavaFX (écrans, panneaux, CSS)
 
-- apprentissage : Images de référence organisées par dossier/personne
-- base : Deuxième base de référence possible
-- test : Images à tester
+- `apprentissage` : Images de référence organisées par dossier/personne
+- `base` : Deuxième base de référence possible
+- `test` : Images à tester
 
-- lib : Bibliothèques JAR
-- bin : Classes compilées
+- `lib` : Bibliothèques JAR
+- `bin` : Classes compilées
  
 ---
  
