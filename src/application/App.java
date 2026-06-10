@@ -32,7 +32,7 @@ public class App {
 
         BaseDeDonnees bdd = new BaseDeDonnees();
         Acp           acp = new Acp(bdd);
-        SVD           svd = new SVD(acp.getMatrice_centree());
+        SVD           svd = new SVD(acp.getMatriceCentree());
 
         List<ImageVect> refs      = bdd.getReferences();
         List<ImageVect> tests     = bdd.getTests();
@@ -45,7 +45,7 @@ public class App {
         System.out.println("-".repeat(50));
 
         for (double seuilVariance : seuilsVar) {
-            Eigenfaces faces = new Eigenfaces(svd, acp.getVisage_moyen());
+            Eigenfaces faces = new Eigenfaces(svd, acp.getVisageMoyen());
             faces.construire();
             faces.selectionnerK(seuilVariance);
             int k = faces.getK();
@@ -72,7 +72,7 @@ public class App {
 
         // Prédictions (alpha = 95%)
 
-        Eigenfaces faces95 = new Eigenfaces(svd, acp.getVisage_moyen());
+        Eigenfaces faces95 = new Eigenfaces(svd, acp.getVisageMoyen());
         faces95.construire();
         faces95.selectionnerK(0.95);
         Projection     proj95 = new Projection(faces95);

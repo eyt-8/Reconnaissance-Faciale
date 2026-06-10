@@ -9,24 +9,24 @@ import org.ejml.simple.SimpleMatrix;
  */
 public class Acp {
 
-	// ============================================================
-    // ATTRIBUTS
-    // ============================================================
-	private SimpleMatrix visage_moyen;
+	// Attributs
+	
+	/** 
+	 * Vecteur Image moyen 
+	 */
+	private SimpleMatrix visageMoyen;
 
 	/**
 	 * Matrice {@link BaseDeDonnees#matriceImages} centrée
 	 */
-	private SimpleMatrix matrice_centree;
+	private SimpleMatrix matriceCentree;
 	/**
 	 * Voir {@link BaseDeDonnees}
 	 */
 	private BaseDeDonnees donnees;
 
 	
-	// ============================================================
-    // CONSTRUCTEURS
-    // ============================================================
+	// Constructeurs
 	
 	/**
      * Constructeur standard à partir d'une base de données.
@@ -51,12 +51,10 @@ public class Acp {
 		this.centrer(test);
 	}
 	
-	
-	// ============================================================
-    // MÉTHODES DE CALCUL 
-    // ============================================================
 
-	/**
+    //  Calculs
+
+	/*
 	 * Permet de calculer le visage moyen à partir de la base de données Modifie
 	 * {@link Acp#visage_moyen}
 	 * @param visages Utilise {@link BaseDeDonnees#matriceImage} ou une matrice de
@@ -68,7 +66,7 @@ public class Acp {
 		// Le nombre de colonnes correspond au nombre de pixels
 		int taille_pixels = visages.getNumRows();
 
-		this.visage_moyen = new SimpleMatrix(taille_pixels, 1);
+		this.visageMoyen = new SimpleMatrix(taille_pixels, 1);
 
 		// On calcule la moyenne sur chaque ligne et on l'ajoute au vecteur du visage
 		// moyen
@@ -80,7 +78,7 @@ public class Acp {
 			for (int j = 0; j < taille; j++) {
 				somme = somme + visages.get(i, j);
 			}
-			this.visage_moyen.set(i, 0, somme / taille);
+			this.visageMoyen.set(i, 0, somme / taille);
 		}
 	}
 
@@ -96,7 +94,7 @@ public class Acp {
 		// Le nombre de colonnes correspond au nombre de colonnes
 		int taille_pixels = visages.getNumRows();
 
-		this.matrice_centree = new SimpleMatrix(taille_pixels, taille);
+		this.matriceCentree = new SimpleMatrix(taille_pixels, taille);
 
 		double elt = 0;
 		for (int i = 0; i < taille_pixels; i++) {
@@ -106,37 +104,37 @@ public class Acp {
 				elt = visages.get(i, j);
 
 				// On le soustrait à la moyenne de la ligne
-				elt = elt - this.visage_moyen.get(i, 0);
+				elt = elt - this.visageMoyen.get(i, 0);
 
 				// On l'ajoute à la matrice centrée
-				this.matrice_centree.set(i, j, elt);
+				this.matriceCentree.set(i, j, elt);
 			}
 		}
 	}
 
 
-	// ============================================================
-	// GETTERS ET SETTERS
-	// ============================================================
+	// Getters
 
-	public SimpleMatrix getVisage_moyen() {
-		return visage_moyen;
+	public SimpleMatrix getVisageMoyen() {
+		return visageMoyen;
 	}
-	
-	public void setVisage_moyen(SimpleMatrix visage_moyen) {
-		this.visage_moyen = visage_moyen;
+
+	public SimpleMatrix getMatriceCentree() {
+		return matriceCentree;
 	}
-	
-	public SimpleMatrix getMatrice_centree() {
-		return matrice_centree;
-	}
-	
-	public void setMatrice_centree(SimpleMatrix matrice_centree) {
-		this.matrice_centree = matrice_centree;
-	}
-	
+
 	public BaseDeDonnees getDonnees() {
 		return donnees;
+	}
+
+	// Setters
+	
+	public void setVisageMoyen(SimpleMatrix visageMoyen) {
+		this.visageMoyen = visageMoyen;
+	}
+	
+	public void setMatriceCentree(SimpleMatrix matriceCentree) {
+		this.matriceCentree = matriceCentree;
 	}
 	
 	public void setDonnees(BaseDeDonnees donnees) {

@@ -77,9 +77,9 @@ public class Gestionnaire {
             this.bdd = new BaseDeDonnees();
             System.out.println("[2/6] Calcul de l'ACP...");
             Acp acp = new Acp(this.bdd);
-            SVD svd = new SVD(acp.getMatrice_centree());
+            SVD svd = new SVD(acp.getMatriceCentree());
             System.out.println("[3/6] Construction des Eigenfaces...");
-            this.faces = new Eigenfaces(svd, acp.getVisage_moyen());
+            this.faces = new Eigenfaces(svd, acp.getVisageMoyen());
             faces.construire();
             SimpleMatrix varianceCumulee = faces.varianceExpliquee();
             this.ecran.getConteneurPrincipal().getPanneauVisu().tracerCourbe(varianceCumulee);
