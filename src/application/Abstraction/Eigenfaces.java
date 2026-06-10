@@ -11,11 +11,26 @@ import org.ejml.simple.SimpleMatrix;
  * obtenue à partir de l'ACP des visages de référence.
  */
 public class Eigenfaces {
+    /**
+     * Vecteur du visageMoyen
+     */
     private SimpleMatrix visageMoyen;
+    /**
+     * SVD permettant de récupérer les informations pour le calcul de la base des eigenfaces
+     */
     private SVD svd;
-    private SimpleMatrix base_reduite; // eigenfaces sélectionnées (colonnes) => Matrice A centrée
-    private SimpleMatrix valPropres; // valeurs propres associées
-    private int k; // nombre d'eigenfaces retenues
+    /**
+     * eigenfaces sélectionnées (colonnes) => Matrice A centrée
+     */
+    private SimpleMatrix baseReduite;
+    /**
+     * valeurs propres associées
+     */
+    private SimpleMatrix valPropres;
+    /**
+     * nombre d'eigenfaces retenues
+     */
+    private int k;
 
     /**
      * Constructeur de eigenfaces
@@ -69,7 +84,7 @@ public class Eigenfaces {
         }
 
         this.valPropres = vpTrie;
-        this.base_reduite = vecTrie;     // par défaut, on garde toutes les composantes
+        this.baseReduite = vecTrie;     // par défaut, on garde toutes les composantes
         this.k = vecTrie.getNumCols();
     }
 
@@ -94,7 +109,7 @@ public class Eigenfaces {
 
         this.k = kChoisi;
         // On tronque la base aux K premières colonnes : base[:, 0..k-1]
-        this.base_reduite = this.base_reduite.extractMatrix(0, this.base_reduite.getNumRows(), 0, this.k);
+        this.baseReduite = this.baseReduite.extractMatrix(0, this.baseReduite.getNumRows(), 0, this.k);
     }
 
     /**
@@ -129,7 +144,7 @@ public class Eigenfaces {
     }
 
     public SimpleMatrix getBase() {
-        return base_reduite;
+        return baseReduite;
     }
 
     public SimpleMatrix getValPropres() {
@@ -149,7 +164,7 @@ public class Eigenfaces {
     }
 
     public SimpleMatrix getEigenface(int i) {
-        return this.base_reduite.extractVector(false, i);
+        return this.baseReduite.extractVector(false, i);
     }
 
     // Setters
