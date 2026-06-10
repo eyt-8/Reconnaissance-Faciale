@@ -76,10 +76,11 @@ java --module-path lib --add-modules javafx.controls,javafx.fxml,javafx.swing -c
 ## Utilisation
  
 1. Lancer l'application.
-2. Le bouton **"Choisir une image"** permet de choisir l'image de test manuellement.
-3. Sélectionner la méthode de distance souhaitée (Mahalanobis, euclidienne, cosinus).
-4. Cliquer sur **"Lancer la reconnaissance"**.
-5. L'image la plus proche et son identité est affichée ainsi que les 5 meilleures correspondances.
+2. Il est possible de directement choisir sa base d'apprentissage ("apprentissage" / "base")
+4. Le bouton **"Choisir une image"** permet de choisir l'image de test manuellement.
+5. Sélectionner la méthode de distance souhaitée (Mahalanobis, euclidienne, cosinus).
+6. Cliquer sur **"Lancer la reconnaissance"**.
+7. L'image la plus proche et son identité est affichée ainsi que les 5 meilleures correspondances.
  
 L'onglet **Visualisation** permet d'afficher le visage moyen, les eigenfaces et la courbe de variance expliquée.
  
