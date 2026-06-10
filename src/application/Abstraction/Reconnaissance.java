@@ -265,8 +265,6 @@ public class Reconnaissance {
             double d = distance(coordsTest, signaturesRef.get(i), methode);
             if (d < distMin) {
                  distMin = d;
-            }
-            else{
                 indexPPV = i; 
             }
         }
