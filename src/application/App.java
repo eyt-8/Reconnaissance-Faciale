@@ -12,7 +12,7 @@ import application.Abstraction.SVD;
 import java.util.List;
 
 /**
- * APPLICATION PRINCIPALE : Benchmark du système de reconnaissance faciale par ACP.
+ * Benchmark du système de reconnaissance faciale par ACP.
  *
  * Pour chaque seuil de variance (70 %, 80 %, 90 %, 95 %, 99 %), affiche :
  *   - K : nombre d'eigenfaces retenues
@@ -38,9 +38,7 @@ public class App {
         List<ImageVect> tests     = bdd.getTests();
         double[]        seuilsVar = {0.70, 0.80, 0.90, 0.95, 0.99};
 
-        // ============================================================
-        // BENCHMARK : ERREURS DE RECONSTRUCTION PAR SEUIL DE VARIANCE
-        // ============================================================
+        // Erreurs de reconstitution par variance (donc Benchmark)
 
         System.out.printf("%-6s %-8s %-10s %-10s %-10s%n",
             "K", "Var%", "EQM", "REQM", "Biais");
@@ -72,9 +70,7 @@ public class App {
                 eqmMoy, Math.sqrt(eqmMoy), biasMoy);
         }
 
-        // ============================================================
-        // PRÉDICTIONS SUR LES IMAGES DE TEST (K = 95 %, AVEC HOTELLING)
-        // ============================================================
+        // Prédictions (alpha = 95%)
 
         Eigenfaces faces95 = new Eigenfaces(svd, acp.getVisage_moyen());
         faces95.construire();
@@ -97,9 +93,7 @@ public class App {
             }
         }
 
-        // ============================================================
-        // STATISTIQUES HOTELLING SUR LES IMAGES DE TEST
-        // ============================================================
+        // Statistique de Hotelling pour les images dans Test
 
         double[] alphas  = {0.05, 0.10, 0.20, 0.50, 0.70, 0.90};
         int      K       = faces95.getK();
