@@ -64,4 +64,11 @@ public class Comparaison {
 		}
 		return somme / n;
 	}
+
+	public double[][] matConfusion(distance) {
+		BaseDeDonnees bdd = new BaseDeDonnees();
+		List<ImageVect> tests = bdd.getTests();
+		
+        reco95.identifier(imgTest, "euclidienne");
+	}
 }

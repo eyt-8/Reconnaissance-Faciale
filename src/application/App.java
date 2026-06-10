@@ -31,12 +31,12 @@ public class App {
         System.out.println("Benchmark Reconnaissance Faciale par ACP\n");
 
         BaseDeDonnees bdd = new BaseDeDonnees();
-        Acp           acp = new Acp(bdd);
-        SVD           svd = new SVD(acp.getMatriceCentree());
+        Acp acp = new Acp(bdd);
+        SVD svd = new SVD(acp.getMatriceCentree());
 
-        List<ImageVect> refs      = bdd.getReferences();
-        List<ImageVect> tests     = bdd.getTests();
-        double[]        seuilsVar = {0.70, 0.80, 0.90, 0.95, 0.99};
+        List<ImageVect> refs = bdd.getReferences(); 
+        List<ImageVect> tests = bdd.getTests();
+        double[] seuilsVar = {0.70, 0.80, 0.90, 0.95, 0.99}; // Différents seuils de Hotelling étudiés
 
         // Erreurs de reconstitution par variance (donc Benchmark)
 
@@ -52,17 +52,17 @@ public class App {
 
             Projection proj = new Projection(faces);
 
-            double eqmTotal   = 0;
+            double eqmTotal = 0;
             double biaisTotal = 0;
             for (ImageVect img : refs) {
-                SimpleMatrix coords      = proj.projeter(img);
-                ImageVect    reconstruit = proj.reconstruire(coords);
-                Comparaison  comp = new Comparaison(
+                SimpleMatrix coords = proj.projeter(img);
+                ImageVect reconstruit = proj.reconstruire(coords);
+                Comparaison comp = new Comparaison(
                     img.getVecteurCol(), reconstruit.getVecteurCol());
-                eqmTotal   += comp.calcul_eqm();
+                eqmTotal += comp.calcul_eqm();
                 biaisTotal += comp.biais();
             }
-            double eqmMoy  = eqmTotal   / refs.size();
+            double eqmMoy = eqmTotal   / refs.size();
             double biasMoy = biaisTotal / refs.size();
 
             System.out.printf("%-6d %-8.0f %-10.2f %-10.2f %-10.2f%n",
@@ -75,7 +75,7 @@ public class App {
         Eigenfaces faces95 = new Eigenfaces(svd, acp.getVisageMoyen());
         faces95.construire();
         faces95.selectionnerK(0.95);
-        Projection     proj95 = new Projection(faces95);
+        Projection proj95 = new Projection(faces95);
         Reconnaissance reco95 = new Reconnaissance(bdd, proj95);
 
         if (!tests.isEmpty()) {
