@@ -138,9 +138,7 @@ public class ImageVect {
         int h = (largeur > 0 && longueur > 0) ? longueur : w;
         this.largeur = w;
         this.longueur = h;
-
         // On travaille sur une copie pour que vecteurCol reste un vecteur n×1
-        // (contrat attendu par getVecteurCol() partout ailleurs : Comparaison, Projection...).
         SimpleMatrix grille = this.vecteurCol.copy();
         grille.reshape(w, h);
 
