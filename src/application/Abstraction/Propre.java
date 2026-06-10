@@ -9,6 +9,9 @@ import org.ejml.simple.SimpleEVD;
  */
 
 public class Propre {
+
+    // Attributs
+
     /**
      * matrice des vecteurs propres, rangés en colonnes
      */
@@ -22,6 +25,8 @@ public class Propre {
      */
     private SimpleMatrix matrice;
 
+    // Constructeurs
+
     /**
      * Constructeur partiel
      */
@@ -34,6 +39,8 @@ public class Propre {
      */
     public Propre() {
     }
+
+    // Fonctions
 
     /**
      * Méthode permettant de faire la décomposition de matrice à l'aide de la méthode eig de EJML
