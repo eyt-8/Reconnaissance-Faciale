@@ -11,9 +11,14 @@ import org.ejml.simple.SimpleMatrix;
  * @version 1.0
  */
 public class Projection {
+    
+    // Attributs
+
     /** Les eigenfaces (base et valeurs propres) utilisées pour la projection */
     private Eigenfaces eigenfaces;
     private SimpleMatrix coords;
+
+    // Constructeur
 
     /**
      * Constructeur principal de la projection
@@ -22,6 +27,8 @@ public class Projection {
     public Projection(Eigenfaces eigenfaces) {
         this.eigenfaces = eigenfaces;
     }
+
+    // Fonctions
     
     /**
      * Projette une image sur la base d'eigenfaces.
