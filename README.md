@@ -36,7 +36,7 @@ Reconnaissance-Faciale/
 |---|---|
 | EJML 0.45 | Calcul matriciel (SVD, projections) |
 | Apache Commons Math 3.6.1 | Loi de Fisher (seuil de Hotelling) |
-| JavaFX | Interface graphique |
+| JavaFX | Interface graphique, affichage des courbes |
 
 ---
 
