@@ -101,7 +101,6 @@ public class Reconnaissance {
 
     /**
      * Méthode interne d'identification sur des coordonnées déjà projetées.
-     *
      * calcule les distances à toutes les références, trouve le plus proche voisin,
      * remplit derniersResultats (triés par distance croissante) puis valide le ppv avec le critère de Hotelling T^2.
      *
@@ -279,7 +278,6 @@ public class Reconnaissance {
      * Prédictions plus petite distance avec critère de Hotelling, pour un alpha donné.
      * Permet de tester différentes valeurs d'alpha dans App.java.
      * Retourne une liste de paires [nom réel, nom prédit].
-     *
      * @param methode méthode de distance pour trouver le plus proche voisin
      * @param alpha   risque pour le critère de Hotelling
      * @return liste des images les plus proches
