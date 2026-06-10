@@ -16,14 +16,13 @@ public class SVD {
     private SimpleMatrix matriceCentree;
     
     /**On crée une instance de la classe Propre
-    *SVD délègue le calcul des valeurs/vecteurs propres 
+    * SVD délègue le calcul des valeurs/vecteurs propres 
     * à cette classe spécialisée. Cela permet de séparer la logique mathématique (EIG) 
     * du traitement des données SVD.
     * */
     private Propre calculPropre;
     
     public SVD(SimpleMatrix matrice) {
-    	//On initialise l'objet Propre
     	this.matriceCentree = matrice;
     	this.calculerMatriceVarCov(matrice);
     	this.calculerBV();
@@ -51,15 +50,13 @@ public class SVD {
         
         calculPropre = new Propre(this.matriceVarCov);
         
-        //La décomposition
         calculPropre.decomposer();
         
-        //Récupération des résultats pour remplir les attributs de SVD
         
-        // 1. Gestion des valeurs propres (extraction de la diagonale en vecteur colonne)
+        // Gestion des valeurs propres (extraction de la diagonale en vecteur colonne)
         this.bValSinguliere = calculPropre.getVectD();
         
-        // 2. Gestion des vecteurs propres (Vecteurs de AtA -> Vraies Eigenfaces U)
+        // Gestion des vecteurs propres (Vecteurs de AtA -> Vraies Eigenfaces U)
         SimpleMatrix V = calculPropre.getMatP();
         SimpleMatrix U = this.matriceCentree.mult(V); // U = A * V
         
@@ -76,7 +73,7 @@ public class SVD {
         this.vectPropATA = V;
         this.U = U;
 
-        System.out.println("      Décomposition Réussie");
+        System.out.println("Décomposition Réussie");
     }
     
     //Les Getters 
@@ -95,7 +92,10 @@ public class SVD {
     public SimpleMatrix getMatriceVarCov() {
     	return this.matriceVarCov;
     }
-
+    /**
+     * redéfinition du toString pour la SVD
+     * @return
+     */
     @Override
     public String toString() {
         return "SVD [matriceVarCov=" + matriceVarCov 
