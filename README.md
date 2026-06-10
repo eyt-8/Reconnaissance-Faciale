@@ -132,7 +132,7 @@ donnees/test/
  
 ## Architecture
  
-Le projet suit un modèle MVC simplifié :
+Les répertoires sont organisés de la manière suivante :
  
 - **Abstraction** : contient toute la logique mathématique ainsi que le recueil des données (`Acp`, `SVD`, `Eigenfaces`, `Projection`, `Reconnaissance`, `BaseDeDonnees`, `ImageVect`, `Comparaison`, `Propre`)
 - **Controle** : `Gestionnaire` organise le chargement, la reconnaissance et la mise à jour de l'interface, donc récupère les fonctions dans Abstraction pour les mettre dans Presentation
