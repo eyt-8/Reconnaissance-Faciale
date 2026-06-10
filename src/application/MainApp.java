@@ -3,7 +3,9 @@ package application;
 import application.Controle.Gestionnaire;
 import javafx.application.Application;
 import javafx.scene.Scene;
+import javafx.scene.control.ChoiceDialog;
 import javafx.stage.Stage;
+import java.util.Optional;
 
 /**
  * Point d'entrée JavaFX de l'application de reconnaissance faciale.
@@ -19,7 +21,14 @@ public class MainApp extends Application {
      */
     @Override
     public void start(Stage primaryStage) {
-        Gestionnaire gestionnaire = new Gestionnaire(primaryStage);
+        ChoiceDialog<String> dialog = new ChoiceDialog<>("apprentissage", "apprentissage", "base");
+        dialog.setTitle("Base de données");
+        dialog.setHeaderText("Choisissez la base de données d'apprentissage");
+        dialog.setContentText("Base :");
+        Optional<String> choix = dialog.showAndWait();
+        String cheminBdd = "donnees/" + choix.orElse("apprentissage") + "/";
+
+        Gestionnaire gestionnaire = new Gestionnaire(primaryStage, cheminBdd);
         Scene scene = new Scene(gestionnaire.getEcran(), 1200, 800);
 
         // Chargement du CSS

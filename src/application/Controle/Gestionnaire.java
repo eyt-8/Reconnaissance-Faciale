@@ -49,24 +49,34 @@ public class Gestionnaire {
     private Image cacheImageMoyenne;
     private List<Image> cacheEigenfaces;
     private List<Double> cacheValeursPropres;
+    private String cheminBdd;
 
 
     // Constructeur
 
     /**
-     * Initialise le gestionnaire avec la fenêtre principale.
+     * Initialise le gestionnaire avec la fenêtre principale et le chemin de la base de données.
      * @param stage fenêtre JavaFX principale
+     * @param cheminBdd chemin du dossier d'apprentissage (ex : "donnees/apprentissage/")
      */
-    public Gestionnaire(Stage stage) {
+    public Gestionnaire(Stage stage, String cheminBdd) {
         this.fenetrePrincipale = stage;
         this.ecran = new Ecran();
         this.distChoisie = "euclidienne";
+        this.cheminBdd = cheminBdd;
 
-        // Initialisation de l'état du menu
         this.ecran.getMenuLateral().getLancerReconnaissance().setDisable(true);
-        
+
         this.initialiserReco();
         this.enregistrerEcouteurs();
+    }
+
+    /**
+     * Constructeur par défaut (base "apprentissage")
+     * @param stage fenêtre JavaFX principale
+     */
+    public Gestionnaire(Stage stage) {
+        this(stage, "donnees/apprentissage/");
     }
 
     // Fonctions
@@ -80,7 +90,7 @@ public class Gestionnaire {
         System.out.println("Démarrage de l'initialisation...");
         try {
             System.out.println("[1/6] Chargement de la base de données...");
-            this.bdd = new BaseDeDonnees();
+            this.bdd = new BaseDeDonnees(this.cheminBdd);
             System.out.println("[2/6] Calcul de l'ACP...");
             Acp acp = new Acp(this.bdd);
             SVD svd = new SVD(acp.getMatriceCentree());
@@ -162,7 +172,7 @@ public class Gestionnaire {
 
             Image imgTrouvee = null;
             if (!nomTrouve.equals("Inconnu")) {
-                File fichierPersonne = new File("donnees/apprentissage/" + nomTrouve);
+                File fichierPersonne = new File(this.bdd.getCheminRacine() + nomTrouve);
                 if (fichierPersonne.exists()) {
                     imgTrouvee = new Image(fichierPersonne.toURI().toString());
                 }
@@ -191,7 +201,7 @@ public class Gestionnaire {
      */
     private void chargerImageMoyenne() {
         SimpleMatrix imgMoyenne = faces.getVisageMoyen();
-        ImageVect img = new ImageVect(imgMoyenne);
+        ImageVect img = new ImageVect(imgMoyenne, bdd.getLargeurImage(), bdd.getLongueurImage());
         this.cacheImageMoyenne = SwingFXUtils.toFXImage(img.getBufferedImage(), null);
     }
 
@@ -203,7 +213,7 @@ public class Gestionnaire {
         this.cacheValeursPropres = new ArrayList<>();
         for (int i = 0; i < 5 && i < faces.getK(); i++) {
             SimpleMatrix vec = faces.getEigenface(i);
-            ImageVect img = new ImageVect(vec);
+            ImageVect img = new ImageVect(vec, bdd.getLargeurImage(), bdd.getLongueurImage());
             Image imgFX = SwingFXUtils.toFXImage(img.getBufferedImage(), null);
             this.cacheEigenfaces.add(imgFX);
             this.cacheValeursPropres.add(faces.getValPropres().get(i, 0));

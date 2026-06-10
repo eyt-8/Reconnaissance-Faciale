@@ -41,6 +41,18 @@ public class ImageVect {
     }
 
     /**
+     * Constructeur depuis un BufferedImage déjà chargé (ex : après redimensionnement)
+     */
+    public ImageVect(BufferedImage img, String nom) {
+        this.image = img;
+        this.nom = nom;
+        this.largeur = img.getWidth();
+        this.longueur = img.getHeight();
+        this.vecteurCol = new SimpleMatrix(this.largeur * this.longueur, 1);
+        this.fichier = null;
+    }
+
+    /**
      * Deuxième constructeur d'ImageVect
      * @param vecteur vecteut colonne
      * @param largeur largeur de l'image
@@ -120,30 +132,33 @@ public class ImageVect {
      */
     public void devectoriser(SimpleMatrix vecteur, int largeur, int longueur){
         this.vecteurCol = vecteur.copy();
-        int taille = (int)Math.floor(Math.sqrt(this.vecteurCol.getNumRows()));
 
-        // Grille carrée utilisée uniquement pour la construction de l'image affichable :
-        // on travaille sur une copie, afin que vecteurCol reste un vecteur colonne n x 1
+        // Utilise les dimensions réelles si disponibles, sinon repli sur image carrée
+        int w = (largeur > 0 && longueur > 0) ? largeur : (int)Math.floor(Math.sqrt(this.vecteurCol.getNumRows()));
+        int h = (largeur > 0 && longueur > 0) ? longueur : w;
+        this.largeur = w;
+        this.longueur = h;
+
+        // On travaille sur une copie pour que vecteurCol reste un vecteur n×1
         // (contrat attendu par getVecteurCol() partout ailleurs : Comparaison, Projection...).
         SimpleMatrix grille = this.vecteurCol.copy();
-        grille.reshape(taille, taille);
+        grille.reshape(w, h);
 
-        // elementMinAbs()/elementMaxAbs() parcourent toute la matrice : on les calcule
-        // une seule fois ici, plutôt qu'à chaque pixel (la matrice ne change pas pendant la boucle).
         double minAbs = grille.elementMinAbs();
         double maxAbs = grille.elementMaxAbs();
         double denominateur = minAbs + maxAbs;
+        if (denominateur == 0) denominateur = 1;
 
-	    BufferedImage image_dest = new BufferedImage(taille,taille,BufferedImage.TYPE_INT_RGB);
-	    for(int i=0; i<taille; i++) {
-	        for(int j=0; j<taille; j++) {
-	        	double decentrer = (grille.get(j, i) + minAbs) / denominateur;
-	            int a = (int)Math.floor(Math.abs(decentrer*255));
-	            Color newColor = new Color(a,a,a);
-	            image_dest.setRGB(j,i,newColor.getRGB());
-	        }
-	    }
-        this.image=image_dest;
+        BufferedImage image_dest = new BufferedImage(w, h, BufferedImage.TYPE_INT_RGB);
+        for (int x = 0; x < w; x++) {
+            for (int y = 0; y < h; y++) {
+                double decentrer = (grille.get(x, y) + minAbs) / denominateur;
+                int a = Math.max(0, Math.min(255, (int)Math.floor(Math.abs(decentrer * 255))));
+                Color newColor = new Color(a, a, a);
+                image_dest.setRGB(x, y, newColor.getRGB());
+            }
+        }
+        this.image = image_dest;
     }
 
 }

@@ -30,7 +30,7 @@ public class App {
 
         System.out.println("Benchmark Reconnaissance Faciale par ACP\n");
 
-        BaseDeDonnees bdd = new BaseDeDonnees();
+        BaseDeDonnees bdd = new BaseDeDonnees("donnees/base/");
         Acp acp = new Acp(bdd);
         SVD svd = new SVD(acp.getMatriceCentree());
 

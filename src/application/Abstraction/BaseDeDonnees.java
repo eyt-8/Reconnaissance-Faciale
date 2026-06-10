@@ -1,6 +1,9 @@
 package application.Abstraction;
 /**	Importation des classes nécessaires */
 import org.ejml.simple.SimpleMatrix;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -25,13 +28,21 @@ public class BaseDeDonnees {
 	private List<ImageVect> references;
 
 	/**
-	 * Constructeur initialisant la base de données avec les images du répertoire d'apprentissage
+	 * Constructeur avec chemin personnalisé vers le dossier d'apprentissage
+	 * @param cheminRacine chemin du dossier (ex : "donnees/base/")
 	 */
-	public BaseDeDonnees(){
-		this.cheminRacine = "donnees/apprentissage/";
+	public BaseDeDonnees(String cheminRacine){
+		this.cheminRacine = cheminRacine;
         this.references = new ArrayList<>();
         this.listeNoms = new ArrayList<>();
         this.chargerChemin();
+	}
+
+	/**
+	 * Constructeur par défaut utilisant le dossier "donnees/apprentissage/"
+	 */
+	public BaseDeDonnees(){
+		this("donnees/apprentissage/");
 	}
 
 	/**
@@ -40,6 +51,15 @@ public class BaseDeDonnees {
 	public int getNbImages() {
         return this.listeNoms.size();
     }
+
+	/** @return le chemin racine de la base de données */
+	public String getCheminRacine() { return this.cheminRacine; }
+
+	/** @return largeur (en pixels) des images de la base, lue depuis la première référence */
+	public int getLargeurImage() { return this.references.get(0).getLargeur(); }
+
+	/** @return hauteur (en pixels) des images de la base, lue depuis la première référence */
+	public int getLongueurImage() { return this.references.get(0).getLongueur(); }
 
 /**
 	 * @return la matrice d'images vectorisées (colonnes = vecteurs d'images)
@@ -73,9 +93,16 @@ public class BaseDeDonnees {
 				File[] fichiersImages = dossierPersonne.listFiles();
 				if (fichiersImages != null) {
 					for (File fichierImage : fichiersImages) {
-						if (fichierImage.isFile() && fichierImage.getName().endsWith(".jpg")) {
+						if (fichierImage.isFile() && (fichierImage.getName().endsWith(".jpg") || fichierImage.getName().endsWith(".png") || fichierImage.getName().endsWith(".pgm"))) {
 							try {
 								ImageVect img = new ImageVect(fichierImage.getAbsolutePath());
+								if (!this.references.isEmpty()) {
+									int refW = this.references.get(0).getLargeur();
+									int refH = this.references.get(0).getLongueur();
+									if (img.getLargeur() != refW || img.getLongueur() != refH) {
+										img = new ImageVect(this.redimensionner(img.getBufferedImage(), refW, refH), img.getNom());
+									}
+								}
 								img.vectoriser();
 								this.references.add(img);
 								this.listeNoms.add(nomPersonne + "/" + fichierImage.getName());
@@ -117,17 +144,36 @@ public class BaseDeDonnees {
 		}
 		File[] fichiers = dossierTest.listFiles();
 		if (fichiers != null) {
+			int refW = this.references.get(0).getLargeur();
+			int refH = this.references.get(0).getLongueur();
 			for (File f : fichiers) {
-				if (f.isFile() && f.getName().endsWith(".jpg")) {
+				if (f.isFile() && (f.getName().endsWith(".jpg") || f.getName().endsWith(".png") || f.getName().endsWith(".pgm"))) {
 					try {
-						listeTests.add(new ImageVect(f.getAbsolutePath()));
+						ImageVect img = new ImageVect(f.getAbsolutePath());
+						if (img.getLargeur() != refW || img.getLongueur() != refH) {
+							img = new ImageVect(this.redimensionner(img.getBufferedImage(), refW, refH), img.getNom());
+						}
+						img.vectoriser();
+						listeTests.add(img);
 					} catch (IOException e) {
-						System.err.println("Erreur lors du chargement de l'image de test" + f.getAbsolutePath() + " : " + e.getMessage());
+						System.err.println("Erreur lors du chargement de l'image de test " + f.getAbsolutePath() + " : " + e.getMessage());
 					}
 				}
 			}
 		}		
 		return listeTests;
+	}
+
+	/**
+	 * Redimensionne un BufferedImage aux dimensions cibles avec interpolation bilinéaire
+	 */
+	private BufferedImage redimensionner(BufferedImage src, int largeur, int longueur) {
+		BufferedImage dest = new BufferedImage(largeur, longueur, BufferedImage.TYPE_INT_RGB);
+		Graphics2D g = dest.createGraphics();
+		g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+		g.drawImage(src, 0, 0, largeur, longueur, null);
+		g.dispose();
+		return dest;
 	}
 
 	/**

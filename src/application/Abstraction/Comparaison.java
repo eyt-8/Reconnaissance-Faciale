@@ -20,7 +20,7 @@ public class Comparaison {
 	private SimpleMatrix projete;
 
 	/**
-	 * Constructeur (vecteurs colonnes n²×1)
+	 * Constructeur (vecteurs colonnes n² * 1)
 	 */
 	public Comparaison(SimpleMatrix image, SimpleMatrix projete) {
 		this.image = image;
@@ -30,7 +30,7 @@ public class Comparaison {
 	/**
 	 * Erreur Quadratique Moyenne (EQM) : moyenne des écarts au carré pixel par pixel.
 	 *
-	 * @return EQM ≥ 0
+	 * @return EQM >= 0
 	 */
 	public double calcul_eqm() {
 		int n = image.getNumRows();
@@ -45,7 +45,7 @@ public class Comparaison {
 	/**
 	 * Racine de l'erreur moyenne quadratique (REQM)
 	 *
-	 * @return REQM ≥ 0
+	 * @return REQM >= 0
 	 */
 	public double calcul_reqm() {
 		return Math.sqrt(this.calcul_eqm());
@@ -54,7 +54,7 @@ public class Comparaison {
 	/**
 	 * Biais (moyenne des écarts absolus pixel par pixel)
 	 *
-	 * @return biais ≥ 0
+	 * @return biais >= 0
 	 */
 	public double biais() {
 		int n = image.getNumRows();
