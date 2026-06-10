@@ -128,12 +128,14 @@ public class Gestionnaire {
         });
 
         // Boutons de navigation
+        // Reconnaissance
         menu.getBtnNavReco().setOnAction(e -> {
             ecran.getConteneurPrincipal().afficherReconnaissance();
             menu.getBtnNavReco().setDisable(true);
             menu.getBtnNavVisu().setDisable(false);
         });
 
+        // Visualisation
         menu.getBtnNavVisu().setOnAction(e -> {
             this.ecran.getConteneurPrincipal().getPanneauVisu().getImageMoyenne().setImage(this.cacheImageMoyenne);
             ecran.getConteneurPrincipal().getPanneauVisu().afficherEigenfaces(this.cacheEigenfaces, this.cacheValeursPropres);
@@ -178,12 +180,18 @@ public class Gestionnaire {
         }
     }
 
+    /**
+     * Passe la matrice moyenne en image
+     */
     private void chargerImageMoyenne() {
         SimpleMatrix imgMoyenne = faces.getVisageMoyen();
         ImageVect img = new ImageVect(imgMoyenne);
         this.cacheImageMoyenne = SwingFXUtils.toFXImage(img.getBufferedImage(), null);
     }
 
+    /**
+     * Passe les éléments de la matrice U (des eigenfaces) en image
+     */
     private void chargerEigenfaces() {
         this.cacheEigenfaces = new ArrayList<>();
         this.cacheValeursPropres = new ArrayList<>();
@@ -197,6 +205,8 @@ public class Gestionnaire {
         }
         System.out.println("[6/6] Chargement des eigenfaces terminés");
     }
+
+    // Getter
 
     /**
      * @return l'écran principal géré par ce gestionnaire
