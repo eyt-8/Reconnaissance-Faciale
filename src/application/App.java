@@ -10,6 +10,8 @@ import application.Abstraction.Projection;
 import application.Abstraction.Reconnaissance;
 import application.Abstraction.SVD;
 import java.util.List;
+import java.io.File;
+import java.util.ArrayList;
 
 /**
  * Benchmark du système de reconnaissance faciale par ACP.
@@ -132,5 +134,117 @@ public class App {
                 System.out.println();
             }
         }
+
+
+
+
+
+
+
+
+        System.out.println("============================================================");
+        System.out.println("   MÉTRIQUES DE CLASSIFICATION (Apprentissage vs Test)");
+        System.out.println("   Apprentissage : donnees/base/ | Test : donnees/testBase/");
+        System.out.println("============================================================");
+
+        try {
+            // 1. Entraînement sur la base
+            BaseDeDonnees bddApp = new BaseDeDonnees("donnees/base/");
+            
+            if (bddApp.getNbImages() == 0) {
+                System.out.println("Erreur : Aucune image dans donnees/base/ !");
+                return;
+            }
+
+            Acp acpApp = new Acp(bddApp);
+            SVD svdApp = new SVD(acpApp.getMatriceCentree());
+
+            Eigenfaces facesApp = new Eigenfaces(svdApp, acpApp.getVisageMoyen());
+            facesApp.construire();
+            facesApp.selectionnerK(0.95); // 95% de variance retenue
+
+            Projection projApp = new Projection(facesApp);
+            Reconnaissance recoApp = new Reconnaissance(bddApp, projApp);
+
+            System.out.println("-> Entraînement terminé (K = " + facesApp.getK() + " eigenfaces retenues).");
+
+            // 2. Chargement "manuel" des images de test (car pas de sous-dossiers)
+            File dossierTest = new File("donnees/testBase/");
+            File[] fichiersTest = dossierTest.listFiles();
+            List<ImageVect> imagesTest = new ArrayList<>();
+            List<String> vraisNoms = new ArrayList<>();
+
+            if (fichiersTest != null) {
+                for (File f : fichiersTest) {
+                    if (f.isFile() && f.getName().toLowerCase().endsWith(".jpg")) {
+                        ImageVect img = new ImageVect(f.getAbsolutePath());
+                        img.vectoriser();
+                        imagesTest.add(img);
+
+                        // Astuce : Extraire "s1" à partir de "visagedeS1.jpg"
+                        String nomFichier = f.getName().toLowerCase(); // "visagedes1.jpg"
+                        String vraiNom = nomFichier.replace("visagede", "").replace(".jpg", ""); // "s1"
+                        vraisNoms.add(vraiNom);
+                    }
+                }
+            }
+            
+            if (imagesTest.isEmpty()) {
+                System.out.println("\nErreur : Aucune image .jpg trouvée dans donnees/testBase/ !");
+                return;
+            }
+
+            System.out.println("-> " + imagesTest.size() + " images de test chargées avec succès.\n");
+
+            // 3. Paramètres de test
+            double alphaHotelling = 0.05; // 5% de risque d'erreur (ajustable)
+            String[] dists = {"euclidienne", "cosinus", "mahalanobis"};
+
+            System.out.println("Seuil Hotelling (alpha) : " + alphaHotelling + "\n");
+            System.out.printf("%-15s | %-14s | %-14s | %-14s | %-14s%n", 
+                              "Distance", "Vrais Positifs", "Faux Positifs", "Faux Négatifs", "Vrais Négatifs");
+            System.out.println("-".repeat(83));
+
+            double seuilT2 = recoApp.calculerSeuilHotelling(alphaHotelling);
+
+            for (String dist : dists) {
+                int vp = 0, fp = 0, fn = 0, vn = 0;
+
+                for (int i = 0; i < imagesTest.size(); i++) {
+                    ImageVect imgTest = imagesTest.get(i);
+                    String vraiNom = vraisNoms.get(i); // "s1", "s2", etc.
+
+                    // Prédiction par l'algorithme
+                    String[] resultat = recoApp.trouverPPVAvecT2(imgTest, dist);
+                    // resultat[0] ressemble à "s1/image.pgm", on extrait juste le dossier et on le met en minuscule
+                    String nomPPV = resultat[0].split("/")[0].toLowerCase(); 
+                    double t2 = Double.parseDouble(resultat[1]);
+
+                    // Validation par le critère de Hotelling
+                    String nomPredit = (t2 <= seuilT2) ? nomPPV : "inconnu";
+
+                    // Calcul des métriques
+                    if (nomPredit.equals(vraiNom)) {
+                        vp++;
+                    } else if (nomPredit.equals("inconnu")) {
+                        fn++;
+                    } else {
+                        fp++;
+                    }
+                }
+
+                // Affichage final de la ligne
+                System.out.printf("%-15s | %-14d | %-14d | %-14d | %-14d%n", 
+                                  dist.substring(0, 1).toUpperCase() + dist.substring(1), 
+                                  vp, fp, fn, vn);
+            }
+
+        } catch (Exception e) {
+            System.err.println("Erreur lors de l'exécution : " + e.getMessage());
+            e.printStackTrace();
+        }
+
+
+
     }
 }
